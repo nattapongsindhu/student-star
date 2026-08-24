@@ -28,23 +28,24 @@ export default async function Home() {
   const caseStudyCourses = courses.filter((course) => course.course_status === "case_study");
   const fallCourseIds = new Set(fallCourses.map((course) => course.id));
   const currentAssignments = assignments.filter((assignment) => fallCourseIds.has(assignment.course_id));
-  const activeAssignments = currentAssignments
+  const liveAssignments = currentAssignments.filter((assignment) => assignment.source === "canvas");
+  const activeAssignments = liveAssignments
     .slice()
     .sort((a, b) => b.priority_score - a.priority_score)
     .slice(0, 6);
-  const dueSoon = currentAssignments.filter((assignment) => {
+  const dueSoon = liveAssignments.filter((assignment) => {
     const days = daysUntil(assignment.due_at);
     return days !== null && days <= 7 && !isCanvasComplete(assignment.status);
   });
-  const labCount = currentAssignments.filter((assignment) => assignment.task_type === "lab").length;
-  const mismatchCount = currentAssignments.filter(
+  const labCount = liveAssignments.filter((assignment) => assignment.task_type === "lab").length;
+  const mismatchCount = liveAssignments.filter(
     (assignment) => assignment.status === "USER_MARKED_SUBMITTED" && !assignment.canvas_submission_confirmed,
   ).length;
-  const missingCount = currentAssignments.filter((assignment) => {
+  const missingCount = liveAssignments.filter((assignment) => {
     const days = daysUntil(assignment.due_at);
     return days !== null && days < 0 && !assignment.canvas_submission_confirmed;
   }).length;
-  const atRiskCount = currentAssignments.filter(
+  const atRiskCount = liveAssignments.filter(
     (assignment) => assignment.risk_level === "HIGH" || assignment.risk_level === "CRITICAL",
   ).length;
 
@@ -119,6 +120,7 @@ export default async function Home() {
                           style={{ backgroundColor: course?.color ?? "#334155" }}
                         />
                         <p className="text-sm font-semibold text-slate-700">{course?.code}</p>
+                        <SourceBadge source={assignment.source} />
                         <span className="rounded bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700">
                           {assignment.task_type}
                         </span>
@@ -161,6 +163,9 @@ export default async function Home() {
                     <span className="rounded bg-slate-100 px-2 py-1 text-sm font-medium">
                       {courseStatusLabels[course.course_status] ?? "Active"}
                     </span>
+                  </div>
+                  <div className="mt-3">
+                    <SourceBadge source={course.source} />
                   </div>
                   {course.final_grade ? (
                     <p className="mt-3 text-sm font-semibold text-emerald-700">Outcome: {course.final_grade}</p>
@@ -210,7 +215,10 @@ export default async function Home() {
                       {course.final_grade ?? "Case Study"}
                     </span>
                   </div>
-                  <p className="mt-3 text-sm text-slate-600">{course.term_label}</p>
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <SourceBadge source={course.source} />
+                    <p className="text-sm text-slate-600">{course.term_label}</p>
+                  </div>
                 </article>
               ))}
             </div>
@@ -232,7 +240,7 @@ export default async function Home() {
             <h2 className="text-xl font-semibold">Kanban Snapshot</h2>
             <div className="mt-5 space-y-3">
               {Object.entries(statusLabels).map(([status, label]) => {
-                const count = currentAssignments.filter((assignment) => assignment.status === status).length;
+                const count = liveAssignments.filter((assignment) => assignment.status === status).length;
                 return (
                   <div className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2" key={status}>
                     <span className="text-sm font-medium text-slate-700">{label}</span>
@@ -257,6 +265,28 @@ export default async function Home() {
       </section>
     </main>
   );
+}
+
+function SourceBadge({ source }: { source: string }) {
+  const label =
+    source === "canvas"
+      ? "Live Canvas"
+      : source === "mock"
+        ? "Local Seed"
+        : source === "user"
+          ? "Manual"
+          : "AI";
+
+  const color =
+    source === "canvas"
+      ? "bg-emerald-50 text-emerald-800"
+      : source === "mock"
+        ? "bg-slate-100 text-slate-700"
+        : source === "user"
+          ? "bg-sky-50 text-sky-800"
+          : "bg-violet-50 text-violet-800";
+
+  return <span className={`rounded px-2 py-1 text-xs font-medium ${color}`}>{label}</span>;
 }
 
 function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {

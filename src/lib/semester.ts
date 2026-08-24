@@ -40,6 +40,7 @@ export type Assignment = {
 
 export const semesterStart = "2026-08-31";
 export const semesterEnd = "2026-12-20";
+export const schoolTimeZone = "America/Los_Angeles";
 
 export const seedCourses: Course[] = [
   {
@@ -357,8 +358,8 @@ export function getPhase(date = new Date()) {
 
 export function daysUntil(value: string | null) {
   if (!value) return null;
-  const today = new Date();
-  const due = new Date(value);
+  const today = zonedCalendarDate(new Date());
+  const due = zonedCalendarDate(new Date(value));
   const ms = due.getTime() - today.getTime();
   return Math.ceil(ms / 86_400_000);
 }
@@ -370,5 +371,18 @@ export function formatShortDate(value: string | null) {
     day: "numeric",
     hour: "numeric",
     minute: "2-digit",
+    timeZone: schoolTimeZone,
   }).format(new Date(value));
+}
+
+function zonedCalendarDate(date: Date) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    day: "2-digit",
+    month: "2-digit",
+    timeZone: schoolTimeZone,
+    year: "numeric",
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+
+  return new Date(Date.UTC(Number(values.year), Number(values.month) - 1, Number(values.day)));
 }
