@@ -1,0 +1,286 @@
+import Link from "next/link";
+import {
+  AlertTriangle,
+  BookOpen,
+  CalendarDays,
+  CheckCircle2,
+  FlaskConical,
+  KanbanSquare,
+  ShieldCheck,
+  RefreshCw,
+} from "lucide-react";
+import { getDashboardData } from "@/lib/dashboard-data";
+import { daysUntil, formatShortDate, getPhase } from "@/lib/semester";
+import { isCanvasComplete } from "@/lib/status";
+import { statusLabels } from "@/lib/status";
+
+const courseStatusLabels = {
+  upcoming: "Upcoming",
+  active: "Active",
+  completed: "Completed",
+  case_study: "Case Study",
+} as const;
+
+export default async function Home() {
+  const { courses, assignments, lastSyncAt, source } = await getDashboardData();
+  const phase = getPhase();
+  const fallCourses = courses.filter((course) => course.term_label === "Fall 2026");
+  const caseStudyCourses = courses.filter((course) => course.course_status === "case_study");
+  const fallCourseIds = new Set(fallCourses.map((course) => course.id));
+  const currentAssignments = assignments.filter((assignment) => fallCourseIds.has(assignment.course_id));
+  const activeAssignments = currentAssignments
+    .slice()
+    .sort((a, b) => b.priority_score - a.priority_score)
+    .slice(0, 6);
+  const dueSoon = currentAssignments.filter((assignment) => {
+    const days = daysUntil(assignment.due_at);
+    return days !== null && days <= 7 && !isCanvasComplete(assignment.status);
+  });
+  const labCount = currentAssignments.filter((assignment) => assignment.task_type === "lab").length;
+  const mismatchCount = currentAssignments.filter(
+    (assignment) => assignment.status === "USER_MARKED_SUBMITTED" && !assignment.canvas_submission_confirmed,
+  ).length;
+  const missingCount = currentAssignments.filter((assignment) => {
+    const days = daysUntil(assignment.due_at);
+    return days !== null && days < 0 && !assignment.canvas_submission_confirmed;
+  }).length;
+  const atRiskCount = currentAssignments.filter(
+    (assignment) => assignment.risk_level === "HIGH" || assignment.risk_level === "CRITICAL",
+  ).length;
+
+  return (
+    <main className="min-h-screen bg-[#f7f8f3] text-slate-950">
+      <section className="border-b border-slate-200 bg-white">
+        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-8 lg:px-8">
+          <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">
+                Student Star · Fall 2026
+              </p>
+              <h1 className="mt-3 max-w-4xl text-4xl font-semibold tracking-normal text-slate-950 md:text-6xl">
+                What should I do now to protect an A in every class?
+              </h1>
+            </div>
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+              <div className="flex items-center gap-2 font-semibold text-slate-950">
+                <RefreshCw className="h-4 w-4" />
+                Canvas Sync
+              </div>
+              <p className="mt-2">
+                {lastSyncAt
+                  ? `Last synced ${formatShortDate(lastSyncAt)}`
+                  : source === "seed"
+                    ? "Using starter data until Supabase and Canvas keys are added."
+                    : "Waiting for first sync."}
+              </p>
+              <Link className="mt-3 inline-flex font-semibold text-teal-800" href="/sync">
+                Open Sync Console
+              </Link>
+            </div>
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-4">
+            <Metric icon={<BookOpen />} label="Fall courses" value={fallCourses.length.toString()} />
+            <Metric icon={<CalendarDays />} label="Due in 7 days" value={dueSoon.length.toString()} />
+            <Metric icon={<AlertTriangle />} label="At risk" value={atRiskCount.toString()} />
+            <Metric icon={<ShieldCheck />} label="Missing / mismatch" value={`${missingCount}/${mismatchCount}`} />
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto grid max-w-7xl gap-6 px-5 py-6 lg:grid-cols-[1.25fr_0.75fr] lg:px-8">
+        <div className="space-y-6">
+          <div className="rounded-lg border border-slate-200 bg-white p-5">
+            <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
+              <div>
+                <h2 className="text-xl font-semibold">What Should I Do Now?</h2>
+                <p className="text-sm text-slate-600">
+                  Sorted by deadline pressure, points, progress, workload, and Canvas submission state.
+                </p>
+              </div>
+              <span className="inline-flex w-fit items-center gap-2 rounded-md bg-teal-50 px-3 py-2 text-sm font-medium text-teal-800">
+                <KanbanSquare className="h-4 w-4" />
+                {phase.name}: {phase.label}
+              </span>
+            </div>
+
+            <div className="mt-5 grid gap-3">
+              {activeAssignments.map((assignment) => {
+                const course = courses.find((item) => item.id === assignment.course_id);
+                return (
+                  <article
+                    className="grid gap-4 rounded-lg border border-slate-200 p-4 md:grid-cols-[1fr_auto]"
+                    key={assignment.id}
+                  >
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span
+                          className="h-2.5 w-2.5 rounded-full"
+                          style={{ backgroundColor: course?.color ?? "#334155" }}
+                        />
+                        <p className="text-sm font-semibold text-slate-700">{course?.code}</p>
+                        <span className="rounded bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700">
+                          {assignment.task_type}
+                        </span>
+                        <span className="rounded bg-amber-50 px-2 py-1 text-xs font-medium text-amber-800">
+                          {assignment.risk_level}
+                        </span>
+                      </div>
+                      <h3 className="mt-2 text-lg font-semibold">{assignment.title}</h3>
+                      <p className="mt-1 text-sm text-slate-600">{assignment.notes}</p>
+                    </div>
+                    <div className="flex min-w-40 flex-col justify-between gap-3 text-sm md:text-right">
+                      <div>
+                        <p className="font-semibold">{formatShortDate(assignment.due_at)}</p>
+                        <p className="text-slate-500">
+                          {assignment.estimated_minutes} min · {assignment.progress_percent}% done
+                        </p>
+                      </div>
+                      <span className="rounded-md bg-slate-950 px-3 py-2 text-center font-semibold text-white">
+                        {assignment.priority_score}/100
+                      </span>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-slate-200 bg-white p-5">
+            <h2 className="text-xl font-semibold">Fall Course Load</h2>
+            <div className="mt-5 grid gap-3 md:grid-cols-2">
+              {fallCourses.map((course) => (
+                <article className="rounded-lg border border-slate-200 p-4" key={course.id}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-semibold" style={{ color: course.color }}>
+                        {course.code}
+                      </p>
+                      <h3 className="mt-1 text-lg font-semibold">{course.title}</h3>
+                    </div>
+                    <span className="rounded bg-slate-100 px-2 py-1 text-sm font-medium">
+                      {courseStatusLabels[course.course_status] ?? "Active"}
+                    </span>
+                  </div>
+                  {course.final_grade ? (
+                    <p className="mt-3 text-sm font-semibold text-emerald-700">Outcome: {course.final_grade}</p>
+                  ) : null}
+                  <p className="mt-3 text-sm text-slate-600">{course.modality}</p>
+                  <div className="mt-4 h-2 rounded-full bg-slate-100">
+                    <div
+                      className="h-2 rounded-full"
+                      style={{
+                        width: `${Math.min(100, course.weekly_hours * 10)}%`,
+                        backgroundColor: course.color,
+                      }}
+                    />
+                  </div>
+                  <p className="mt-2 text-xs font-medium text-slate-500">
+                    {(course.term_label ?? "Fall 2026")} · {course.starts_on} to {course.ends_on} · Source:{" "}
+                    {course.source}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-slate-200 bg-white p-5">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h2 className="text-xl font-semibold">Past A Case Studies</h2>
+                <p className="text-sm text-slate-600">
+                  Completed classes kept out of workload counts and used only for future pattern analysis.
+                </p>
+              </div>
+              <span className="rounded bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-800">
+                {caseStudyCourses.length} records
+              </span>
+            </div>
+            <div className="mt-5 grid gap-2 md:grid-cols-2">
+              {caseStudyCourses.map((course) => (
+                <article className="rounded-lg border border-slate-200 p-4" key={course.id}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-semibold" style={{ color: course.color }}>
+                        {course.code}
+                      </p>
+                      <h3 className="mt-1 font-semibold">{course.title}</h3>
+                    </div>
+                    <span className="rounded bg-slate-100 px-2 py-1 text-sm font-medium">
+                      {course.final_grade ?? "Case Study"}
+                    </span>
+                  </div>
+                  <p className="mt-3 text-sm text-slate-600">{course.term_label}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <aside className="space-y-6">
+          <div className="rounded-lg border border-slate-200 bg-white p-5">
+            <h2 className="text-xl font-semibold">This Week</h2>
+            <p className="mt-2 text-sm text-slate-600">{phase.risk}</p>
+            <div className="mt-5 space-y-3">
+              <ActionRow icon={<CheckCircle2 />} title="Monday reset" body="Sync Canvas, triage due dates, pick top 3 tasks." />
+              <ActionRow icon={<FlaskConical />} title="Lab batch" body="Finish technical labs within 2-3 days of module release." />
+              <ActionRow icon={<CalendarDays />} title="Thursday fixed block" body="CIS 112 lab at City-FH 201, 2:30-5:40 PM." />
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-slate-200 bg-white p-5">
+            <h2 className="text-xl font-semibold">Kanban Snapshot</h2>
+            <div className="mt-5 space-y-3">
+              {Object.entries(statusLabels).map(([status, label]) => {
+                const count = currentAssignments.filter((assignment) => assignment.status === status).length;
+                return (
+                  <div className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2" key={status}>
+                    <span className="text-sm font-medium text-slate-700">{label}</span>
+                    <span className="text-lg font-semibold">{count}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-slate-200 bg-white p-5">
+            <h2 className="text-xl font-semibold">Lab Notes</h2>
+            <p className="mt-2 text-sm text-slate-600">
+              Starter API is ready for notes. First target: commands, screenshots checklist, hashes, and submission proof.
+            </p>
+            <div className="mt-5 rounded-lg bg-slate-950 p-4 font-mono text-sm text-slate-100">
+              <p>labs tracked: {labCount}</p>
+              <p>default fields: command, result, blocker, next step</p>
+            </div>
+          </div>
+        </aside>
+      </section>
+    </main>
+  );
+}
+
+function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+      <div className="flex items-center gap-2 text-slate-600">
+        <span className="flex h-8 w-8 items-center justify-center rounded-md bg-white text-teal-700 [&_svg]:h-4 [&_svg]:w-4">
+          {icon}
+        </span>
+        <span className="text-sm font-medium">{label}</span>
+      </div>
+      <p className="mt-3 text-3xl font-semibold">{value}</p>
+    </div>
+  );
+}
+
+function ActionRow({ icon, title, body }: { icon: React.ReactNode; title: string; body: string }) {
+  return (
+    <div className="flex gap-3 rounded-lg bg-slate-50 p-3">
+      <span className="mt-0.5 text-teal-700 [&_svg]:h-5 [&_svg]:w-5">{icon}</span>
+      <div>
+        <p className="font-semibold">{title}</p>
+        <p className="text-sm text-slate-600">{body}</p>
+      </div>
+    </div>
+  );
+}
