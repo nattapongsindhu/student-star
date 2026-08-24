@@ -30,7 +30,16 @@ const fixedBlocks: ScheduleBlock[] = [
     time: "2:30-5:40 PM",
     title: "Operating Systems Lab",
   },
+  {
+    courseCode: "CIS 162",
+    day: "sat",
+    location: "Zoom 850 1892 7897",
+    time: "2:00-6:10 PM",
+    title: "Cyber Security I Live Zoom",
+  },
 ];
+
+const fixedCourseCodes = new Set(fixedBlocks.map((block) => block.courseCode));
 
 function getTodayKey() {
   const weekday = new Intl.DateTimeFormat("en-US", {
@@ -45,7 +54,7 @@ function getTodayKey() {
 
 function isPureOnlineCourse(course: Course) {
   const text = `${course.campus} ${course.modality}`.toLowerCase();
-  return text.includes("online") && !text.includes("fh 201") && !text.includes("thu lab");
+  return text.includes("online") && !text.includes("fh 201") && !text.includes("thu lab") && !fixedCourseCodes.has(course.code);
 }
 
 export function WeeklySchedule({ courses }: { courses: Course[] }) {
@@ -90,7 +99,7 @@ export function WeeklySchedule({ courses }: { courses: Course[] }) {
                       <div className="mt-2 space-y-1 text-xs font-medium text-slate-700">
                         <p className="flex items-center gap-1.5">
                           <Clock className="h-3.5 w-3.5" />
-                          Thu {block.time}
+                          {day.label} {block.time}
                         </p>
                         <p className="flex items-center gap-1.5">
                           <MapPin className="h-3.5 w-3.5" />
