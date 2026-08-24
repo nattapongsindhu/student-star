@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { syncCanvasToSupabase } from "@/lib/canvas-sync";
-import { getSupabaseAdmin } from "@/lib/supabase";
+import { recordCanvasSyncFailure, syncCanvasToSupabase } from "@/lib/canvas-sync";
 
 export async function GET(request: NextRequest) {
   const expectedSecret = process.env.CRON_SECRET;
@@ -14,21 +13,11 @@ export async function GET(request: NextRequest) {
     const result = await syncCanvasToSupabase();
     return NextResponse.json({ ok: true, ...result });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown sync error";
-    const supabase = getSupabaseAdmin();
-    if (supabase) {
-      await supabase.from("sync_runs").insert({
-        source: "canvas",
-        status: "failed",
-        error_message: message,
-        started_at: new Date().toISOString(),
-        finished_at: new Date().toISOString(),
-      });
-    }
+    const failure = await recordCanvasSyncFailure(error);
 
     return NextResponse.json(
-      { ok: false, error: message },
-      { status: 500 },
+      { ok: false, error: failure.message, syncStatus: failure.syncStatus, lastAttempt: failure.lastAttempt },
+      { status: failure.syncStatus === "token_expired" ? 401 : 500 },
     );
   }
 }

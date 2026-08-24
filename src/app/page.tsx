@@ -9,6 +9,7 @@ import {
   ShieldCheck,
   RefreshCw,
 } from "lucide-react";
+import { CanvasTokenAlert } from "@/components/CanvasTokenAlert";
 import { getDashboardData } from "@/lib/dashboard-data";
 import {
   daysUntil,
@@ -43,7 +44,7 @@ const termStatusLabels: Record<TermStatus, string> = {
 
 export default async function Home({ searchParams }: HomeProps) {
   const params = searchParams ? await searchParams : {};
-  const { courses, assignments, lastSyncAt, source } = await getDashboardData();
+  const { courses, assignments, lastSyncAt, lastAttemptAt, syncStatus, source } = await getDashboardData();
   const activeTerm = getActiveTermConfig();
   const selectedTerm = termConfigs.find((term) => term.id === params.term) ?? activeTerm;
   const phase = getPhase();
@@ -98,7 +99,9 @@ export default async function Home({ searchParams }: HomeProps) {
                 Canvas Sync
               </div>
               <p className="mt-2">
-                {lastSyncAt
+                {syncStatus === "token_expired"
+                  ? "Outdated / Sync Paused"
+                  : lastSyncAt
                   ? `Last synced ${formatShortDate(lastSyncAt)}`
                   : source === "seed"
                     ? "Using starter data until Supabase and Canvas keys are added."
@@ -123,6 +126,11 @@ export default async function Home({ searchParams }: HomeProps) {
 
       {selectedTerm.status === "active" ? (
         <section className="mx-auto grid max-w-7xl gap-6 px-5 py-6 lg:grid-cols-[1.25fr_0.75fr] lg:px-8">
+          {syncStatus === "token_expired" ? (
+            <div className="lg:col-span-2">
+              <CanvasTokenAlert lastAttemptAt={lastAttemptAt ? formatShortDate(lastAttemptAt) : null} />
+            </div>
+          ) : null}
           <div className="space-y-6">
             <div className="rounded-lg border border-slate-200 bg-white p-5">
               <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">

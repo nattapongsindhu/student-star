@@ -5,6 +5,25 @@ import { detectAssignmentChanges } from "./change-detection";
 import { calculateAssignmentRisk } from "./risk-engine";
 import { seedCourses } from "./semester";
 
+export type CanvasSyncStatus = "ok" | "token_expired" | "sync_failed";
+
+export type CanvasSyncFailure = {
+  syncStatus: Exclude<CanvasSyncStatus, "ok">;
+  lastAttempt: string;
+  message: string;
+  runStatus: "token_expired" | "failed";
+};
+
+export class CanvasApiError extends Error {
+  constructor(
+    readonly status: number,
+    readonly statusText: string,
+  ) {
+    super(`Canvas API failed: ${status} ${statusText}`);
+    this.name = "CanvasApiError";
+  }
+}
+
 type CanvasCourse = {
   id: number;
   name?: string;
@@ -34,6 +53,44 @@ function requireEnv(name: string) {
   return value;
 }
 
+export function isCanvasTokenExpiredError(error: unknown) {
+  if (error instanceof CanvasApiError && error.status === 401) {
+    return true;
+  }
+
+  const message = error instanceof Error ? error.message : String(error);
+  return /(401|unauthorized|invalid token|expired token|token.*expired|token.*invalid)/i.test(message);
+}
+
+export function getCanvasSyncFailure(error: unknown, lastAttempt = new Date().toISOString()): CanvasSyncFailure {
+  const tokenExpired = isCanvasTokenExpiredError(error);
+  const message = error instanceof Error ? error.message : "Unknown sync error";
+
+  return {
+    syncStatus: tokenExpired ? "token_expired" : "sync_failed",
+    lastAttempt,
+    message,
+    runStatus: tokenExpired ? "token_expired" : "failed",
+  };
+}
+
+export async function recordCanvasSyncFailure(error: unknown) {
+  const failure = getCanvasSyncFailure(error);
+  const supabase = getSupabaseAdmin();
+
+  if (supabase) {
+    await supabase.from("sync_runs").insert({
+      source: "canvas",
+      status: failure.runStatus,
+      error_message: failure.message,
+      started_at: failure.lastAttempt,
+      finished_at: failure.lastAttempt,
+    });
+  }
+
+  return failure;
+}
+
 async function canvasGet<T>(path: string): Promise<T[]> {
   const baseUrl = requireEnv("CANVAS_BASE_URL").replace(/\/$/, "");
   const token = requireEnv("CANVAS_ACCESS_TOKEN");
@@ -48,8 +105,12 @@ async function canvasGet<T>(path: string): Promise<T[]> {
       cache: "no-store",
     });
 
+    if (response.status === 401) {
+      throw new CanvasApiError(response.status, response.statusText || "Unauthorized");
+    }
+
     if (!response.ok) {
-      throw new Error(`Canvas API failed: ${response.status} ${response.statusText}`);
+      throw new CanvasApiError(response.status, response.statusText || "Unknown error");
     }
 
     results.push(...((await response.json()) as T[]));
@@ -259,6 +320,8 @@ export async function syncCanvasToSupabase() {
     assignmentCount += rows.length;
   }
 
+  const finishedAt = new Date().toISOString();
+
   await supabase.from("sync_runs").insert({
     source: "canvas",
     status: "success",
@@ -266,10 +329,12 @@ export async function syncCanvasToSupabase() {
     assignments_seen: assignmentCount,
     changes_seen: changeCount,
     started_at: startedAt,
-    finished_at: new Date().toISOString(),
+    finished_at: finishedAt,
   });
 
   return {
+    syncStatus: "ok" as const,
+    lastSynced: finishedAt,
     coursesSeen: courses.length,
     assignmentsSeen: assignmentCount,
     changesSeen: changeCount,

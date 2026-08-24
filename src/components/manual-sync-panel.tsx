@@ -5,6 +5,9 @@ import { RefreshCw } from "lucide-react";
 
 type SyncResponse = {
   ok: boolean;
+  syncStatus?: "ok" | "token_expired" | "sync_failed";
+  lastAttempt?: string;
+  lastSynced?: string;
   coursesSeen?: number;
   assignmentsSeen?: number;
   changesSeen?: number;
@@ -29,7 +32,11 @@ export function ManualSyncPanel() {
         const data = (await response.json()) as SyncResponse;
 
         if (!response.ok || !data.ok) {
-          setMessage(data.error ?? "Sync failed.");
+          setMessage(
+            data.syncStatus === "token_expired"
+              ? "Canvas Access Token has expired or is invalid. Update CANVAS_ACCESS_TOKEN, then redeploy."
+              : data.error ?? "Sync failed.",
+          );
           return;
         }
 
