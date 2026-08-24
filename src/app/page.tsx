@@ -5,11 +5,13 @@ import {
   CalendarDays,
   CheckCircle2,
   FlaskConical,
+  HomeIcon,
   KanbanSquare,
   ShieldCheck,
   RefreshCw,
 } from "lucide-react";
 import { CanvasTokenAlert } from "@/components/CanvasTokenAlert";
+import { WeeklySchedule } from "@/components/WeeklySchedule";
 import { getDashboardData } from "@/lib/dashboard-data";
 import {
   daysUntil,
@@ -46,7 +48,9 @@ export default async function Home({ searchParams }: HomeProps) {
   const params = searchParams ? await searchParams : {};
   const { courses, assignments, lastSyncAt, lastAttemptAt, syncStatus, source } = await getDashboardData();
   const activeTerm = getActiveTermConfig();
-  const selectedTerm = termConfigs.find((term) => term.id === params.term) ?? activeTerm;
+  const requestedTermId = params.term;
+  const selectedTermId = requestedTermId && termConfigs.some((term) => term.id === requestedTermId) ? requestedTermId : "home";
+  const selectedTerm = termConfigs.find((term) => term.id === selectedTermId) ?? activeTerm;
   const phase = getPhase();
   const fallCourses = courses.filter((course) => course.term_label === "Fall 2026");
   const caseStudyCourses = courses.filter((course) => course.course_status === "case_study");
@@ -79,7 +83,7 @@ export default async function Home({ searchParams }: HomeProps) {
     <main className="min-h-screen bg-[#f7f8f3] text-slate-950">
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-8 lg:px-8">
-          <TermSwitcher selectedTerm={selectedTerm} />
+          <TermSwitcher selectedTabId={selectedTermId} selectedTerm={selectedTerm} />
           <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">
@@ -131,6 +135,20 @@ export default async function Home({ searchParams }: HomeProps) {
               <CanvasTokenAlert lastAttemptAt={lastAttemptAt ? formatShortDate(lastAttemptAt) : null} />
             </div>
           ) : null}
+          <div className="grid gap-6 lg:col-span-2 lg:grid-cols-[0.7fr_1.3fr]">
+            <div className="rounded-lg border border-slate-200 bg-white p-5">
+              <h2 className="text-xl font-semibold">This Week</h2>
+              <p className="mt-2 text-sm text-slate-600">{phase.risk}</p>
+              <div className="mt-5 space-y-3">
+                <ActionRow icon={<CheckCircle2 />} title="Monday reset" body="Sync Canvas, triage due dates, pick top 3 tasks." />
+                <ActionRow icon={<FlaskConical />} title="Lab batch" body="Finish technical labs within 2-3 days of module release." />
+                <ActionRow icon={<CalendarDays />} title="Thursday fixed block" body="CIS 112 lab at City-FH 201, 2:30-5:40 PM." />
+              </div>
+            </div>
+
+            <WeeklySchedule courses={fallCourses} />
+          </div>
+
           <div className="space-y-6">
             <div className="rounded-lg border border-slate-200 bg-white p-5">
               <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
@@ -281,16 +299,6 @@ export default async function Home({ searchParams }: HomeProps) {
 
         <aside className="space-y-6">
           <div className="rounded-lg border border-slate-200 bg-white p-5">
-            <h2 className="text-xl font-semibold">This Week</h2>
-            <p className="mt-2 text-sm text-slate-600">{phase.risk}</p>
-            <div className="mt-5 space-y-3">
-              <ActionRow icon={<CheckCircle2 />} title="Monday reset" body="Sync Canvas, triage due dates, pick top 3 tasks." />
-              <ActionRow icon={<FlaskConical />} title="Lab batch" body="Finish technical labs within 2-3 days of module release." />
-              <ActionRow icon={<CalendarDays />} title="Thursday fixed block" body="CIS 112 lab at City-FH 201, 2:30-5:40 PM." />
-            </div>
-          </div>
-
-          <div className="rounded-lg border border-slate-200 bg-white p-5">
             <h2 className="text-xl font-semibold">Kanban Snapshot</h2>
             {liveAssignments.length ? (
               <div className="mt-5 space-y-3">
@@ -332,12 +340,24 @@ export default async function Home({ searchParams }: HomeProps) {
   );
 }
 
-function TermSwitcher({ selectedTerm }: { selectedTerm: TermConfig }) {
+function TermSwitcher({ selectedTabId, selectedTerm }: { selectedTabId: string; selectedTerm: TermConfig }) {
+  const isHomeSelected = selectedTabId === "home";
+
   return (
     <nav aria-label="Academic terms" className="overflow-x-auto">
       <div className="flex min-w-max gap-2 rounded-lg border border-slate-200 bg-slate-50 p-1">
+        <Link
+          aria-current={isHomeSelected ? "page" : undefined}
+          className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold transition ${
+            isHomeSelected ? "bg-white text-slate-950 shadow-sm" : "text-slate-600 hover:bg-white hover:text-slate-950"
+          }`}
+          href="/"
+        >
+          <HomeIcon className="h-4 w-4 text-slate-500" />
+          <span>Home</span>
+        </Link>
         {termConfigs.map((term) => {
-          const isSelected = term.id === selectedTerm.id;
+          const isSelected = term.id === selectedTerm.id && selectedTabId !== "home";
           return (
             <Link
               aria-current={isSelected ? "page" : undefined}
@@ -346,7 +366,7 @@ function TermSwitcher({ selectedTerm }: { selectedTerm: TermConfig }) {
                   ? "bg-white text-slate-950 shadow-sm"
                   : "text-slate-600 hover:bg-white hover:text-slate-950"
               }`}
-              href={term.status === "active" ? "/" : `/?term=${term.id}`}
+              href={`/?term=${term.id}`}
               key={term.id}
             >
               <span>{term.label}</span>
