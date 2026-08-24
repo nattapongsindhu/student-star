@@ -42,6 +42,59 @@ export const semesterStart = "2026-08-31";
 export const semesterEnd = "2026-12-20";
 export const schoolTimeZone = "America/Los_Angeles";
 
+export type TermStatus = "active" | "archived" | "upcoming";
+export type TermSeason = "winter" | "spring" | "summer" | "fall";
+
+export interface TermConfig {
+  id: string;
+  label: string;
+  year: number;
+  season: TermSeason;
+  status: TermStatus;
+}
+
+export const termConfigs: TermConfig[] = [
+  {
+    id: "2026-spring",
+    label: "Spring 2026",
+    year: 2026,
+    season: "spring",
+    status: "archived",
+  },
+  {
+    id: "2026-summer",
+    label: "Summer 2026",
+    year: 2026,
+    season: "summer",
+    status: "archived",
+  },
+  {
+    id: "2026-fall",
+    label: "Fall 2026",
+    year: 2026,
+    season: "fall",
+    status: "active",
+  },
+  {
+    id: "2027-winter",
+    label: "Winter 2027",
+    year: 2027,
+    season: "winter",
+    status: "upcoming",
+  },
+  {
+    id: "2027-spring",
+    label: "Spring 2027",
+    year: 2027,
+    season: "spring",
+    status: "upcoming",
+  },
+];
+
+export function getActiveTermConfig() {
+  return termConfigs.find((term) => term.status === "active") ?? termConfigs[0];
+}
+
 export const seedCourses: Course[] = [
   {
     id: "asian-001",

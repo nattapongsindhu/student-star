@@ -10,7 +10,14 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { getDashboardData } from "@/lib/dashboard-data";
-import { daysUntil, formatShortDate, getPhase } from "@/lib/semester";
+import {
+  daysUntil,
+  formatShortDate,
+  getActiveTermConfig,
+  getPhase,
+  termConfigs,
+} from "@/lib/semester";
+import type { Course, TermConfig, TermStatus } from "@/lib/semester";
 import { isCanvasComplete } from "@/lib/status";
 import { statusLabels } from "@/lib/status";
 import { SourceKind } from "@/types/academic";
@@ -22,8 +29,23 @@ const courseStatusLabels = {
   case_study: "Case Study",
 } as const;
 
-export default async function Home() {
+type HomeProps = {
+  searchParams?: Promise<{
+    term?: string;
+  }>;
+};
+
+const termStatusLabels: Record<TermStatus, string> = {
+  active: "Active",
+  archived: "Archive",
+  upcoming: "Upcoming",
+};
+
+export default async function Home({ searchParams }: HomeProps) {
+  const params = searchParams ? await searchParams : {};
   const { courses, assignments, lastSyncAt, source } = await getDashboardData();
+  const activeTerm = getActiveTermConfig();
+  const selectedTerm = termConfigs.find((term) => term.id === params.term) ?? activeTerm;
   const phase = getPhase();
   const fallCourses = courses.filter((course) => course.term_label === "Fall 2026");
   const caseStudyCourses = courses.filter((course) => course.course_status === "case_study");
@@ -49,18 +71,25 @@ export default async function Home() {
   const atRiskCount = liveAssignments.filter(
     (assignment) => assignment.risk_level === "HIGH" || assignment.risk_level === "CRITICAL",
   ).length;
+  const archivedTermCourses = caseStudyCourses.filter((course) => course.term_label === selectedTerm.label);
+  const upcomingTermCourses = courses.filter((course) => course.term_label === selectedTerm.label);
 
   return (
     <main className="min-h-screen bg-[#f7f8f3] text-slate-950">
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-8 lg:px-8">
+          <TermSwitcher selectedTerm={selectedTerm} />
           <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">
-                Student Star · Fall 2026
+                Student Star · {selectedTerm.label}
               </p>
               <h1 className="mt-3 max-w-4xl text-4xl font-semibold tracking-normal text-slate-950 md:text-6xl">
-                What should I do now to protect an A in every class?
+                {selectedTerm.status === "active"
+                  ? "What should I do now to protect an A in every class?"
+                  : selectedTerm.status === "archived"
+                    ? "What patterns helped me finish this term well?"
+                    : "What should I prepare before this term opens?"}
               </h1>
             </div>
             <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
@@ -81,127 +110,130 @@ export default async function Home() {
             </div>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-4">
-            <Metric icon={<BookOpen />} label="Fall courses" value={fallCourses.length.toString()} />
-            <Metric icon={<CalendarDays />} label="Due in 7 days" value={dueSoon.length.toString()} />
-            <Metric icon={<AlertTriangle />} label="At risk" value={atRiskCount.toString()} />
-            <Metric icon={<ShieldCheck />} label="Missing / mismatch" value={`${missingCount}/${mismatchCount}`} />
-          </div>
+          {selectedTerm.status === "active" ? (
+            <div className="grid gap-3 md:grid-cols-4">
+              <Metric icon={<BookOpen />} label="Fall courses" value={fallCourses.length.toString()} />
+              <Metric icon={<CalendarDays />} label="Due in 7 days" value={dueSoon.length.toString()} />
+              <Metric icon={<AlertTriangle />} label="At risk" value={atRiskCount.toString()} />
+              <Metric icon={<ShieldCheck />} label="Missing / mismatch" value={`${missingCount}/${mismatchCount}`} />
+            </div>
+          ) : null}
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-6 px-5 py-6 lg:grid-cols-[1.25fr_0.75fr] lg:px-8">
-        <div className="space-y-6">
-          <div className="rounded-lg border border-slate-200 bg-white p-5">
-            <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
-              <div>
-                <h2 className="text-xl font-semibold">What Should I Do Now?</h2>
-                <p className="text-sm text-slate-600">
-                  Sorted by deadline pressure, points, progress, workload, and Canvas submission state.
-                </p>
+      {selectedTerm.status === "active" ? (
+        <section className="mx-auto grid max-w-7xl gap-6 px-5 py-6 lg:grid-cols-[1.25fr_0.75fr] lg:px-8">
+          <div className="space-y-6">
+            <div className="rounded-lg border border-slate-200 bg-white p-5">
+              <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
+                <div>
+                  <h2 className="text-xl font-semibold">What Should I Do Now?</h2>
+                  <p className="text-sm text-slate-600">
+                    Sorted by deadline pressure, points, progress, workload, and Canvas submission state.
+                  </p>
+                </div>
+                <span className="inline-flex w-fit items-center gap-2 rounded-md bg-teal-50 px-3 py-2 text-sm font-medium text-teal-800">
+                  <KanbanSquare className="h-4 w-4" />
+                  {phase.name}: {phase.label}
+                </span>
               </div>
-              <span className="inline-flex w-fit items-center gap-2 rounded-md bg-teal-50 px-3 py-2 text-sm font-medium text-teal-800">
-                <KanbanSquare className="h-4 w-4" />
-                {phase.name}: {phase.label}
-              </span>
+
+              <div className="mt-5 grid gap-3">
+                {activeAssignments.length ? (
+                  activeAssignments.map((assignment) => {
+                    const course = courses.find((item) => item.id === assignment.course_id);
+                    return (
+                      <article
+                        className="grid gap-4 rounded-lg border border-slate-200 p-4 md:grid-cols-[1fr_auto]"
+                        key={assignment.id}
+                      >
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span
+                              className="h-2.5 w-2.5 rounded-full"
+                              style={{ backgroundColor: course?.color ?? "#334155" }}
+                            />
+                            <p className="text-sm font-semibold text-slate-700">{course?.code}</p>
+                            <SourceBadge source={assignment.source} />
+                            <span className="rounded bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700">
+                              {assignment.task_type}
+                            </span>
+                            <span className="rounded bg-amber-50 px-2 py-1 text-xs font-medium text-amber-800">
+                              {assignment.risk_level}
+                            </span>
+                          </div>
+                          <h3 className="mt-2 text-lg font-semibold">{assignment.title}</h3>
+                          <p className="mt-1 text-sm text-slate-600">{assignment.notes}</p>
+                        </div>
+                        <div className="flex min-w-40 flex-col justify-between gap-3 text-sm md:text-right">
+                          <div>
+                            <p className="font-semibold">{formatShortDate(assignment.due_at)}</p>
+                            <p className="text-slate-500">
+                              {assignment.estimated_minutes} min · {assignment.progress_percent}% done
+                            </p>
+                          </div>
+                          <span className="rounded-md bg-slate-950 px-3 py-2 text-center font-semibold text-white">
+                            {assignment.priority_score}/100
+                          </span>
+                        </div>
+                      </article>
+                    );
+                  })
+                ) : (
+                  <EmptyState
+                    title="No pending Canvas work"
+                    body={
+                      lastSyncAt
+                        ? "The live Canvas queue is empty after the latest sync. Local seed and case study data are excluded from this decision list."
+                        : "Run the first Canvas sync to replace local seed placeholders with live coursework."
+                    }
+                    href="/sync"
+                    action="Open Sync Console"
+                  />
+                )}
+              </div>
             </div>
 
-            <div className="mt-5 grid gap-3">
-              {activeAssignments.length ? (
-                activeAssignments.map((assignment) => {
-                const course = courses.find((item) => item.id === assignment.course_id);
-                return (
-                  <article
-                    className="grid gap-4 rounded-lg border border-slate-200 p-4 md:grid-cols-[1fr_auto]"
-                    key={assignment.id}
-                  >
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span
-                          className="h-2.5 w-2.5 rounded-full"
-                          style={{ backgroundColor: course?.color ?? "#334155" }}
-                        />
-                        <p className="text-sm font-semibold text-slate-700">{course?.code}</p>
-                        <SourceBadge source={assignment.source} />
-                        <span className="rounded bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700">
-                          {assignment.task_type}
-                        </span>
-                        <span className="rounded bg-amber-50 px-2 py-1 text-xs font-medium text-amber-800">
-                          {assignment.risk_level}
-                        </span>
-                      </div>
-                      <h3 className="mt-2 text-lg font-semibold">{assignment.title}</h3>
-                      <p className="mt-1 text-sm text-slate-600">{assignment.notes}</p>
-                    </div>
-                    <div className="flex min-w-40 flex-col justify-between gap-3 text-sm md:text-right">
+            <div className="rounded-lg border border-slate-200 bg-white p-5">
+              <h2 className="text-xl font-semibold">Fall Course Load</h2>
+              <div className="mt-5 grid gap-3 md:grid-cols-2">
+                {fallCourses.map((course) => (
+                  <article className="rounded-lg border border-slate-200 p-4" key={course.id}>
+                    <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="font-semibold">{formatShortDate(assignment.due_at)}</p>
-                        <p className="text-slate-500">
-                          {assignment.estimated_minutes} min · {assignment.progress_percent}% done
+                        <p className="font-semibold" style={{ color: course.color }}>
+                          {course.code}
                         </p>
+                        <h3 className="mt-1 text-lg font-semibold">{course.title}</h3>
                       </div>
-                      <span className="rounded-md bg-slate-950 px-3 py-2 text-center font-semibold text-white">
-                        {assignment.priority_score}/100
+                      <span className="rounded bg-slate-100 px-2 py-1 text-sm font-medium">
+                        {courseStatusLabels[course.course_status] ?? "Active"}
                       </span>
                     </div>
-                  </article>
-                );
-                })
-              ) : (
-                <EmptyState
-                  title="No pending Canvas work"
-                  body={
-                    lastSyncAt
-                      ? "The live Canvas queue is empty after the latest sync. Local seed and case study data are excluded from this decision list."
-                      : "Run the first Canvas sync to replace local seed placeholders with live coursework."
-                  }
-                  href="/sync"
-                  action="Open Sync Console"
-                />
-              )}
-            </div>
-          </div>
-
-          <div className="rounded-lg border border-slate-200 bg-white p-5">
-            <h2 className="text-xl font-semibold">Fall Course Load</h2>
-            <div className="mt-5 grid gap-3 md:grid-cols-2">
-              {fallCourses.map((course) => (
-                <article className="rounded-lg border border-slate-200 p-4" key={course.id}>
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="font-semibold" style={{ color: course.color }}>
-                        {course.code}
-                      </p>
-                      <h3 className="mt-1 text-lg font-semibold">{course.title}</h3>
+                    <div className="mt-3">
+                      <SourceBadge source={course.source} />
                     </div>
-                    <span className="rounded bg-slate-100 px-2 py-1 text-sm font-medium">
-                      {courseStatusLabels[course.course_status] ?? "Active"}
-                    </span>
-                  </div>
-                  <div className="mt-3">
-                    <SourceBadge source={course.source} />
-                  </div>
-                  {course.final_grade ? (
-                    <p className="mt-3 text-sm font-semibold text-emerald-700">Outcome: {course.final_grade}</p>
-                  ) : null}
-                  <p className="mt-3 text-sm text-slate-600">{course.modality}</p>
-                  <div className="mt-4 h-2 rounded-full bg-slate-100">
-                    <div
-                      className="h-2 rounded-full"
-                      style={{
-                        width: `${Math.min(100, course.weekly_hours * 10)}%`,
-                        backgroundColor: course.color,
-                      }}
-                    />
-                  </div>
-                  <p className="mt-2 text-xs font-medium text-slate-500">
-                    {(course.term_label ?? "Fall 2026")} · {course.starts_on} to {course.ends_on} · Source:{" "}
-                    {course.source}
-                  </p>
-                </article>
-              ))}
+                    {course.final_grade ? (
+                      <p className="mt-3 text-sm font-semibold text-emerald-700">Outcome: {course.final_grade}</p>
+                    ) : null}
+                    <p className="mt-3 text-sm text-slate-600">{course.modality}</p>
+                    <div className="mt-4 h-2 rounded-full bg-slate-100">
+                      <div
+                        className="h-2 rounded-full"
+                        style={{
+                          width: `${Math.min(100, course.weekly_hours * 10)}%`,
+                          backgroundColor: course.color,
+                        }}
+                      />
+                    </div>
+                    <p className="mt-2 text-xs font-medium text-slate-500">
+                      {(course.term_label ?? "Fall 2026")} · {course.starts_on} to {course.ends_on} · Source:{" "}
+                      {course.source}
+                    </p>
+                  </article>
+                ))}
+              </div>
             </div>
-          </div>
 
           <div className="rounded-lg border border-slate-200 bg-white p-5">
             <div className="flex items-center justify-between gap-3">
@@ -283,7 +315,142 @@ export default async function Home() {
           </div>
         </aside>
       </section>
+      ) : selectedTerm.status === "archived" ? (
+        <ArchivedTermView courses={archivedTermCourses} term={selectedTerm} />
+      ) : (
+        <UpcomingTermView courses={upcomingTermCourses} term={selectedTerm} />
+      )}
     </main>
+  );
+}
+
+function TermSwitcher({ selectedTerm }: { selectedTerm: TermConfig }) {
+  return (
+    <nav aria-label="Academic terms" className="overflow-x-auto">
+      <div className="flex min-w-max gap-2 rounded-lg border border-slate-200 bg-slate-50 p-1">
+        {termConfigs.map((term) => {
+          const isSelected = term.id === selectedTerm.id;
+          return (
+            <Link
+              aria-current={isSelected ? "page" : undefined}
+              className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold transition ${
+                isSelected
+                  ? "bg-white text-slate-950 shadow-sm"
+                  : "text-slate-600 hover:bg-white hover:text-slate-950"
+              }`}
+              href={term.status === "active" ? "/" : `/?term=${term.id}`}
+              key={term.id}
+            >
+              <span>{term.label}</span>
+              <TermStatusBadge status={term.status} />
+            </Link>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}
+
+function TermStatusBadge({ status }: { status: TermStatus }) {
+  const color =
+    status === "active"
+      ? "bg-emerald-50 text-emerald-800"
+      : status === "archived"
+        ? "bg-slate-100 text-slate-700"
+        : "bg-sky-50 text-sky-800";
+
+  return <span className={`rounded px-2 py-1 text-xs font-medium ${color}`}>{termStatusLabels[status]}</span>;
+}
+
+function ArchivedTermView({ courses, term }: { courses: Course[]; term: TermConfig }) {
+  return (
+    <section className="mx-auto max-w-7xl px-5 py-6 lg:px-8">
+      <div className="rounded-lg border border-slate-200 bg-white p-5">
+        <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
+          <div>
+            <h2 className="text-xl font-semibold">Archived Term View</h2>
+            <p className="text-sm text-slate-600">
+              Completed courses from {term.label}. Active execution widgets are hidden for archived terms.
+            </p>
+          </div>
+          <span className="rounded bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-700">
+            {courses.length} records
+          </span>
+        </div>
+
+        {courses.length ? (
+          <div className="mt-5 grid gap-3 md:grid-cols-2">
+            {courses.map((course) => (
+              <article className="rounded-lg border border-slate-200 p-4" key={course.id}>
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-semibold" style={{ color: course.color }}>
+                      {course.code}
+                    </p>
+                    <h3 className="mt-1 text-lg font-semibold">{course.title}</h3>
+                  </div>
+                  <span className="rounded bg-emerald-50 px-2 py-1 text-sm font-semibold text-emerald-800">
+                    {course.final_grade ?? "Complete"}
+                  </span>
+                </div>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <SourceBadge source={course.source} />
+                  <span className="text-sm text-slate-600">{term.label}</span>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            title="No archived courses for this term"
+            body="Case study records will appear here once completed courses are added for this term."
+            href="/"
+            action="Return to Active Term"
+          />
+        )}
+      </div>
+    </section>
+  );
+}
+
+function UpcomingTermView({ courses, term }: { courses: Course[]; term: TermConfig }) {
+  return (
+    <section className="mx-auto max-w-7xl px-5 py-6 lg:px-8">
+      <div className="rounded-lg border border-slate-200 bg-white p-5">
+        <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
+          <div>
+            <h2 className="text-xl font-semibold">Upcoming Term View</h2>
+            <p className="text-sm text-slate-600">
+              Course registration and syllabus sync will open closer to {term.label}.
+            </p>
+          </div>
+          <span className="rounded bg-sky-50 px-3 py-2 text-sm font-semibold text-sky-800">
+            {termStatusLabels[term.status]}
+          </span>
+        </div>
+
+        {courses.length ? (
+          <div className="mt-5 grid gap-3 md:grid-cols-2">
+            {courses.map((course) => (
+              <article className="rounded-lg border border-slate-200 p-4" key={course.id}>
+                <p className="font-semibold" style={{ color: course.color }}>
+                  {course.code}
+                </p>
+                <h3 className="mt-1 text-lg font-semibold">{course.title}</h3>
+                <p className="mt-3 text-sm text-slate-600">{course.modality}</p>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            title="No planned courses yet"
+            body="Course registration and syllabus sync will open closer to term start."
+            href="/"
+            action="Return to Active Term"
+          />
+        )}
+      </div>
+    </section>
   );
 }
 
