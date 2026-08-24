@@ -14,4 +14,18 @@ describe("semester date helpers", () => {
 
     vi.useRealTimers();
   });
+
+  it("keeps calendar-day math stable across the fall DST transition", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-11-01T18:00:00Z"));
+
+    expect(formatShortDate("2026-11-02T07:59:00Z")).toBe("Nov 1, 11:59 PM");
+    expect(daysUntil("2026-11-02T07:59:00Z")).toBe(0);
+
+    vi.useRealTimers();
+  });
+
+  it("uses PST correctly after daylight saving time ends", () => {
+    expect(formatShortDate("2026-11-03T07:59:00Z")).toBe("Nov 2, 11:59 PM");
+  });
 });

@@ -13,6 +13,7 @@ import { getDashboardData } from "@/lib/dashboard-data";
 import { daysUntil, formatShortDate, getPhase } from "@/lib/semester";
 import { isCanvasComplete } from "@/lib/status";
 import { statusLabels } from "@/lib/status";
+import { SourceKind } from "@/types/academic";
 
 const courseStatusLabels = {
   upcoming: "Upcoming",
@@ -106,7 +107,8 @@ export default async function Home() {
             </div>
 
             <div className="mt-5 grid gap-3">
-              {activeAssignments.map((assignment) => {
+              {activeAssignments.length ? (
+                activeAssignments.map((assignment) => {
                 const course = courses.find((item) => item.id === assignment.course_id);
                 return (
                   <article
@@ -144,7 +146,19 @@ export default async function Home() {
                     </div>
                   </article>
                 );
-              })}
+                })
+              ) : (
+                <EmptyState
+                  title="No pending Canvas work"
+                  body={
+                    lastSyncAt
+                      ? "The live Canvas queue is empty after the latest sync. Local seed and case study data are excluded from this decision list."
+                      : "Run the first Canvas sync to replace local seed placeholders with live coursework."
+                  }
+                  href="/sync"
+                  action="Open Sync Console"
+                />
+              )}
             </div>
           </div>
 
@@ -238,17 +252,23 @@ export default async function Home() {
 
           <div className="rounded-lg border border-slate-200 bg-white p-5">
             <h2 className="text-xl font-semibold">Kanban Snapshot</h2>
-            <div className="mt-5 space-y-3">
-              {Object.entries(statusLabels).map(([status, label]) => {
-                const count = liveAssignments.filter((assignment) => assignment.status === status).length;
-                return (
-                  <div className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2" key={status}>
-                    <span className="text-sm font-medium text-slate-700">{label}</span>
-                    <span className="text-lg font-semibold">{count}</span>
-                  </div>
-                );
-              })}
-            </div>
+            {liveAssignments.length ? (
+              <div className="mt-5 space-y-3">
+                {Object.entries(statusLabels).map(([status, label]) => {
+                  const count = liveAssignments.filter((assignment) => assignment.status === status).length;
+                  return (
+                    <div className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2" key={status}>
+                      <span className="text-sm font-medium text-slate-700">{label}</span>
+                      <span className="text-lg font-semibold">{count}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="mt-5 rounded-lg bg-slate-50 p-3 text-sm text-slate-600">
+                No live Canvas assignments are available for the current Fall courses.
+              </p>
+            )}
           </div>
 
           <div className="rounded-lg border border-slate-200 bg-white p-5">
@@ -267,7 +287,7 @@ export default async function Home() {
   );
 }
 
-function SourceBadge({ source }: { source: string }) {
+function SourceBadge({ source }: { source: SourceKind }) {
   const label =
     source === "canvas"
       ? "Live Canvas"
@@ -287,6 +307,18 @@ function SourceBadge({ source }: { source: string }) {
           : "bg-violet-50 text-violet-800";
 
   return <span className={`rounded px-2 py-1 text-xs font-medium ${color}`}>{label}</span>;
+}
+
+function EmptyState({ title, body, href, action }: { title: string; body: string; href: string; action: string }) {
+  return (
+    <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-5">
+      <p className="font-semibold text-slate-950">{title}</p>
+      <p className="mt-2 text-sm text-slate-600">{body}</p>
+      <Link className="mt-4 inline-flex font-semibold text-teal-800" href={href}>
+        {action}
+      </Link>
+    </div>
+  );
 }
 
 function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
