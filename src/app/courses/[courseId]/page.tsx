@@ -15,8 +15,8 @@ import {
   totalPoints,
 } from "@/lib/course-meta";
 import { getDashboardData } from "@/lib/dashboard-data";
-import { formatShortDate } from "@/lib/semester";
-import type { Assignment, Course } from "@/lib/semester";
+import { formatShortDate, termConfigs } from "@/lib/semester";
+import type { Assignment, Course, TermConfig } from "@/lib/semester";
 
 type CoursePageProps = {
   params: Promise<{
@@ -35,14 +35,17 @@ export default async function CoursePage({ params }: CoursePageProps) {
 
   const assignments = courseAssignments.filter((assignment) => assignment.course_id === course.id);
   const points = totalPoints(assignments);
+  const backTerm = termConfigs.find((term) => term.label === course.term_label);
+  const backHref = termHref(backTerm);
+  const backLabel = backTerm?.label ?? course.term_label;
 
   return (
     <main className="min-h-screen bg-[#f7f8f3] text-slate-950">
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-6xl px-5 py-8 lg:px-8">
-          <Link className="inline-flex items-center gap-2 text-sm font-semibold text-teal-800" href="/">
+          <Link className="inline-flex items-center gap-2 text-sm font-semibold text-teal-800" href={backHref}>
             <ArrowLeft className="h-4 w-4" />
-            Dashboard
+            {backLabel}
           </Link>
 
           <div className="mt-6 flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
@@ -106,6 +109,11 @@ export default async function CoursePage({ params }: CoursePageProps) {
       </section>
     </main>
   );
+}
+
+function termHref(term: TermConfig | undefined) {
+  if (!term) return "/";
+  return `/?term=${term.id}`;
 }
 
 function AssignmentRow({ assignment }: { assignment: Assignment }) {
