@@ -82,6 +82,7 @@ export function courseOutcome(course: Course) {
 }
 
 export function instructorFor(course: Course) {
+  if (course.code === "POLS C1000") return "Anika Toussant";
   if (course.code === "CIS 166") return "Allan Pratt";
   if (course.code === "CIS 162") return "Ray Lampano, Jr.";
   return "Instructor not synced yet";
