@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { verifyCronSecret } from "@/lib/auth";
 import { recordCanvasSyncFailure, syncCanvasToSupabase } from "@/lib/canvas-sync";
 
 export async function GET(request: NextRequest) {
-  const expectedSecret = process.env.CRON_SECRET;
-  const authHeader = request.headers.get("authorization");
-
-  if (expectedSecret && authHeader !== `Bearer ${expectedSecret}`) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const unauthorized = verifyCronSecret(request);
+  if (unauthorized) return unauthorized;
 
   try {
     const result = await syncCanvasToSupabase();

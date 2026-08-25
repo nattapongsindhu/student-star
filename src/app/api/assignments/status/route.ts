@@ -1,4 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { requireAppSessionResponse } from "@/lib/auth";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import type { TaskStatus } from "@/types/academic";
 
@@ -34,7 +36,18 @@ function isTaskStatus(value: unknown): value is TaskStatus {
   return typeof value === "string" && taskStatuses.includes(value as TaskStatus);
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const unauthorized = await requireAppSessionResponse(request);
+  if (unauthorized) return unauthorized;
+
+  const rateLimit = checkRateLimit(`assignment-status:${clientKey(request)}`, 60, 60_000);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many requests." },
+      { headers: { "Retry-After": rateLimit.retryAfterSeconds.toString() }, status: 429 },
+    );
+  }
+
   const body: unknown = await request.json();
 
   if (!isRecord(body) || typeof body.assignmentId !== "string" || !isTaskStatus(body.status)) {
@@ -64,4 +77,8 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json({ ok: true, status });
+}
+
+function clientKey(request: NextRequest) {
+  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
 }

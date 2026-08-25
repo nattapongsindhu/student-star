@@ -1,7 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireAppSessionResponse } from "@/lib/auth";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { getSupabaseAdmin } from "@/lib/supabase";
 
 export async function POST(request: NextRequest) {
+  const unauthorized = await requireAppSessionResponse(request);
+  if (unauthorized) return unauthorized;
+
+  const rateLimit = checkRateLimit(`lab-notes:${clientKey(request)}`, 30, 60_000);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many requests." },
+      { headers: { "Retry-After": rateLimit.retryAfterSeconds.toString() }, status: 429 },
+    );
+  }
+
   const supabase = getSupabaseAdmin();
   if (!supabase) {
     return NextResponse.json({ error: "Supabase is not configured." }, { status: 500 });
@@ -32,4 +45,8 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({ ok: true, note: data });
+}
+
+function clientKey(request: NextRequest) {
+  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
 }
