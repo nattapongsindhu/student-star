@@ -304,25 +304,12 @@ function TermSwitcher({ selectedTabId, selectedTerm }: { selectedTabId: string; 
               key={term.id}
             >
               <span>{term.label}</span>
-              <TermStatusBadge isActive={isSelected} status={term.status} />
             </Link>
           );
         })}
       </div>
     </nav>
   );
-}
-
-function TermStatusBadge({ isActive, status }: { isActive: boolean; status: TermStatus }) {
-  const color = isActive
-    ? "bg-white/15 text-white"
-    : status === "active"
-      ? "bg-emerald-50 text-emerald-800"
-      : status === "archived"
-        ? "bg-white text-slate-700"
-        : "bg-sky-50 text-sky-800";
-
-  return <span className={`rounded px-2 py-1 text-xs font-medium ${color}`}>{termStatusLabels[status]}</span>;
 }
 
 function ArchivedTermView({ assignments, courses, term }: { assignments: Assignment[]; courses: Course[]; term: TermConfig }) {
