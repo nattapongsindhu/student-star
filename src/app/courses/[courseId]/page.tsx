@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, BookOpen, CalendarDays, CheckCircle2, ExternalLink, FileText } from "lucide-react";
+import { ArrowLeft, BookOpen, CalendarDays, CheckCircle2, ExternalLink, FileText, Flag } from "lucide-react";
 import {
   courseOutcome,
   instructorFor,
@@ -234,6 +234,7 @@ function CourseOverviewInsights({ assignments, course }: { assignments: Assignme
   const gradedCount = assignments.filter((assignment) => assignment.status === "GRADED").length;
   const discussionCount = assignments.filter((assignment) => assignment.task_type === "discussion").length;
   const quizCount = assignments.filter((assignment) => assignment.task_type === "quiz").length;
+  const majorExamCount = assignments.filter(isMajorExamAssignment).length;
   const completionRate = percentageLabel(submittedCount, assignments.length);
   const gradedRate = percentageLabel(gradedCount, assignments.length);
   const mainWorkType = mainWorkTypeLabel(assignments);
@@ -257,6 +258,7 @@ function CourseOverviewInsights({ assignments, course }: { assignments: Assignme
         <MiniInsight label="Graded Rate" value={gradedRate} />
         <MiniInsight label="Main Work Type" value={mainWorkType} />
         <MiniInsight label="Course Pace" value={coursePace} />
+        <MiniInsight label="Major Exams" value={majorExamCount.toString()} />
       </div>
     </div>
   );
@@ -309,9 +311,14 @@ function StrategyStep({ text }: { text: string }) {
 function AssignmentRow({ assignment }: { assignment: Assignment }) {
   const guide = assignment.notes ? sanitizeSnippet(assignment.notes) : null;
   const isComplete = assignment.status === "GRADED" || assignment.canvas_submission_confirmed;
+  const majorExamLabel = majorExamAssignmentLabel(assignment);
 
   return (
-    <article className="p-5">
+    <article
+      className={`p-5 ${
+        majorExamLabel ? "border-l-4 border-amber-400 bg-amber-50/50" : ""
+      }`}
+    >
       <div className="flex flex-col justify-between gap-3 md:flex-row md:items-start">
         <div>
           <div className="flex flex-wrap items-center gap-2">
@@ -321,6 +328,12 @@ function AssignmentRow({ assignment }: { assignment: Assignment }) {
             <span className={`rounded px-2 py-1 text-xs font-semibold ${submissionClass(assignment.status, assignment.canvas_submission_confirmed)}`}>
               {submissionLabel(assignment.status, assignment.canvas_submission_confirmed)}
             </span>
+            {majorExamLabel ? (
+              <span className="inline-flex items-center gap-1 rounded bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-900">
+                <Flag className="h-3 w-3" />
+                {majorExamLabel}
+              </span>
+            ) : null}
           </div>
           <h3 className="mt-2 text-lg font-semibold text-slate-950">{assignment.title}</h3>
           <div className="mt-2 flex flex-wrap gap-3 text-sm text-slate-600">
@@ -358,6 +371,20 @@ function AssignmentRow({ assignment }: { assignment: Assignment }) {
 function percentageLabel(part: number, total: number) {
   if (total === 0) return "N/A";
   return `${Math.round((part / total) * 1000) / 10}%`;
+}
+
+function isMajorExamAssignment(assignment: Assignment) {
+  return majorExamAssignmentLabel(assignment) !== null;
+}
+
+function majorExamAssignmentLabel(assignment: Assignment) {
+  const title = assignment.title.toLowerCase();
+
+  if (assignment.task_type === "final" || title.includes("final exam") || title.includes("final")) return "Final Exam";
+  if (assignment.task_type === "midterm" || title.includes("midterm") || title.includes("mid-term")) return "Midterm";
+  if (assignment.task_type === "exam" || title.includes("exam")) return "Exam";
+
+  return null;
 }
 
 function mainWorkTypeLabel(assignments: Assignment[]) {
