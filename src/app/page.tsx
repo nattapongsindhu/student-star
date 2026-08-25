@@ -14,6 +14,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { CanvasTokenAlert } from "@/components/CanvasTokenAlert";
+import { AssignmentStatusActions } from "@/components/AssignmentStatusActions";
 import { CourseDetailCard } from "@/components/CourseDetailModal";
 import { WeeklySchedule } from "@/components/WeeklySchedule";
 import { getCanvasAnnouncements } from "@/lib/canvas-announcements";
@@ -30,6 +31,7 @@ import { isCanvasComplete } from "@/lib/status";
 import { statusLabels } from "@/lib/status";
 import { SourceKind } from "@/types/academic";
 import type { CanvasAnnouncement } from "@/lib/canvas-announcements";
+import type { TaskStatus } from "@/types/academic";
 
 type HomeProps = {
   searchParams?: Promise<{
@@ -85,10 +87,21 @@ export default async function Home({ searchParams }: HomeProps) {
   ).length;
   const activeTermCourseAssignments = courseAssignments.filter((assignment) => selectedTermCourseIds.has(assignment.course_id));
   const liveTermAssignments = activeTermCourseAssignments.filter((assignment) => assignment.source === "canvas");
-  const nextDueAssignment = liveAssignments
-    .filter((assignment) => assignment.due_at)
+  const upcomingLiveAssignments = liveAssignments.filter((assignment) => {
+    const days = daysUntil(assignment.due_at);
+    return days !== null && days >= 0 && !isCanvasComplete(assignment.status);
+  });
+  const todayAssignments = upcomingLiveAssignments.filter((assignment) => daysUntil(assignment.due_at) === 0).slice(0, 4);
+  const next72HourAssignments = upcomingLiveAssignments
+    .filter((assignment) => {
+      const days = daysUntil(assignment.due_at);
+      return days !== null && days > 0 && days <= 3;
+    })
+    .slice(0, 5);
+  const nextDueAssignment = upcomingLiveAssignments
     .slice()
     .sort((a, b) => new Date(a.due_at ?? "").getTime() - new Date(b.due_at ?? "").getTime())[0];
+  const proofCourse = nextDueAssignment ? courses.find((course) => course.id === nextDueAssignment.course_id) : undefined;
   const highValueCount = liveAssignments.filter((assignment) => (assignment.points_possible ?? 0) >= 100).length;
   const canvasCoverageCount = activeTermCourses.filter((course) => course.source === "canvas").length;
   const announcements = isHomeTab ? await getCanvasAnnouncements(activeTermCourses) : [];
@@ -154,6 +167,19 @@ export default async function Home({ searchParams }: HomeProps) {
             nextDue={nextDueAssignment?.due_at ? formatShortDate(nextDueAssignment.due_at) : "No live due date"}
             totalAssignments={liveTermAssignments.length}
           />
+          <div className="grid gap-6 lg:col-span-2 lg:grid-cols-[1fr_1fr]">
+            <TodayFocusPanel
+              courses={courses}
+              next72HourAssignments={next72HourAssignments}
+              nextDueAssignment={nextDueAssignment}
+              todayAssignments={todayAssignments}
+            />
+            <CanvasOutagePlan
+              dueSoonCount={dueSoon.length}
+              highValueCount={highValueCount}
+              nextDue={nextDueAssignment?.due_at ? formatShortDate(nextDueAssignment.due_at) : "No live due date"}
+            />
+          </div>
           <div className="grid gap-6 lg:col-span-2 lg:grid-cols-[0.7fr_1.3fr]">
             <div className="rounded-lg border border-slate-200 bg-white p-5">
               <h2 className="text-xl font-semibold">This Week</h2>
@@ -209,6 +235,11 @@ export default async function Home({ searchParams }: HomeProps) {
                           </div>
                           <h3 className="mt-2 text-lg font-semibold">{assignment.title}</h3>
                           <p className="mt-1 text-sm text-slate-600">{assignment.notes}</p>
+                          <AssignmentStatusActions
+                            actions={statusActionsFor(assignment.status)}
+                            assignmentId={assignment.id}
+                            currentStatus={assignment.status}
+                          />
                         </div>
                         <div className="flex min-w-40 flex-col justify-between gap-3 text-sm md:text-right">
                           <div>
@@ -255,8 +286,13 @@ export default async function Home({ searchParams }: HomeProps) {
         </div>
 
         <aside className="space-y-6">
+          <SubmitProofChecklist assignment={nextDueAssignment} course={proofCourse} />
+
           <div className="rounded-lg border border-slate-200 bg-white p-5">
             <h2 className="text-xl font-semibold">Kanban Snapshot</h2>
+            <p className="mt-1 text-sm text-slate-600">
+              A quick pipeline view of where each live Canvas assignment stands before it is submitted and graded.
+            </p>
             {liveAssignments.length ? (
               <div className="mt-5 space-y-3">
                 {Object.entries(statusLabels).map(([status, label]) => {
@@ -390,6 +426,165 @@ function SemesterOverviewView({ assignments, courses, term }: { assignments: Ass
 function courseCardVariant(course: Course) {
   if (course.course_status === "case_study") return "archived";
   return "active";
+}
+
+type CourseLookup = Pick<Course, "id" | "code" | "color">[];
+
+function TodayFocusPanel({
+  courses,
+  next72HourAssignments,
+  nextDueAssignment,
+  todayAssignments,
+}: {
+  courses: CourseLookup;
+  next72HourAssignments: Assignment[];
+  nextDueAssignment: Assignment | undefined;
+  todayAssignments: Assignment[];
+}) {
+  return (
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-teal-700">
+        <Clock className="h-4 w-4" />
+        Today / Next 72 Hours
+      </div>
+      <h2 className="mt-2 text-xl font-semibold">Short-range focus</h2>
+      <div className="mt-4 space-y-4">
+        <FocusGroup assignments={todayAssignments} courses={courses} emptyLabel="No live Canvas work due today." title="Today" />
+        <FocusGroup
+          assignments={next72HourAssignments}
+          courses={courses}
+          emptyLabel={
+            nextDueAssignment?.due_at
+              ? `Nothing due in the next 72 hours. Next live due date: ${formatShortDate(nextDueAssignment.due_at)}.`
+              : "No upcoming live Canvas due dates found."
+          }
+          title="Next 72 hours"
+        />
+      </div>
+    </div>
+  );
+}
+
+function FocusGroup({
+  assignments,
+  courses,
+  emptyLabel,
+  title,
+}: {
+  assignments: Assignment[];
+  courses: CourseLookup;
+  emptyLabel: string;
+  title: string;
+}) {
+  return (
+    <div>
+      <p className="text-sm font-semibold text-slate-700">{title}</p>
+      {assignments.length ? (
+        <div className="mt-2 space-y-2">
+          {assignments.map((assignment) => {
+            const course = courses.find((item) => item.id === assignment.course_id);
+            return (
+              <div className="rounded-lg bg-slate-50 p-3" key={assignment.id}>
+                <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-600">
+                  <span className="h-2 w-2 rounded-full" style={{ backgroundColor: course?.color ?? "#334155" }} />
+                  <span>{course?.code ?? "Course"}</span>
+                  <span>{assignment.points_possible ?? 0} pts</span>
+                  <span>{assignment.due_at ? formatShortDate(assignment.due_at) : "No due date"}</span>
+                </div>
+                <p className="mt-1 text-sm font-semibold text-slate-950">{assignment.title}</p>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <p className="mt-2 rounded-lg bg-slate-50 p-3 text-sm text-slate-600">{emptyLabel}</p>
+      )}
+    </div>
+  );
+}
+
+function CanvasOutagePlan({
+  dueSoonCount,
+  highValueCount,
+  nextDue,
+}: {
+  dueSoonCount: number;
+  highValueCount: number;
+  nextDue: string;
+}) {
+  return (
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-amber-700">
+        <AlertTriangle className="h-4 w-4" />
+        Canvas Outage Plan
+      </div>
+      <h2 className="mt-2 text-xl font-semibold">Submit before the platform becomes the problem</h2>
+      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+        <MiniStat icon={<CalendarDays />} label="7-day buffer" value={`${dueSoonCount} tasks`} />
+        <MiniStat icon={<AlertTriangle />} label="High value" value={`${highValueCount}`} />
+        <MiniStat icon={<Clock />} label="Next due" value={nextDue} />
+      </div>
+      <div className="mt-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-950">
+        Keep screenshots, filenames, and timestamps ready before due dates. If Canvas, Cengage, or NetLab has maintenance,
+        submit early and keep proof outside the browser.
+      </div>
+    </div>
+  );
+}
+
+function SubmitProofChecklist({ assignment, course }: { assignment: Assignment | undefined; course: Course | undefined }) {
+  return (
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-teal-700">
+        <ShieldCheck className="h-4 w-4" />
+        Submit Proof
+      </div>
+      <h2 className="mt-2 text-xl font-semibold">Before marking submitted</h2>
+      {assignment ? (
+        <div className="mt-4 rounded-lg bg-slate-50 p-3">
+          <p className="text-sm font-semibold text-slate-700">{course?.code ?? "Course"}</p>
+          <p className="mt-1 font-semibold text-slate-950">{assignment.title}</p>
+          <p className="mt-1 text-sm text-slate-600">{assignment.due_at ? formatShortDate(assignment.due_at) : "No due date"}</p>
+        </div>
+      ) : (
+        <p className="mt-4 rounded-lg bg-slate-50 p-3 text-sm text-slate-600">
+          No live Canvas assignment needs proof right now.
+        </p>
+      )}
+      <div className="mt-4 space-y-2 text-sm text-slate-700">
+        {["Submission screenshot saved", "Canvas confirmation page captured", "File name and timestamp recorded", "Backup copy stored locally"].map(
+          (item) => (
+            <div className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2" key={item}>
+              <CheckCircle2 className="h-4 w-4 text-teal-700" />
+              <span>{item}</span>
+            </div>
+          ),
+        )}
+      </div>
+    </div>
+  );
+}
+
+function statusActionsFor(status: TaskStatus) {
+  const actions: { status: TaskStatus; label: string }[] = [];
+
+  if (status === "DISCOVERED") {
+    actions.push({ status: "ACKNOWLEDGED", label: "Acknowledge" });
+    actions.push({ status: "STARTED", label: "Start" });
+  } else if (status === "ACKNOWLEDGED") {
+    actions.push({ status: "STARTED", label: "Start" });
+  } else if (status === "STARTED") {
+    actions.push({ status: "READY_FOR_AUDIT", label: "Ready for Audit" });
+  } else if (status === "READY_FOR_AUDIT") {
+    actions.push({ status: "AI_AUDITED", label: "AI Audited" });
+    actions.push({ status: "READY_TO_SUBMIT", label: "Ready to Submit" });
+  } else if (status === "AI_AUDITED") {
+    actions.push({ status: "READY_TO_SUBMIT", label: "Ready to Submit" });
+  } else if (status === "READY_TO_SUBMIT") {
+    actions.push({ status: "USER_MARKED_SUBMITTED", label: "Mark Submitted" });
+  }
+
+  return actions;
 }
 
 function HomeOpsOverview({
