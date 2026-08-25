@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
   const unauthorized = await requireAppSessionResponse(request);
   if (unauthorized) return unauthorized;
 
-  const rateLimit = checkRateLimit(`lab-notes:${clientKey(request)}`, 30, 60_000);
+  const rateLimit = await checkRateLimit(`lab-notes:${clientKey(request)}`, 30, 60_000);
   if (!rateLimit.allowed) {
     return NextResponse.json(
       { error: "Too many requests." },

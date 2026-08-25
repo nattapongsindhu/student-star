@@ -76,10 +76,10 @@ describe("auth guards", () => {
 });
 
 describe("rate limiting", () => {
-  it("blocks requests after the configured limit until the window resets", () => {
-    expect(checkRateLimit("login:test", 2, 60_000, 1_000).allowed).toBe(true);
-    expect(checkRateLimit("login:test", 2, 60_000, 2_000).allowed).toBe(true);
-    expect(checkRateLimit("login:test", 2, 60_000, 3_000).allowed).toBe(false);
-    expect(checkRateLimit("login:test", 2, 60_000, 62_000).allowed).toBe(true);
+  it("blocks requests after the configured limit until the window resets", async () => {
+    expect((await checkRateLimit("login:test", 2, 60_000, 1_000)).allowed).toBe(true);
+    expect((await checkRateLimit("login:test", 2, 60_000, 2_000)).allowed).toBe(true);
+    expect((await checkRateLimit("login:test", 2, 60_000, 3_000)).allowed).toBe(false);
+    expect((await checkRateLimit("login:test", 2, 60_000, 62_000)).allowed).toBe(true);
   });
 });

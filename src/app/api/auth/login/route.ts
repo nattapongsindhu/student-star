@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
   const formData = await request.formData();
   const password = String(formData.get("password") ?? "");
   const nextPath = safeNextPath(String(formData.get("next") ?? "/"));
-  const rateLimit = checkRateLimit(`login:${clientKey(request)}`, 8, 60_000);
+  const rateLimit = await checkRateLimit(`login:${clientKey(request)}`, 8, 60_000);
 
   if (!rateLimit.allowed) {
     return NextResponse.redirect(new URL(`/login?error=rate&next=${encodeURIComponent(nextPath)}`, request.url));

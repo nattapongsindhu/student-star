@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
   const unauthorized = await requireAppSessionResponse(request);
   if (unauthorized) return unauthorized;
 
-  const rateLimit = checkRateLimit(`assignment-status:${clientKey(request)}`, 60, 60_000);
+  const rateLimit = await checkRateLimit(`assignment-status:${clientKey(request)}`, 60, 60_000);
   if (!rateLimit.allowed) {
     return NextResponse.json(
       { error: "Too many requests." },
