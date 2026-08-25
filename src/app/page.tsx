@@ -46,10 +46,10 @@ export default async function Home({ searchParams }: HomeProps) {
   const selectedTermId = requestedTermId && termConfigs.some((term) => term.id === requestedTermId) ? requestedTermId : "home";
   const selectedTerm = termConfigs.find((term) => term.id === selectedTermId) ?? activeTerm;
   const phase = getPhase();
-  const fallCourses = courses.filter((course) => course.term_label === "Fall 2026");
-  const caseStudyCourses = courses.filter((course) => course.course_status === "case_study");
-  const fallCourseIds = new Set(fallCourses.map((course) => course.id));
-  const currentAssignments = assignments.filter((assignment) => fallCourseIds.has(assignment.course_id));
+  const selectedTermCourses = courses.filter((course) => course.term_label === selectedTerm.label);
+  const activeTermCourses = selectedTermCourses.filter((course) => course.course_status !== "case_study");
+  const selectedTermCourseIds = new Set(selectedTermCourses.map((course) => course.id));
+  const currentAssignments = assignments.filter((assignment) => selectedTermCourseIds.has(assignment.course_id));
   const liveAssignments = currentAssignments.filter((assignment) => assignment.source === "canvas");
   const activeAssignments = liveAssignments
     .slice()
@@ -70,8 +70,8 @@ export default async function Home({ searchParams }: HomeProps) {
   const atRiskCount = liveAssignments.filter(
     (assignment) => assignment.risk_level === "HIGH" || assignment.risk_level === "CRITICAL",
   ).length;
-  const archivedTermCourses = caseStudyCourses.filter((course) => course.term_label === selectedTerm.label);
-  const upcomingTermCourses = courses.filter((course) => course.term_label === selectedTerm.label);
+  const archivedTermCourses = selectedTermCourses.filter((course) => course.course_status === "case_study");
+  const upcomingTermCourses = selectedTermCourses;
 
   return (
     <main className="min-h-screen bg-[#f7f8f3] text-slate-950">
@@ -113,7 +113,7 @@ export default async function Home({ searchParams }: HomeProps) {
 
           {selectedTerm.status === "active" ? (
             <div className="grid gap-3 md:grid-cols-4">
-              <Metric icon={<BookOpen />} label="Fall courses" value={fallCourses.length.toString()} />
+              <Metric icon={<BookOpen />} label="Term courses" value={activeTermCourses.length.toString()} />
               <Metric icon={<CalendarDays />} label="Due in 7 days" value={dueSoon.length.toString()} />
               <Metric icon={<AlertTriangle />} label="At risk" value={atRiskCount.toString()} />
               <Metric icon={<ShieldCheck />} label="Missing / mismatch" value={`${missingCount}/${mismatchCount}`} />
@@ -140,7 +140,7 @@ export default async function Home({ searchParams }: HomeProps) {
               </div>
             </div>
 
-            <WeeklySchedule courses={fallCourses} />
+            <WeeklySchedule courses={activeTermCourses} />
           </div>
 
           <div className="space-y-6">
@@ -215,9 +215,9 @@ export default async function Home({ searchParams }: HomeProps) {
             </div>
 
             <div className="rounded-lg border border-slate-200 bg-white p-5">
-              <h2 className="text-xl font-semibold">Fall Course Load</h2>
+              <h2 className="text-xl font-semibold">{selectedTerm.label} Course Load</h2>
               <div className="mt-5 grid gap-3 md:grid-cols-2">
-                {fallCourses.map((course) => (
+                {activeTermCourses.map((course) => (
                   <CourseDetailCard
                     assignments={courseAssignments.filter((assignment) => assignment.course_id === course.id)}
                     course={course}
@@ -227,30 +227,6 @@ export default async function Home({ searchParams }: HomeProps) {
                 ))}
               </div>
             </div>
-
-          <div className="rounded-lg border border-slate-200 bg-white p-5">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <h2 className="text-xl font-semibold">Past A Case Studies</h2>
-                <p className="text-sm text-slate-600">
-                  Completed classes kept out of workload counts and used only for future pattern analysis.
-                </p>
-              </div>
-              <span className="rounded bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-800">
-                {caseStudyCourses.length} records
-              </span>
-            </div>
-            <div className="mt-5 grid gap-2 md:grid-cols-2">
-              {caseStudyCourses.map((course) => (
-                <CourseDetailCard
-                  assignments={courseAssignments.filter((assignment) => assignment.course_id === course.id)}
-                  course={course}
-                  key={course.id}
-                  variant="case_study"
-                />
-              ))}
-            </div>
-          </div>
         </div>
 
         <aside className="space-y-6">
@@ -270,7 +246,7 @@ export default async function Home({ searchParams }: HomeProps) {
               </div>
             ) : (
               <p className="mt-5 rounded-lg bg-slate-50 p-3 text-sm text-slate-600">
-                No live Canvas assignments are available for the current Fall courses.
+                No live Canvas assignments are available for the selected term.
               </p>
             )}
           </div>
