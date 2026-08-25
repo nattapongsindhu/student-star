@@ -86,6 +86,7 @@ export function instructorFor(course: Course) {
   if (course.code === "CIS 210") return "Mike Yazdanian";
   if (course.code === "ANTHRO 102") return "Brian Bartelt";
   if (course.code === "CS 101") return "Pamela Atkinson";
+  if (course.code === "ENGL C1000") return "Kylowna Moton";
   if (course.code === "CIS 166") return "Allan Pratt";
   if (course.code === "CIS 162") return "Ray Lampano, Jr.";
   return "Instructor not synced yet";
