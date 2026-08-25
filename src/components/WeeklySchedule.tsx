@@ -45,6 +45,13 @@ const fixedBlocks: ScheduleBlock[] = [
     title: "Human Ways Of Life Lecture",
   },
   {
+    courseCode: "ENGL C1000",
+    day: "wed",
+    location: "City-OF Campus Zoom",
+    time: "18:50-22:00",
+    title: "Academic Reading & Writing Lecture",
+  },
+  {
     courseCode: "CIS 112",
     day: "thu",
     location: "City-FH 201",

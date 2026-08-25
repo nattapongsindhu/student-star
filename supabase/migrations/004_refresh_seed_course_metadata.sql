@@ -11,7 +11,7 @@ values
   ('cis-210', 362781, 'CIS 210', 'Intro to Computer Networking', 'Summer 2026', 'case_study', 'City Online', 'Completed Canvas course used as a networking case study', 3, 'A', '2026-05-17', '2026-08-10', 0, '#0e7490', 'canvas'),
   ('anthro-102', 341065, 'ANTHRO 102', 'Human Ways Of Life', 'Spring 2026', 'case_study', 'City-Franklin Hall 221', 'Lecture Wed 14:20-15:45', 3, 'A', '2026-01-26', '2026-06-21', 0, '#a16207', 'canvas'),
   ('cs-101', 341019, 'CS 101', 'Intro to Comp Sci', 'Spring 2026', 'case_study', 'City-OF Campus Zoom', 'Online lecture + Tue/Thu lab 11:10-12:35', 3, 'A', '2026-02-09', '2026-06-08', 0, '#4338ca', 'canvas'),
-  ('engl-c1000', null, 'ENGL C1000', 'Academic Reading & Writing', 'Spring 2026', 'case_study', 'SIS history', 'Completed course from SIS history; Canvas access not visible to current token', 3, 'A', '2026-01-26', '2026-06-21', 0, '#047857', 'user'),
+  ('engl-c1000', null, 'ENGL C1000', 'Academic Reading & Writing', 'Spring 2026', 'case_study', 'City-OF Campus Zoom', 'Lecture Wed 18:50-22:00', 3, 'A', '2026-01-26', '2026-06-21', 0, '#047857', 'user'),
   ('health-101', null, 'HEALTH 101', 'Intro Public Health', 'Spring 2026', 'case_study', 'SIS history', 'Completed course from SIS history; Canvas access not visible to current token', 3, 'A', '2026-01-26', '2026-06-21', 0, '#0891b2', 'user')
 on conflict (id) do update set
   canvas_course_id = excluded.canvas_course_id,
