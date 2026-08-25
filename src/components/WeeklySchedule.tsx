@@ -27,14 +27,14 @@ const fixedBlocks: ScheduleBlock[] = [
     courseCode: "CIS 112",
     day: "thu",
     location: "City-FH 201",
-    time: "2:30-5:40 PM",
+    time: "14:30-17:40",
     title: "Operating Systems Lab",
   },
   {
     courseCode: "CIS 162",
     day: "sat",
     location: "Zoom 850 1892 7897",
-    time: "2:00-6:10 PM",
+    time: "14:00-18:10",
     title: "Cyber Security I Live Zoom",
   },
 ];

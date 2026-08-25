@@ -141,7 +141,7 @@ export default async function Home({ searchParams }: HomeProps) {
               <div className="mt-5 space-y-3">
                 <ActionRow icon={<CheckCircle2 />} title="Monday reset" body="Sync Canvas, triage due dates, pick top 3 tasks." />
                 <ActionRow icon={<FlaskConical />} title="Lab batch" body="Finish technical labs within 2-3 days of module release." />
-                <ActionRow icon={<CalendarDays />} title="Thursday fixed block" body="CIS 112 lab at City-FH 201, 2:30-5:40 PM." />
+                <ActionRow icon={<CalendarDays />} title="Thursday fixed block" body="CIS 112 lab at City-FH 201, 14:30-17:40." />
               </div>
             </div>
 

@@ -121,7 +121,7 @@ export const seedCourses: Course[] = [
     term_label: "Fall 2026",
     course_status: "upcoming",
     campus: "City + LACC FH 201",
-    modality: "Online lecture + Thu lab 2:30-5:40 PM",
+    modality: "Online lecture + Thu lab 14:30-17:40",
     units: 3,
     final_grade: null,
     starts_on: semesterStart,
@@ -138,7 +138,7 @@ export const seedCourses: Course[] = [
     term_label: "Fall 2026",
     course_status: "upcoming",
     campus: "City Online",
-    modality: "Online lecture + online lab",
+    modality: "Online lecture + Sat live Zoom 14:00-18:10",
     units: 3,
     final_grade: null,
     starts_on: semesterStart,
@@ -541,7 +541,8 @@ export function formatShortDate(value: string | null) {
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
-    hour: "numeric",
+    hour: "2-digit",
+    hour12: false,
     minute: "2-digit",
     timeZone: schoolTimeZone,
   }).format(new Date(value));
