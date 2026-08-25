@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   AlertTriangle,
+  Award,
   BookOpen,
   CalendarDays,
   CheckCircle2,
@@ -37,6 +38,12 @@ const seasonalHeroCopy: Record<TermSeason, string> = {
   spring: "Spring brings flowers, professors bring tears.",
   summer: "Summer sunshine, brain decline.",
   winter: "Winter snow, motivation low.",
+};
+
+const termTabBadges: Record<string, { label: string }> = {
+  "2026-spring": {
+    label: "Full Time Dean's Honor List",
+  },
 };
 
 export default async function Home({ searchParams }: HomeProps) {
@@ -288,6 +295,7 @@ function TermSwitcher({ selectedTabId, selectedTerm }: { selectedTabId: string; 
         </Link>
         {termConfigs.map((term) => {
           const isSelected = term.id === selectedTerm.id && selectedTabId !== "home";
+          const tabBadge = termTabBadges[term.id];
           return (
             <Link
               aria-current={isSelected ? "page" : undefined}
@@ -300,6 +308,17 @@ function TermSwitcher({ selectedTabId, selectedTerm }: { selectedTabId: string; 
               key={term.id}
             >
               <span>{term.label}</span>
+              {tabBadge ? (
+                <span
+                  aria-label={tabBadge.label}
+                  className={`inline-flex h-5 w-5 items-center justify-center rounded-full ${
+                    isSelected ? "bg-amber-300 text-slate-950" : "bg-amber-100 text-amber-700"
+                  }`}
+                  title={tabBadge.label}
+                >
+                  <Award className="h-3.5 w-3.5" />
+                </span>
+              ) : null}
             </Link>
           );
         })}
