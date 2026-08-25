@@ -40,7 +40,7 @@ const fixedBlocks: ScheduleBlock[] = [
   {
     courseCode: "ANTHRO 102",
     day: "wed",
-    location: "City-Franklin Hall 221",
+    location: "LACC FH 221",
     time: "14:20-15:45",
     title: "Human Ways Of Life Lecture",
   },
@@ -54,7 +54,7 @@ const fixedBlocks: ScheduleBlock[] = [
   {
     courseCode: "CIS 112",
     day: "thu",
-    location: "City-FH 201",
+    location: "LACC FH 201",
     time: "14:30-17:40",
     title: "Operating Systems Lab",
   },
