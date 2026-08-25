@@ -221,7 +221,7 @@ export default async function Home({ searchParams }: HomeProps) {
 
             <div className="rounded-lg border border-slate-200 bg-white p-5">
               <h2 className="text-xl font-semibold">{selectedTerm.label} Course Load</h2>
-              <div className="mt-5 grid gap-3 md:grid-cols-2">
+              <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                 {activeTermCourses.map((course) => (
                   <CourseDetailCard
                     assignments={courseAssignments.filter((assignment) => assignment.course_id === course.id)}
@@ -342,7 +342,7 @@ function SemesterOverviewView({ assignments, courses, term }: { assignments: Ass
         </div>
 
         {courses.length ? (
-          <div className="mt-5 grid gap-3 md:grid-cols-2">
+          <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {courses.map((course) => (
               <CourseDetailCard
                 assignments={assignments.filter((assignment) => assignment.course_id === course.id)}
