@@ -245,6 +245,10 @@ function CourseOverviewInsights({ assignments, course }: { assignments: Assignme
   const gradedCount = assignments.filter((assignment) => assignment.status === "GRADED").length;
   const discussionCount = assignments.filter((assignment) => assignment.task_type === "discussion").length;
   const quizCount = assignments.filter((assignment) => assignment.task_type === "quiz").length;
+  const completionRate = percentageLabel(submittedCount, assignments.length);
+  const gradedRate = percentageLabel(gradedCount, assignments.length);
+  const mainWorkType = mainWorkTypeLabel(assignments);
+  const coursePace = coursePaceLabel(course, assignments);
 
   return (
     <div className="rounded-lg border border-slate-200 bg-white p-5">
@@ -260,6 +264,10 @@ function CourseOverviewInsights({ assignments, course }: { assignments: Assignme
         <MiniInsight label="Graded" value={gradedCount.toString()} />
         <MiniInsight label="Discussions" value={discussionCount.toString()} />
         <MiniInsight label="Quizzes" value={quizCount.toString()} />
+        <MiniInsight label="Completion Rate" value={completionRate} />
+        <MiniInsight label="Graded Rate" value={gradedRate} />
+        <MiniInsight label="Main Work Type" value={mainWorkType} />
+        <MiniInsight label="Course Pace" value={coursePace} />
       </div>
     </div>
   );
@@ -285,6 +293,7 @@ function CourseStrategy({ assignments, course }: { assignments: Assignment[]; co
         <StrategyStep text="Use month tabs to see where workload spikes happened." />
         <StrategyStep text="Treat 0-point unlock tasks as required work, not optional noise." />
         <StrategyStep text="Keep proof for every submitted item so future classes can copy the same habit." />
+        <StrategyStep text={`${mainWorkTypeLabel(assignments)} means the winning habit is steady weekly completion, not one big final sprint.`} />
       </div>
     </div>
   );
@@ -309,7 +318,8 @@ function StrategyStep({ text }: { text: string }) {
 }
 
 function AssignmentRow({ assignment }: { assignment: Assignment }) {
-  const guide = sanitizeSnippet(assignment.notes);
+  const guide = assignment.notes ? sanitizeSnippet(assignment.notes) : null;
+  const isComplete = assignment.status === "GRADED" || assignment.canvas_submission_confirmed;
 
   return (
     <article className="p-5">
@@ -334,7 +344,9 @@ function AssignmentRow({ assignment }: { assignment: Assignment }) {
         </div>
         {assignment.url ? (
           <a
-            className="inline-flex w-fit items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:border-slate-400"
+            className={`inline-flex w-fit items-center gap-2 rounded-md border px-3 py-2 text-sm font-semibold hover:border-slate-400 ${
+              isComplete ? "border-slate-100 text-slate-500" : "border-slate-200 text-slate-700"
+            }`}
             href={assignment.url}
             rel="noreferrer"
             target="_blank"
@@ -345,11 +357,41 @@ function AssignmentRow({ assignment }: { assignment: Assignment }) {
         ) : null}
       </div>
 
-      <div className="mt-3 rounded-lg bg-slate-50 p-3 text-sm text-slate-700">
-        <p>{guide}</p>
-      </div>
+      {guide ? (
+        <div className="mt-3 rounded-lg bg-slate-50 p-3 text-sm text-slate-700">
+          <p>{guide}</p>
+        </div>
+      ) : null}
     </article>
   );
+}
+
+function percentageLabel(part: number, total: number) {
+  if (total === 0) return "N/A";
+  return `${Math.round((part / total) * 1000) / 10}%`;
+}
+
+function mainWorkTypeLabel(assignments: Assignment[]) {
+  if (assignments.length === 0) return "N/A";
+  const counts = new Map<Assignment["task_type"], number>();
+
+  assignments.forEach((assignment) => {
+    counts.set(assignment.task_type, (counts.get(assignment.task_type) ?? 0) + 1);
+  });
+
+  const [taskType, count] = Array.from(counts.entries()).sort((a, b) => b[1] - a[1])[0];
+  return `${taskTypeLabels[taskType]}-heavy (${count})`;
+}
+
+function coursePaceLabel(course: Course, assignments: Assignment[]) {
+  const start = new Date(`${course.starts_on}T00:00:00`);
+  const end = new Date(`${course.ends_on}T00:00:00`);
+  const weeks = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24 * 7)));
+  const weeklyLoad = assignments.length / weeks;
+
+  if (weeks <= 8 || weeklyLoad >= 4) return "Accelerated";
+  if (weeklyLoad >= 2) return "Steady";
+  return "Light";
 }
 
 function ArchivedSummary({ course }: { course: Course }) {
