@@ -15,17 +15,27 @@ import {
   totalPoints,
 } from "@/lib/course-meta";
 import { getDashboardData } from "@/lib/dashboard-data";
-import { formatShortDate, termConfigs } from "@/lib/semester";
+import { formatShortDate, schoolTimeZone, termConfigs } from "@/lib/semester";
 import type { Assignment, Course, TermConfig } from "@/lib/semester";
 
 type CoursePageProps = {
   params: Promise<{
     courseId: string;
   }>;
+  searchParams?: Promise<{
+    view?: string;
+  }>;
 };
 
-export default async function CoursePage({ params }: CoursePageProps) {
+type CourseRoomTab = {
+  href: string;
+  id: string;
+  label: string;
+};
+
+export default async function CoursePage({ params, searchParams }: CoursePageProps) {
   const { courseId } = await params;
+  const query = searchParams ? await searchParams : {};
   const { courses, courseAssignments } = await getDashboardData();
   const course = courses.find((item) => item.id === courseId);
 
@@ -34,6 +44,10 @@ export default async function CoursePage({ params }: CoursePageProps) {
   }
 
   const assignments = courseAssignments.filter((assignment) => assignment.course_id === course.id);
+  const roomTabs = buildCourseRoomTabs(course, assignments);
+  const requestedView = query.view;
+  const activeView = requestedView && roomTabs.some((tab) => tab.id === requestedView) ? requestedView : "overview";
+  const visibleAssignments = assignmentsForView(assignments, activeView);
   const points = totalPoints(assignments);
   const backTerm = termConfigs.find((term) => term.label === course.term_label);
   const backHref = termHref(backTerm);
@@ -88,23 +102,35 @@ export default async function CoursePage({ params }: CoursePageProps) {
           </div>
         </div>
 
-        <div className="rounded-lg border border-slate-200 bg-white">
+        <div className="space-y-6">
+          <CourseRoomTabs activeView={activeView} tabs={roomTabs} />
+          {activeView === "overview" ? <CourseOverviewInsights assignments={assignments} course={course} /> : null}
+          {activeView === "a-strategy" ? <CourseStrategy assignments={assignments} course={course} /> : null}
+
+          <div className="rounded-lg border border-slate-200 bg-white">
           <div className="border-b border-slate-200 p-5">
-            <h2 className="text-xl font-semibold">Assignment Breakdown</h2>
+            <h2 className="text-xl font-semibold">{assignmentPanelTitle(activeView, roomTabs)}</h2>
             <p className="mt-2 text-sm text-slate-600">
-              Pulled from synced Student Star data. Use the Canvas button when you need the official submission page.
+              Pulled from synced Student Star data. Tabs above split this course by month, score state, and study pattern.
             </p>
           </div>
 
-          {assignments.length ? (
+          {visibleAssignments.length ? (
             <div className="divide-y divide-slate-200">
-              {assignments.map((assignment) => (
+              {visibleAssignments.map((assignment) => (
                 <AssignmentRow assignment={assignment} key={assignment.id} />
               ))}
+            </div>
+          ) : assignments.length ? (
+            <div className="p-5">
+              <p className="rounded-lg bg-slate-50 p-3 text-sm text-slate-600">
+                No assignments match this tab yet. Switch to Assignments to see the full synced list.
+              </p>
             </div>
           ) : (
             <ArchivedSummary course={course} />
           )}
+          </div>
         </div>
       </section>
     </main>
@@ -114,6 +140,172 @@ export default async function CoursePage({ params }: CoursePageProps) {
 function termHref(term: TermConfig | undefined) {
   if (!term) return "/";
   return `/?term=${term.id}`;
+}
+
+function buildCourseRoomTabs(course: Course, assignments: Assignment[]): CourseRoomTab[] {
+  const baseHref = `/courses/${course.id}`;
+  const monthTabs = monthGroups(assignments).map((month) => ({
+    href: `${baseHref}?view=${month.id}`,
+    id: month.id,
+    label: month.label,
+  }));
+
+  return [
+    { href: baseHref, id: "overview", label: "Overview" },
+    ...monthTabs,
+    { href: `${baseHref}?view=assignments`, id: "assignments", label: "Assignments" },
+    { href: `${baseHref}?view=scores`, id: "scores", label: "Scores" },
+    { href: `${baseHref}?view=a-strategy`, id: "a-strategy", label: "A Strategy" },
+  ];
+}
+
+function CourseRoomTabs({ activeView, tabs }: { activeView: string; tabs: CourseRoomTab[] }) {
+  return (
+    <nav aria-label="Course room sections" className="overflow-x-auto rounded-lg border border-slate-200 bg-white p-1.5">
+      <div className="flex min-w-max gap-1.5">
+        {tabs.map((tab) => {
+          const isActive = tab.id === activeView;
+          return (
+            <Link
+              aria-current={isActive ? "page" : undefined}
+              className={`rounded-md px-3 py-2 text-sm font-semibold transition-colors ${
+                isActive ? "bg-slate-900 text-white shadow-sm" : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
+              }`}
+              href={tab.href}
+              key={tab.id}
+            >
+              {tab.label}
+            </Link>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}
+
+function assignmentPanelTitle(activeView: string, tabs: CourseRoomTab[]) {
+  if (activeView === "overview") return "Recent Assignment Snapshot";
+  if (activeView === "assignments") return "All Assignments";
+  if (activeView === "scores") return "Submitted / Graded Work";
+  if (activeView === "a-strategy") return "Evidence Behind the A Strategy";
+  return `${tabs.find((tab) => tab.id === activeView)?.label ?? "Monthly"} Assignments`;
+}
+
+function assignmentsForView(assignments: Assignment[], activeView: string) {
+  if (activeView === "overview") return assignments.slice(0, 8);
+  if (activeView === "assignments" || activeView === "a-strategy") return assignments;
+  if (activeView === "scores") {
+    return assignments.filter(
+      (assignment) =>
+        assignment.status === "GRADED" ||
+        assignment.status === "CANVAS_CONFIRMED" ||
+        assignment.status === "USER_MARKED_SUBMITTED" ||
+        assignment.canvas_submission_confirmed,
+    );
+  }
+
+  return assignments.filter((assignment) => assignmentMonthKey(assignment.due_at) === activeView);
+}
+
+function monthGroups(assignments: Assignment[]) {
+  const months = new Map<string, string>();
+
+  assignments.forEach((assignment) => {
+    const id = assignmentMonthKey(assignment.due_at);
+    if (!id || months.has(id)) return;
+    months.set(id, assignmentMonthLabel(assignment.due_at));
+  });
+
+  return Array.from(months.entries()).map(([id, label]) => ({ id, label }));
+}
+
+function assignmentMonthKey(value: string | null) {
+  if (!value) return null;
+  const parts = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    timeZone: schoolTimeZone,
+    year: "numeric",
+  }).formatToParts(new Date(value));
+  const month = parts.find((part) => part.type === "month")?.value.toLowerCase();
+  const year = parts.find((part) => part.type === "year")?.value;
+  return month && year ? `${month}-${year}` : null;
+}
+
+function assignmentMonthLabel(value: string | null) {
+  if (!value) return "No Month";
+  return new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    timeZone: schoolTimeZone,
+    year: "numeric",
+  }).format(new Date(value));
+}
+
+function CourseOverviewInsights({ assignments, course }: { assignments: Assignment[]; course: Course }) {
+  const submittedCount = assignments.filter((assignment) => assignment.canvas_submission_confirmed).length;
+  const gradedCount = assignments.filter((assignment) => assignment.status === "GRADED").length;
+  const discussionCount = assignments.filter((assignment) => assignment.task_type === "discussion").length;
+  const quizCount = assignments.filter((assignment) => assignment.task_type === "quiz").length;
+
+  return (
+    <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
+        <div>
+          <h2 className="text-xl font-semibold">{course.code} Pattern Summary</h2>
+          <p className="mt-1 text-sm text-slate-600">A quick read of the course rhythm before drilling into monthly tabs.</p>
+        </div>
+        <span className="rounded bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-800">{courseOutcome(course)}</span>
+      </div>
+      <div className="mt-4 grid gap-3 sm:grid-cols-4">
+        <MiniInsight label="Submitted" value={`${submittedCount}/${assignments.length}`} />
+        <MiniInsight label="Graded" value={gradedCount.toString()} />
+        <MiniInsight label="Discussions" value={discussionCount.toString()} />
+        <MiniInsight label="Quizzes" value={quizCount.toString()} />
+      </div>
+    </div>
+  );
+}
+
+function CourseStrategy({ assignments, course }: { assignments: Assignment[]; course: Course }) {
+  const months = monthGroups(assignments);
+  const highPointTasks = assignments.filter((assignment) => (assignment.points_possible ?? 0) >= 10).length;
+
+  return (
+    <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-5">
+      <h2 className="text-xl font-semibold text-slate-950">A Strategy from {course.code}</h2>
+      <p className="mt-2 text-sm text-slate-700">
+        This course is useful as a case study because it shows the rhythm of a recently completed online class: frequent
+        small Canvas items, module unlock work, and steady submission proof.
+      </p>
+      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+        <MiniInsight label="Active months" value={months.length.toString()} />
+        <MiniInsight label="High-point tasks" value={highPointTasks.toString()} />
+        <MiniInsight label="Final outcome" value={courseOutcome(course)} />
+      </div>
+      <div className="mt-4 grid gap-2 text-sm text-slate-700">
+        <StrategyStep text="Use month tabs to see where workload spikes happened." />
+        <StrategyStep text="Treat 0-point unlock tasks as required work, not optional noise." />
+        <StrategyStep text="Keep proof for every submitted item so future classes can copy the same habit." />
+      </div>
+    </div>
+  );
+}
+
+function MiniInsight({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg bg-slate-50 p-3">
+      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p>
+      <p className="mt-1 text-xl font-semibold text-slate-950">{value}</p>
+    </div>
+  );
+}
+
+function StrategyStep({ text }: { text: string }) {
+  return (
+    <div className="flex gap-2 rounded-lg bg-white/70 px-3 py-2">
+      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" />
+      <span>{text}</span>
+    </div>
+  );
 }
 
 function AssignmentRow({ assignment }: { assignment: Assignment }) {
