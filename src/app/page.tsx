@@ -21,7 +21,7 @@ import {
   getPhase,
   termConfigs,
 } from "@/lib/semester";
-import type { Assignment, Course, TermConfig, TermSeason, TermStatus } from "@/lib/semester";
+import type { Assignment, Course, TermConfig, TermSeason } from "@/lib/semester";
 import { isCanvasComplete } from "@/lib/status";
 import { statusLabels } from "@/lib/status";
 import { SourceKind } from "@/types/academic";
@@ -30,12 +30,6 @@ type HomeProps = {
   searchParams?: Promise<{
     term?: string;
   }>;
-};
-
-const termStatusLabels: Record<TermStatus, string> = {
-  active: "Active",
-  archived: "Archive",
-  upcoming: "Upcoming",
 };
 
 const seasonalHeroCopy: Record<TermSeason, string> = {
@@ -51,6 +45,7 @@ export default async function Home({ searchParams }: HomeProps) {
   const activeTerm = getActiveTermConfig();
   const requestedTermId = params.term;
   const selectedTermId = requestedTermId && termConfigs.some((term) => term.id === requestedTermId) ? requestedTermId : "home";
+  const isHomeTab = selectedTermId === "home";
   const selectedTerm = termConfigs.find((term) => term.id === selectedTermId) ?? activeTerm;
   const phase = getPhase();
   const selectedTermCourses = courses.filter((course) => course.term_label === selectedTerm.label);
@@ -77,8 +72,6 @@ export default async function Home({ searchParams }: HomeProps) {
   const atRiskCount = liveAssignments.filter(
     (assignment) => assignment.risk_level === "HIGH" || assignment.risk_level === "CRITICAL",
   ).length;
-  const archivedTermCourses = selectedTermCourses.filter((course) => course.course_status === "case_study");
-  const upcomingTermCourses = selectedTermCourses;
 
   return (
     <main className="min-h-screen bg-[#f7f8f3] text-slate-950">
@@ -116,7 +109,7 @@ export default async function Home({ searchParams }: HomeProps) {
             </div>
           </div>
 
-          {selectedTerm.status === "active" ? (
+          {isHomeTab ? (
             <div className="grid gap-3 md:grid-cols-4">
               <Metric icon={<BookOpen />} label="Term courses" value={activeTermCourses.length.toString()} />
               <Metric icon={<CalendarDays />} label="Due in 7 days" value={dueSoon.length.toString()} />
@@ -127,7 +120,7 @@ export default async function Home({ searchParams }: HomeProps) {
         </div>
       </section>
 
-      {selectedTerm.status === "active" ? (
+      {isHomeTab ? (
         <section className="mx-auto grid max-w-7xl gap-6 px-5 py-6 lg:grid-cols-[1.25fr_0.75fr] lg:px-8">
           {syncStatus === "token_expired" ? (
             <div className="lg:col-span-2">
@@ -268,10 +261,8 @@ export default async function Home({ searchParams }: HomeProps) {
           </div>
         </aside>
       </section>
-      ) : selectedTerm.status === "archived" ? (
-        <ArchivedTermView assignments={courseAssignments} courses={archivedTermCourses} term={selectedTerm} />
       ) : (
-        <UpcomingTermView courses={upcomingTermCourses} term={selectedTerm} />
+        <SemesterOverviewView assignments={courseAssignments} courses={selectedTermCourses} term={selectedTerm} />
       )}
     </main>
   );
@@ -317,16 +308,14 @@ function TermSwitcher({ selectedTabId, selectedTerm }: { selectedTabId: string; 
   );
 }
 
-function ArchivedTermView({ assignments, courses, term }: { assignments: Assignment[]; courses: Course[]; term: TermConfig }) {
+function SemesterOverviewView({ assignments, courses, term }: { assignments: Assignment[]; courses: Course[]; term: TermConfig }) {
   return (
-    <section className="mx-auto max-w-7xl px-5 py-6 lg:px-8">
+    <section className="mx-auto grid max-w-7xl gap-6 px-5 py-6 lg:px-8">
       <div className="rounded-lg border border-slate-200 bg-white p-5">
         <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
           <div>
-            <h2 className="text-xl font-semibold">Archived Term View</h2>
-            <p className="text-sm text-slate-600">
-              Completed courses from {term.label}. Active execution widgets are hidden for archived terms.
-            </p>
+            <h2 className="text-xl font-semibold">{term.label} Courses</h2>
+            <p className="text-sm text-slate-600">Courses and schedule for this semester only.</p>
           </div>
           <span className="rounded bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-700">
             {courses.length} records
@@ -340,62 +329,28 @@ function ArchivedTermView({ assignments, courses, term }: { assignments: Assignm
                 assignments={assignments.filter((assignment) => assignment.course_id === course.id)}
                 course={course}
                 key={course.id}
-                variant="archived"
+                variant={courseCardVariant(course)}
               />
             ))}
           </div>
         ) : (
           <EmptyState
-            title="No archived courses for this term"
-            body="Case study records will appear here once completed courses are added for this term."
+            title="No courses for this term yet"
+            body="Course registration and syllabus sync will appear here once this semester is ready."
             href="/"
             action="Return to Active Term"
           />
         )}
       </div>
+
+      <WeeklySchedule courses={courses} />
     </section>
   );
 }
 
-function UpcomingTermView({ courses, term }: { courses: Course[]; term: TermConfig }) {
-  return (
-    <section className="mx-auto max-w-7xl px-5 py-6 lg:px-8">
-      <div className="rounded-lg border border-slate-200 bg-white p-5">
-        <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
-          <div>
-            <h2 className="text-xl font-semibold">Upcoming Term View</h2>
-            <p className="text-sm text-slate-600">
-              Course registration and syllabus sync will open closer to {term.label}.
-            </p>
-          </div>
-          <span className="rounded bg-sky-50 px-3 py-2 text-sm font-semibold text-sky-800">
-            {termStatusLabels[term.status]}
-          </span>
-        </div>
-
-        {courses.length ? (
-          <div className="mt-5 grid gap-3 md:grid-cols-2">
-            {courses.map((course) => (
-              <article className="rounded-lg border border-slate-200 p-4" key={course.id}>
-                <p className="font-semibold" style={{ color: course.color }}>
-                  {course.code}
-                </p>
-                <h3 className="mt-1 text-lg font-semibold">{course.title}</h3>
-                <p className="mt-3 text-sm text-slate-600">{course.modality}</p>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <EmptyState
-            title="No planned courses yet"
-            body="Course registration and syllabus sync will open closer to term start."
-            href="/"
-            action="Return to Active Term"
-          />
-        )}
-      </div>
-    </section>
-  );
+function courseCardVariant(course: Course) {
+  if (course.course_status === "case_study") return "archived";
+  return "active";
 }
 
 function SourceBadge({ source }: { source: SourceKind }) {

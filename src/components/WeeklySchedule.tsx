@@ -59,6 +59,7 @@ function isPureOnlineCourse(course: Course) {
 
 export function WeeklySchedule({ courses }: { courses: Course[] }) {
   const todayKey = getTodayKey();
+  const courseCodes = new Set(courses.map((course) => course.code));
   const asynchronousCourses = courses.filter(isPureOnlineCourse);
 
   return (
@@ -75,7 +76,7 @@ export function WeeklySchedule({ courses }: { courses: Course[] }) {
 
       <div className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-7">
         {weekdayColumns.map((day) => {
-          const blocks = fixedBlocks.filter((block) => block.day === day.key);
+          const blocks = fixedBlocks.filter((block) => block.day === day.key && courseCodes.has(block.courseCode));
           const isToday = day.key === todayKey;
 
           return (
