@@ -7,6 +7,7 @@ import type { Assignment, Course } from "./semester";
 export type DashboardData = {
   courses: Course[];
   assignments: Assignment[];
+  courseAssignments: Assignment[];
   lastSyncAt: string | null;
   lastAttemptAt: string | null;
   syncStatus: CanvasSyncStatus;
@@ -42,6 +43,7 @@ export async function getDashboardData(): Promise<DashboardData> {
     return {
       courses: seedCourses,
       assignments: seedAssignments,
+      courseAssignments: seedAssignments,
       lastSyncAt: null,
       lastAttemptAt: null,
       syncStatus: "ok",
@@ -49,7 +51,7 @@ export async function getDashboardData(): Promise<DashboardData> {
     };
   }
 
-  const [coursesResult, assignmentsResult, latestSyncResult, successfulSyncResult] = await Promise.all([
+  const [coursesResult, assignmentsResult, courseAssignmentsResult, latestSyncResult, successfulSyncResult] = await Promise.all([
     supabase.from("courses").select("*").order("starts_on", { ascending: true }),
     supabase
       .from("assignments")
@@ -57,6 +59,7 @@ export async function getDashboardData(): Promise<DashboardData> {
       .neq("status", "GRADED")
       .neq("status", "CANVAS_CONFIRMED")
       .order("due_at", { ascending: true, nullsFirst: false }),
+    supabase.from("assignments").select("*").order("due_at", { ascending: true, nullsFirst: false }),
     supabase
       .from("sync_runs")
       .select("status, error_message, finished_at")
@@ -76,6 +79,7 @@ export async function getDashboardData(): Promise<DashboardData> {
     return {
       courses: seedCourses,
       assignments: seedAssignments,
+      courseAssignments: seedAssignments,
       lastSyncAt: null,
       lastAttemptAt: null,
       syncStatus: "sync_failed",
@@ -88,6 +92,7 @@ export async function getDashboardData(): Promise<DashboardData> {
   return {
     courses: coursesResult.data as Course[],
     assignments: assignmentsResult.data as Assignment[],
+    courseAssignments: (courseAssignmentsResult.data ?? assignmentsResult.data) as Assignment[],
     lastSyncAt: successfulSyncResult.data?.finished_at ?? null,
     lastAttemptAt: latestSync?.finished_at ?? successfulSyncResult.data?.finished_at ?? null,
     syncStatus: statusFromSyncRun(latestSync),

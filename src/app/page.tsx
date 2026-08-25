@@ -11,6 +11,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { CanvasTokenAlert } from "@/components/CanvasTokenAlert";
+import { CourseDetailCard } from "@/components/CourseDetailModal";
 import { WeeklySchedule } from "@/components/WeeklySchedule";
 import { getDashboardData } from "@/lib/dashboard-data";
 import {
@@ -20,17 +21,10 @@ import {
   getPhase,
   termConfigs,
 } from "@/lib/semester";
-import type { Course, TermConfig, TermStatus } from "@/lib/semester";
+import type { Assignment, Course, TermConfig, TermStatus } from "@/lib/semester";
 import { isCanvasComplete } from "@/lib/status";
 import { statusLabels } from "@/lib/status";
 import { SourceKind } from "@/types/academic";
-
-const courseStatusLabels = {
-  upcoming: "Upcoming",
-  active: "Active",
-  completed: "Completed",
-  case_study: "Case Study",
-} as const;
 
 type HomeProps = {
   searchParams?: Promise<{
@@ -46,7 +40,7 @@ const termStatusLabels: Record<TermStatus, string> = {
 
 export default async function Home({ searchParams }: HomeProps) {
   const params = searchParams ? await searchParams : {};
-  const { courses, assignments, lastSyncAt, lastAttemptAt, syncStatus, source } = await getDashboardData();
+  const { courses, assignments, courseAssignments, lastSyncAt, lastAttemptAt, syncStatus, source } = await getDashboardData();
   const activeTerm = getActiveTermConfig();
   const requestedTermId = params.term;
   const selectedTermId = requestedTermId && termConfigs.some((term) => term.id === requestedTermId) ? requestedTermId : "home";
@@ -224,39 +218,12 @@ export default async function Home({ searchParams }: HomeProps) {
               <h2 className="text-xl font-semibold">Fall Course Load</h2>
               <div className="mt-5 grid gap-3 md:grid-cols-2">
                 {fallCourses.map((course) => (
-                  <article className="rounded-lg border border-slate-200 p-4" key={course.id}>
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="font-semibold" style={{ color: course.color }}>
-                          {course.code}
-                        </p>
-                        <h3 className="mt-1 text-lg font-semibold">{course.title}</h3>
-                      </div>
-                      <span className="rounded bg-slate-100 px-2 py-1 text-sm font-medium">
-                        {courseStatusLabels[course.course_status] ?? "Active"}
-                      </span>
-                    </div>
-                    <div className="mt-3">
-                      <SourceBadge source={course.source} />
-                    </div>
-                    {course.final_grade ? (
-                      <p className="mt-3 text-sm font-semibold text-emerald-700">Outcome: {course.final_grade}</p>
-                    ) : null}
-                    <p className="mt-3 text-sm text-slate-600">{course.modality}</p>
-                    <div className="mt-4 h-2 rounded-full bg-slate-100">
-                      <div
-                        className="h-2 rounded-full"
-                        style={{
-                          width: `${Math.min(100, course.weekly_hours * 10)}%`,
-                          backgroundColor: course.color,
-                        }}
-                      />
-                    </div>
-                    <p className="mt-2 text-xs font-medium text-slate-500">
-                      {(course.term_label ?? "Fall 2026")} · {course.starts_on} to {course.ends_on} · Source:{" "}
-                      {course.source}
-                    </p>
-                  </article>
+                  <CourseDetailCard
+                    assignments={courseAssignments.filter((assignment) => assignment.course_id === course.id)}
+                    course={course}
+                    key={course.id}
+                    variant="active"
+                  />
                 ))}
               </div>
             </div>
@@ -275,23 +242,12 @@ export default async function Home({ searchParams }: HomeProps) {
             </div>
             <div className="mt-5 grid gap-2 md:grid-cols-2">
               {caseStudyCourses.map((course) => (
-                <article className="rounded-lg border border-slate-200 p-4" key={course.id}>
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="font-semibold" style={{ color: course.color }}>
-                        {course.code}
-                      </p>
-                      <h3 className="mt-1 font-semibold">{course.title}</h3>
-                    </div>
-                    <span className="rounded bg-slate-100 px-2 py-1 text-sm font-medium">
-                      {course.final_grade ?? "Case Study"}
-                    </span>
-                  </div>
-                  <div className="mt-3 flex flex-wrap items-center gap-2">
-                    <SourceBadge source={course.source} />
-                    <p className="text-sm text-slate-600">{course.term_label}</p>
-                  </div>
-                </article>
+                <CourseDetailCard
+                  assignments={courseAssignments.filter((assignment) => assignment.course_id === course.id)}
+                  course={course}
+                  key={course.id}
+                  variant="case_study"
+                />
               ))}
             </div>
           </div>
@@ -332,7 +288,7 @@ export default async function Home({ searchParams }: HomeProps) {
         </aside>
       </section>
       ) : selectedTerm.status === "archived" ? (
-        <ArchivedTermView courses={archivedTermCourses} term={selectedTerm} />
+        <ArchivedTermView assignments={courseAssignments} courses={archivedTermCourses} term={selectedTerm} />
       ) : (
         <UpcomingTermView courses={upcomingTermCourses} term={selectedTerm} />
       )}
@@ -345,15 +301,17 @@ function TermSwitcher({ selectedTabId, selectedTerm }: { selectedTabId: string; 
 
   return (
     <nav aria-label="Academic terms" className="overflow-x-auto">
-      <div className="flex min-w-max gap-2 rounded-lg border border-slate-200 bg-slate-50 p-1">
+      <div className="flex min-w-max gap-2 rounded-xl border border-slate-200/80 bg-slate-100 p-1.5">
         <Link
           aria-current={isHomeSelected ? "page" : undefined}
-          className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold transition ${
-            isHomeSelected ? "bg-white text-slate-950 shadow-sm" : "text-slate-600 hover:bg-white hover:text-slate-950"
+          className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors ${
+            isHomeSelected
+              ? "bg-slate-900 font-semibold text-white shadow-sm"
+              : "font-medium text-slate-600 hover:bg-white/60 hover:text-slate-900"
           }`}
           href="/"
         >
-          <HomeIcon className="h-4 w-4 text-slate-500" />
+          <HomeIcon className={`h-4 w-4 ${isHomeSelected ? "text-white" : "text-slate-500"}`} />
           <span>Home</span>
         </Link>
         {termConfigs.map((term) => {
@@ -361,16 +319,16 @@ function TermSwitcher({ selectedTabId, selectedTerm }: { selectedTabId: string; 
           return (
             <Link
               aria-current={isSelected ? "page" : undefined}
-              className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold transition ${
+              className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors ${
                 isSelected
-                  ? "bg-white text-slate-950 shadow-sm"
-                  : "text-slate-600 hover:bg-white hover:text-slate-950"
+                  ? "bg-slate-900 font-semibold text-white shadow-sm"
+                  : "font-medium text-slate-600 hover:bg-white/60 hover:text-slate-900"
               }`}
               href={`/?term=${term.id}`}
               key={term.id}
             >
               <span>{term.label}</span>
-              <TermStatusBadge status={term.status} />
+              <TermStatusBadge isActive={isSelected} status={term.status} />
             </Link>
           );
         })}
@@ -379,18 +337,19 @@ function TermSwitcher({ selectedTabId, selectedTerm }: { selectedTabId: string; 
   );
 }
 
-function TermStatusBadge({ status }: { status: TermStatus }) {
-  const color =
-    status === "active"
+function TermStatusBadge({ isActive, status }: { isActive: boolean; status: TermStatus }) {
+  const color = isActive
+    ? "bg-white/15 text-white"
+    : status === "active"
       ? "bg-emerald-50 text-emerald-800"
       : status === "archived"
-        ? "bg-slate-100 text-slate-700"
+        ? "bg-white text-slate-700"
         : "bg-sky-50 text-sky-800";
 
   return <span className={`rounded px-2 py-1 text-xs font-medium ${color}`}>{termStatusLabels[status]}</span>;
 }
 
-function ArchivedTermView({ courses, term }: { courses: Course[]; term: TermConfig }) {
+function ArchivedTermView({ assignments, courses, term }: { assignments: Assignment[]; courses: Course[]; term: TermConfig }) {
   return (
     <section className="mx-auto max-w-7xl px-5 py-6 lg:px-8">
       <div className="rounded-lg border border-slate-200 bg-white p-5">
@@ -409,23 +368,12 @@ function ArchivedTermView({ courses, term }: { courses: Course[]; term: TermConf
         {courses.length ? (
           <div className="mt-5 grid gap-3 md:grid-cols-2">
             {courses.map((course) => (
-              <article className="rounded-lg border border-slate-200 p-4" key={course.id}>
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="font-semibold" style={{ color: course.color }}>
-                      {course.code}
-                    </p>
-                    <h3 className="mt-1 text-lg font-semibold">{course.title}</h3>
-                  </div>
-                  <span className="rounded bg-emerald-50 px-2 py-1 text-sm font-semibold text-emerald-800">
-                    {course.final_grade ?? "Complete"}
-                  </span>
-                </div>
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <SourceBadge source={course.source} />
-                  <span className="text-sm text-slate-600">{term.label}</span>
-                </div>
-              </article>
+              <CourseDetailCard
+                assignments={assignments.filter((assignment) => assignment.course_id === course.id)}
+                course={course}
+                key={course.id}
+                variant="archived"
+              />
             ))}
           </div>
         ) : (
