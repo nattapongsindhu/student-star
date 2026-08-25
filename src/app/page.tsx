@@ -21,7 +21,7 @@ import {
   getPhase,
   termConfigs,
 } from "@/lib/semester";
-import type { Assignment, Course, TermConfig, TermStatus } from "@/lib/semester";
+import type { Assignment, Course, TermConfig, TermSeason, TermStatus } from "@/lib/semester";
 import { isCanvasComplete } from "@/lib/status";
 import { statusLabels } from "@/lib/status";
 import { SourceKind } from "@/types/academic";
@@ -36,6 +36,13 @@ const termStatusLabels: Record<TermStatus, string> = {
   active: "Active",
   archived: "Archive",
   upcoming: "Upcoming",
+};
+
+const seasonalHeroCopy: Record<TermSeason, string> = {
+  fall: "Fall into a deep sleep.",
+  spring: "Spring brings flowers, professors bring tears.",
+  summer: "Summer sunshine, brain decline.",
+  winter: "Winter snow, motivation low.",
 };
 
 export default async function Home({ searchParams }: HomeProps) {
@@ -84,11 +91,7 @@ export default async function Home({ searchParams }: HomeProps) {
                 Student Star · {selectedTerm.label}
               </p>
               <h1 className="mt-3 max-w-4xl text-4xl font-semibold tracking-normal text-slate-950 md:text-6xl">
-                {selectedTerm.status === "active"
-                  ? "What should I do now to protect an A in every class?"
-                  : selectedTerm.status === "archived"
-                    ? "What patterns helped me finish this term well?"
-                    : "What should I prepare before this term opens?"}
+                {seasonalHeroCopy[selectedTerm.season]}
               </h1>
             </div>
             <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
