@@ -104,33 +104,37 @@ export default async function CoursePage({ params, searchParams }: CoursePagePro
 
         <div className="space-y-6">
           <CourseRoomTabs activeView={activeView} tabs={roomTabs} />
-          {activeView === "overview" ? <CourseOverviewInsights assignments={assignments} course={course} /> : null}
-          {activeView === "a-strategy" ? <CourseStrategy assignments={assignments} course={course} /> : null}
-
-          <div className="rounded-lg border border-slate-200 bg-white">
-          <div className="border-b border-slate-200 p-5">
-            <h2 className="text-xl font-semibold">{assignmentPanelTitle(activeView, roomTabs)}</h2>
-            <p className="mt-2 text-sm text-slate-600">
-              Pulled from synced Student Star data. Tabs above split this course by month, score state, and study pattern.
-            </p>
-          </div>
-
-          {visibleAssignments.length ? (
-            <div className="divide-y divide-slate-200">
-              {visibleAssignments.map((assignment) => (
-                <AssignmentRow assignment={assignment} key={assignment.id} />
-              ))}
-            </div>
-          ) : assignments.length ? (
-            <div className="p-5">
-              <p className="rounded-lg bg-slate-50 p-3 text-sm text-slate-600">
-                No assignments match this tab yet. Switch to Assignments to see the full synced list.
-              </p>
-            </div>
+          {activeView === "overview" ? (
+            <>
+              <CourseOverviewInsights assignments={assignments} course={course} />
+              <CourseStrategy assignments={assignments} course={course} />
+            </>
           ) : (
-            <ArchivedSummary course={course} />
+            <div className="rounded-lg border border-slate-200 bg-white">
+              <div className="border-b border-slate-200 p-5">
+                <h2 className="text-xl font-semibold">{assignmentPanelTitle(activeView, roomTabs)}</h2>
+                <p className="mt-2 text-sm text-slate-600">
+                  Pulled from synced Student Star data. Tabs above split this course by month and assignment list.
+                </p>
+              </div>
+
+              {visibleAssignments.length ? (
+                <div className="divide-y divide-slate-200">
+                  {visibleAssignments.map((assignment) => (
+                    <AssignmentRow assignment={assignment} key={assignment.id} />
+                  ))}
+                </div>
+              ) : assignments.length ? (
+                <div className="p-5">
+                  <p className="rounded-lg bg-slate-50 p-3 text-sm text-slate-600">
+                    No assignments match this tab yet. Switch to Assignments to see the full synced list.
+                  </p>
+                </div>
+              ) : (
+                <ArchivedSummary course={course} />
+              )}
+            </div>
           )}
-          </div>
         </div>
       </section>
     </main>
@@ -154,8 +158,6 @@ function buildCourseRoomTabs(course: Course, assignments: Assignment[]): CourseR
     { href: baseHref, id: "overview", label: "Overview" },
     ...monthTabs,
     { href: `${baseHref}?view=assignments`, id: "assignments", label: "Assignments" },
-    { href: `${baseHref}?view=scores`, id: "scores", label: "Scores" },
-    { href: `${baseHref}?view=a-strategy`, id: "a-strategy", label: "A Strategy" },
   ];
 }
 
@@ -184,25 +186,12 @@ function CourseRoomTabs({ activeView, tabs }: { activeView: string; tabs: Course
 }
 
 function assignmentPanelTitle(activeView: string, tabs: CourseRoomTab[]) {
-  if (activeView === "overview") return "Recent Assignment Snapshot";
   if (activeView === "assignments") return "All Assignments";
-  if (activeView === "scores") return "Submitted / Graded Work";
-  if (activeView === "a-strategy") return "Evidence Behind the A Strategy";
   return `${tabs.find((tab) => tab.id === activeView)?.label ?? "Monthly"} Assignments`;
 }
 
 function assignmentsForView(assignments: Assignment[], activeView: string) {
-  if (activeView === "overview") return assignments.slice(0, 8);
-  if (activeView === "assignments" || activeView === "a-strategy") return assignments;
-  if (activeView === "scores") {
-    return assignments.filter(
-      (assignment) =>
-        assignment.status === "GRADED" ||
-        assignment.status === "CANVAS_CONFIRMED" ||
-        assignment.status === "USER_MARKED_SUBMITTED" ||
-        assignment.canvas_submission_confirmed,
-    );
-  }
+  if (activeView === "overview" || activeView === "assignments") return assignments;
 
   return assignments.filter((assignment) => assignmentMonthKey(assignment.due_at) === activeView);
 }
