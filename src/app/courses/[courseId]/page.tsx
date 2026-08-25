@@ -250,7 +250,7 @@ function CourseOverviewInsights({ assignments, course }: { assignments: Assignme
     <div className="rounded-lg border border-slate-200 bg-white p-5">
       <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
         <div>
-          <h2 className="text-xl font-semibold">{course.code} Pattern Summary</h2>
+          <h2 className="text-xl font-semibold">{course.code} Summary</h2>
           <p className="mt-1 text-sm text-slate-600">A quick read of the course rhythm before drilling into monthly tabs.</p>
         </div>
         <span className="rounded bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-800">{courseOutcome(course)}</span>
