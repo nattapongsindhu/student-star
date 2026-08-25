@@ -85,6 +85,10 @@ function isPureOnlineCourse(course: Course) {
   return text.includes("online") && !text.includes("fh 201") && !text.includes("thu lab") && !fixedCourseCodes.has(course.code);
 }
 
+function isZoomBlock(block: ScheduleBlock) {
+  return `${block.location} ${block.title}`.toLowerCase().includes("zoom");
+}
+
 export function WeeklySchedule({ courses }: { courses: Course[] }) {
   const todayKey = getTodayKey();
   const courseCodes = new Set(courses.map((course) => course.code));
@@ -130,10 +134,14 @@ export function WeeklySchedule({ courses }: { courses: Course[] }) {
                           <Clock className="h-3 w-3 shrink-0" />
                           {day.label} {block.time}
                         </p>
-                        <p className="flex items-start gap-1">
-                          <MapPin className="mt-0.5 h-3 w-3 shrink-0" />
-                          {block.location}
-                        </p>
+                        {isZoomBlock(block) ? (
+                          <span className="inline-flex rounded bg-sky-50 px-1.5 py-0.5 text-[10px] font-semibold text-sky-800">Zoom</span>
+                        ) : (
+                          <p className="flex items-start gap-1">
+                            <MapPin className="mt-0.5 h-3 w-3 shrink-0" />
+                            {block.location}
+                          </p>
+                        )}
                       </div>
                     </article>
                   ))
