@@ -91,7 +91,9 @@ export default async function Home({ searchParams }: HomeProps) {
                 Student Star · {selectedTerm.label}
               </p>
               <h1 className="mt-3 max-w-4xl text-4xl font-semibold tracking-normal text-slate-950 md:text-6xl">
-                {seasonalHeroCopy[selectedTerm.season]}
+                {selectedTermId === "home"
+                  ? "What should I do now to protect an A in every class?"
+                  : seasonalHeroCopy[selectedTerm.season]}
               </h1>
             </div>
             <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
