@@ -24,6 +24,27 @@ const weekdayColumns: { key: WeekdayKey; label: string }[] = [
 
 const fixedBlocks: ScheduleBlock[] = [
   {
+    courseCode: "CS 101",
+    day: "tue",
+    location: "City-OF Campus Zoom",
+    time: "11:10-12:35",
+    title: "Intro to Comp Sci Lab",
+  },
+  {
+    courseCode: "CS 101",
+    day: "thu",
+    location: "City-OF Campus Zoom",
+    time: "11:10-12:35",
+    title: "Intro to Comp Sci Lab",
+  },
+  {
+    courseCode: "ANTHRO 102",
+    day: "wed",
+    location: "City-Franklin Hall 221",
+    time: "14:20-15:45",
+    title: "Human Ways Of Life Lecture",
+  },
+  {
     courseCode: "CIS 112",
     day: "thu",
     location: "City-FH 201",
