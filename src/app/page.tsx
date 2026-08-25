@@ -5,15 +5,18 @@ import {
   BookOpen,
   CalendarDays,
   CheckCircle2,
+  Clock,
   FlaskConical,
   HomeIcon,
   KanbanSquare,
+  Megaphone,
   ShieldCheck,
   RefreshCw,
 } from "lucide-react";
 import { CanvasTokenAlert } from "@/components/CanvasTokenAlert";
 import { CourseDetailCard } from "@/components/CourseDetailModal";
 import { WeeklySchedule } from "@/components/WeeklySchedule";
+import { getCanvasAnnouncements } from "@/lib/canvas-announcements";
 import { getDashboardData } from "@/lib/dashboard-data";
 import {
   daysUntil,
@@ -26,6 +29,7 @@ import type { Assignment, Course, TermConfig, TermSeason } from "@/lib/semester"
 import { isCanvasComplete } from "@/lib/status";
 import { statusLabels } from "@/lib/status";
 import { SourceKind } from "@/types/academic";
+import type { CanvasAnnouncement } from "@/lib/canvas-announcements";
 
 type HomeProps = {
   searchParams?: Promise<{
@@ -79,6 +83,15 @@ export default async function Home({ searchParams }: HomeProps) {
   const atRiskCount = liveAssignments.filter(
     (assignment) => assignment.risk_level === "HIGH" || assignment.risk_level === "CRITICAL",
   ).length;
+  const activeTermCourseAssignments = courseAssignments.filter((assignment) => selectedTermCourseIds.has(assignment.course_id));
+  const liveTermAssignments = activeTermCourseAssignments.filter((assignment) => assignment.source === "canvas");
+  const nextDueAssignment = liveAssignments
+    .filter((assignment) => assignment.due_at)
+    .slice()
+    .sort((a, b) => new Date(a.due_at ?? "").getTime() - new Date(b.due_at ?? "").getTime())[0];
+  const highValueCount = liveAssignments.filter((assignment) => (assignment.points_possible ?? 0) >= 100).length;
+  const canvasCoverageCount = activeTermCourses.filter((course) => course.source === "canvas").length;
+  const announcements = isHomeTab ? await getCanvasAnnouncements(activeTermCourses) : [];
 
   return (
     <main className="min-h-screen bg-[#f7f8f3] text-slate-950">
@@ -134,6 +147,13 @@ export default async function Home({ searchParams }: HomeProps) {
               <CanvasTokenAlert lastAttemptAt={lastAttemptAt ? formatShortDate(lastAttemptAt) : null} />
             </div>
           ) : null}
+          <HomeOpsOverview
+            announcements={announcements}
+            canvasCoverage={`${canvasCoverageCount}/${activeTermCourses.length}`}
+            highValueCount={highValueCount}
+            nextDue={nextDueAssignment?.due_at ? formatShortDate(nextDueAssignment.due_at) : "No live due date"}
+            totalAssignments={liveTermAssignments.length}
+          />
           <div className="grid gap-6 lg:col-span-2 lg:grid-cols-[0.7fr_1.3fr]">
             <div className="rounded-lg border border-slate-200 bg-white p-5">
               <h2 className="text-xl font-semibold">This Week</h2>
@@ -372,6 +392,80 @@ function courseCardVariant(course: Course) {
   return "active";
 }
 
+function HomeOpsOverview({
+  announcements,
+  canvasCoverage,
+  highValueCount,
+  nextDue,
+  totalAssignments,
+}: {
+  announcements: CanvasAnnouncement[];
+  canvasCoverage: string;
+  highValueCount: number;
+  nextDue: string;
+  totalAssignments: number;
+}) {
+  return (
+    <div className="grid gap-6 lg:col-span-2 lg:grid-cols-[1.1fr_0.9fr]">
+      <div className="rounded-lg border border-amber-200 bg-amber-50 p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-amber-800">
+              <Megaphone className="h-4 w-4" />
+              Canvas Watch
+            </div>
+            <h2 className="mt-2 text-xl font-semibold text-slate-950">Latest announcements and outage planning</h2>
+          </div>
+          <Link className="text-sm font-semibold text-amber-900" href="/sync">
+            Sync
+          </Link>
+        </div>
+
+        <div className="mt-4 space-y-3">
+          {announcements.length ? (
+            announcements.map((announcement) => (
+              <article className="rounded-lg border border-amber-200 bg-white p-3" key={announcement.id}>
+                <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-600">
+                  <span className="rounded bg-amber-100 px-2 py-1 text-amber-900">{announcement.courseCode}</span>
+                  <span>{announcement.postedAt ? formatShortDate(announcement.postedAt) : "No posted date"}</span>
+                </div>
+                <h3 className="mt-2 text-sm font-semibold text-slate-950">{announcement.title}</h3>
+                <p className="mt-1 line-clamp-2 text-sm text-slate-700">{announcement.summary}</p>
+                {announcement.url ? (
+                  <Link className="mt-2 inline-flex text-sm font-semibold text-teal-800" href={announcement.url} target="_blank">
+                    Open in Canvas
+                  </Link>
+                ) : null}
+              </article>
+            ))
+          ) : (
+            <div className="rounded-lg border border-amber-200 bg-white p-3">
+              <p className="font-semibold text-slate-950">No current Canvas announcements found.</p>
+              <p className="mt-1 text-sm text-slate-700">
+                Keep a 24-hour submission buffer for high-point work. If Canvas or LACCD posts maintenance, outages, or
+                security incidents, submit early and save proof of submission.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="rounded-lg border border-slate-200 bg-white p-5">
+        <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-teal-700">
+          <ShieldCheck className="h-4 w-4" />
+          Ops Stats
+        </div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <MiniStat icon={<BookOpen />} label="Live coverage" value={canvasCoverage} />
+          <MiniStat icon={<KanbanSquare />} label="Canvas items" value={totalAssignments.toString()} />
+          <MiniStat icon={<Clock />} label="Next due" value={nextDue} />
+          <MiniStat icon={<AlertTriangle />} label="100+ point tasks" value={highValueCount.toString()} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function SourceBadge({ source }: { source: SourceKind }) {
   const label =
     source === "canvas"
@@ -392,6 +486,20 @@ function SourceBadge({ source }: { source: SourceKind }) {
           : "bg-violet-50 text-violet-800";
 
   return <span className={`rounded px-2 py-1 text-xs font-medium ${color}`}>{label}</span>;
+}
+
+function MiniStat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <div className="rounded-lg bg-slate-50 p-3">
+      <div className="flex items-center gap-2 text-slate-600">
+        <span className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-teal-700 [&_svg]:h-4 [&_svg]:w-4">
+          {icon}
+        </span>
+        <span className="text-xs font-semibold uppercase tracking-wide">{label}</span>
+      </div>
+      <p className="mt-2 text-lg font-semibold text-slate-950">{value}</p>
+    </div>
+  );
 }
 
 function EmptyState({ title, body, href, action }: { title: string; body: string; href: string; action: string }) {
