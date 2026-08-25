@@ -5,10 +5,16 @@ import { seedCourses } from "./semester";
 describe("course metadata helpers", () => {
   it("shows verified instructors for Canvas-backed courses", () => {
     const pols = courseById("pols-c1000");
+    const cis210 = courseById("cis-210");
+    const anthro102 = courseById("anthro-102");
+    const cs101 = courseById("cs-101");
     const cis166 = courseById("cis-166");
     const cis162 = courseById("cis-162");
 
     expect(instructorFor(pols)).toBe("Anika Toussant");
+    expect(instructorFor(cis210)).toBe("Mike Yazdanian");
+    expect(instructorFor(anthro102)).toBe("Brian Bartelt");
+    expect(instructorFor(cs101)).toBe("Pamela Atkinson");
     expect(instructorFor(cis166)).toBe("Allan Pratt");
     expect(instructorFor(cis162)).toBe("Ray Lampano, Jr.");
   });
