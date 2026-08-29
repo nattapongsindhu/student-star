@@ -97,13 +97,14 @@ export function classTypeLinesFor(course: Course) {
     modality === "online lecture + online lab" ||
     modality === "late-start online lecture + lab";
 
-  if (isAsyncOnline) return ["Online Course", "(Asynchronous / Self-Paced)"];
+    if (isAsyncOnline) return ["Online", "Asynchronous"];
 
   return course.modality
     .split(/\s*(?:\+|;)\s+/)
-    .flatMap((line) => line.replace(/^Online live Zoom\s+(.+)$/, "Online live Zoom|$1").split("|"))
-    .flatMap((line) => line.replace(/^(Lecture|Lab)\s+(.+)$/, "$1|$2").split("|"))
+    .flatMap((line) => line.replace(/^Online(?: live Zoom| Lecture| lecture)(?:\s+(.+))?$/, (_, schedule) => schedule ? `Online|${schedule}` : "Online").split("|"))
+    .flatMap((line) => line.replace(/^Lecture\s+(.+)$/, "Campus Lecture|$1").split("|"))
     .map((line) => line.trim())
+    .filter((line) => line.toLowerCase() !== "recordings posted")
     .filter(Boolean);
 }
 

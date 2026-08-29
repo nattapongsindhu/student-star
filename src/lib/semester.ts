@@ -319,7 +319,7 @@ export const seedCourses: Course[] = [
     term_label: "Spring 2026",
     course_status: "case_study",
     campus: "Zoom",
-    modality: "Lecture Wed 18:50-22:00",
+    modality: "Online Lecture Wed 18:50-22:00",
     units: 3,
     final_grade: "A",
     starts_on: "2026-02-09",
