@@ -6,6 +6,7 @@ import {
   instructorFor,
   pointsLabel,
   sanitizeSnippet,
+  sourceProofFor,
   sourceBadgeClass,
   sourceLabels,
   submissionClass,
@@ -99,6 +100,7 @@ export default async function CoursePage({ params, searchParams }: CoursePagePro
               <InfoItem label="Location / Campus" value={course.campus} />
               <InfoItem label="Canvas Course ID" value={course.canvas_course_id ? `${course.canvas_course_id}` : "Not synced yet"} />
             </div>
+            <SourceProofList course={course} />
           </div>
         </div>
 
@@ -439,6 +441,21 @@ function InfoItem({ label, value }: { label: string; value: string }) {
 
 function SourceBadge({ source }: { source: Course["source"] }) {
   return <span className={`rounded px-2 py-1 text-xs font-medium ${sourceBadgeClass(source)}`}>{sourceLabels[source]}</span>;
+}
+
+function SourceProofList({ course }: { course: Course }) {
+  return (
+    <div className="mt-4 rounded-md border border-slate-200 bg-white p-3">
+      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Source Proof</p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {sourceProofFor(course).map((proof) => (
+          <span className="rounded bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-700" key={proof}>
+            {proof}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { instructorFor } from "./course-meta";
+import { instructorFor, sourceProofFor } from "./course-meta";
 import { seedCourses } from "./semester";
 
 describe("course metadata helpers", () => {
@@ -21,6 +21,21 @@ describe("course metadata helpers", () => {
     expect(instructorFor(health101)).toBe("Tracy Harkins");
     expect(instructorFor(cis166)).toBe("Allan Pratt");
     expect(instructorFor(cis162)).toBe("Ray Lampano, Jr.");
+  });
+
+  it("does not show the old unsynced instructor placeholder", () => {
+    const oldPlaceholder = ["Instructor", "not", "synced", "yet"].join(" ");
+
+    seedCourses.forEach((course) => {
+      expect(instructorFor(course)).not.toBe(oldPlaceholder);
+    });
+  });
+
+  it("shows source proof for verified course details", () => {
+    expect(sourceProofFor(courseById("cis-210"))).toContain("Syllabus PDF");
+    expect(sourceProofFor(courseById("health-101"))).toContain("Canvas modules/grades PDFs");
+    expect(sourceProofFor(courseById("engl-c1000"))).toContain("Course roster PDF");
+    expect(sourceProofFor(courseById("pols-c1000"))).toContain("SIS course history screenshot");
   });
 });
 

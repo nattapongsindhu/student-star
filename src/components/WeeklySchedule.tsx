@@ -40,14 +40,14 @@ const fixedBlocks: ScheduleBlock[] = [
   {
     courseCode: "CS 101",
     day: "tue",
-    location: "City-OF Campus Zoom",
+    location: "Zoom",
     time: "11:10-12:35",
     title: "Intro to Comp Sci Lab",
   },
   {
     courseCode: "CS 101",
     day: "thu",
-    location: "City-OF Campus Zoom",
+    location: "Zoom",
     time: "11:10-12:35",
     title: "Intro to Comp Sci Lab",
   },
@@ -61,7 +61,7 @@ const fixedBlocks: ScheduleBlock[] = [
   {
     courseCode: "ENGL C1000",
     day: "wed",
-    location: "City-OF Campus Zoom",
+    location: "Zoom",
     time: "18:50-22:00",
     title: "Academic Reading & Writing Lecture",
   },
@@ -75,7 +75,7 @@ const fixedBlocks: ScheduleBlock[] = [
   {
     courseCode: "CIS 162",
     day: "sat",
-    location: "Zoom 850 1892 7897",
+    location: "Zoom",
     time: "14:00-18:10",
     title: "Cyber Security I Live Zoom",
   },
@@ -96,7 +96,8 @@ function getTodayKey() {
 
 function isPureOnlineCourse(course: Course) {
   const text = `${course.campus} ${course.modality}`.toLowerCase();
-  return text.includes("online") && !text.includes("fh 201") && !text.includes("thu lab") && !fixedCourseCodes.has(course.code);
+  const hasPhysicalRoom = text.includes("fh ") || text.includes("lacc");
+  return text.includes("online") && !hasPhysicalRoom && !fixedCourseCodes.has(course.code);
 }
 
 function isZoomBlock(block: ScheduleBlock) {
@@ -149,7 +150,7 @@ export function WeeklySchedule({ courses }: { courses: Course[] }) {
                           {day.label} {block.time}
                         </p>
                         {isZoomBlock(block) ? (
-                          <span className="inline-flex rounded bg-sky-50 px-1.5 py-0.5 text-[10px] font-semibold text-sky-800">Zoom</span>
+                          <span className="inline-flex w-fit rounded bg-sky-50 px-1.5 py-0.5 text-[10px] font-semibold text-sky-800">Zoom</span>
                         ) : (
                           <p className="flex items-start gap-1">
                             <MapPin className="mt-0.5 h-3 w-3 shrink-0" />

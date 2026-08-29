@@ -90,7 +90,27 @@ export function instructorFor(course: Course) {
   if (course.code === "HEALTH 101") return "Tracy Harkins";
   if (course.code === "CIS 166") return "Allan Pratt";
   if (course.code === "CIS 162") return "Ray Lampano, Jr.";
-  return "Instructor not synced yet";
+  return "Pending source proof";
+}
+
+export function sourceProofFor(course: Course) {
+  const sourceProofs: Record<string, string[]> = {
+    "ANTHRO 102": ["Canvas course data", "SIS weekly schedule screenshot", "SIS course history screenshot"],
+    "CIS 112": ["SIS weekly schedule screenshot", "Local seed"],
+    "CIS 162": ["Canvas course detail update", "SIS schedule source"],
+    "CIS 166": ["Canvas instructor message", "Canvas assignment sync"],
+    "CIS 210": ["Syllabus PDF", "Canvas grade PDF", "SIS course history screenshot"],
+    "CIS 214": ["Local seed", "SIS enrollment source pending"],
+    "CS 101": ["Canvas course data", "SIS weekly schedule screenshot", "SIS course history screenshot"],
+    "CS 119": ["Local seed", "SIS enrollment source pending"],
+    "ENGL C1000": ["Course roster PDF", "Syllabus PDF", "SIS weekly schedule screenshot"],
+    "HEALTH 101": ["Syllabus PDF", "Canvas modules/grades PDFs", "SIS course history screenshot"],
+    "POLS C1000": ["Canvas assignment sync", "SIS course history screenshot"],
+  };
+
+  if (sourceProofs[course.code]) return sourceProofs[course.code];
+  if (course.term_label.includes("2027")) return ["Student Educational Plan", "Schedule TBA"];
+  return [sourceLabels[course.source]];
 }
 
 export function topicsFor(course: Course) {

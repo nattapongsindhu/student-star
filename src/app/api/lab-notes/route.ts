@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAppSessionResponse } from "@/lib/auth";
+import { firstOversizedLabNoteField, normalizeLabNotePayload } from "@/lib/lab-note-validation";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { getSupabaseAdmin } from "@/lib/supabase";
 
@@ -22,20 +23,29 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json();
   const assignmentId = String(body.assignment_id ?? "");
-  const note = String(body.note ?? "").trim();
+  const payload = normalizeLabNotePayload(body);
 
-  if (!assignmentId || !note) {
+  if (!assignmentId || !payload.note) {
     return NextResponse.json({ error: "assignment_id and note are required." }, { status: 400 });
+  }
+
+  const oversizedField = firstOversizedLabNoteField(payload);
+
+  if (oversizedField) {
+    return NextResponse.json(
+      { error: `${oversizedField} is too long.` },
+      { status: 413 },
+    );
   }
 
   const { data, error } = await supabase
     .from("lab_notes")
     .insert({
       assignment_id: assignmentId,
-      note,
-      command_snippet: body.command_snippet ? String(body.command_snippet) : null,
-      result_summary: body.result_summary ? String(body.result_summary) : null,
-      next_step: body.next_step ? String(body.next_step) : null,
+      note: payload.note,
+      command_snippet: payload.commandSnippet,
+      result_summary: payload.resultSummary,
+      next_step: payload.nextStep,
     })
     .select("*")
     .single();
