@@ -81,8 +81,15 @@ export function courseOutcome(course: Course) {
   return "In progress";
 }
 
+export function compactCourseTitleFor(course: Course) {
+  if (course.code === "ENGL C1000") return "Academic Rd&Wr";
+  if (course.code === "CIS 210") return "Intro to Comp Network";
+  return course.title;
+}
+
 export function instructorFor(course: Course) {
   if (course.code === "POLS C1000") return "Anika Toussant";
+  if (course.code === "CIS 112") return "Mike Yazdanian";
   if (course.code === "CIS 210") return "Mike Yazdanian";
   if (course.code === "ANTHRO 102") return "Brian Bartelt";
   if (course.code === "CS 101") return "Pamela Atkinson";
@@ -90,7 +97,7 @@ export function instructorFor(course: Course) {
   if (course.code === "HEALTH 101") return "Tracy Harkins";
   if (course.code === "CIS 166") return "Allan Pratt";
   if (course.code === "CIS 162") return "Ray Lampano, Jr.";
-  return "Pending source proof";
+  return "Pending";
 }
 
 export function sourceProofFor(course: Course) {

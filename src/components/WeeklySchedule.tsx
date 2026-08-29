@@ -1,5 +1,5 @@
 import { CalendarDays, Clock, MapPin } from "lucide-react";
-import { instructorFor } from "@/lib/course-meta";
+import { compactCourseTitleFor, instructorFor } from "@/lib/course-meta";
 import { schoolTimeZone } from "@/lib/semester";
 import type { Course } from "@/lib/semester";
 
@@ -151,8 +151,10 @@ export function WeeklySchedule({ courses }: { courses: Course[] }) {
                     return (
                       <article className="rounded-md bg-white p-2.5 shadow-sm" key={`${block.courseCode}-${block.day}`}>
                         <p className="text-xs font-semibold text-slate-950">{block.courseCode}</p>
-                        <p className="mt-1 text-[11px] leading-snug text-slate-600">{course?.title ?? block.courseCode}</p>
-                        <p className="mt-0.5 text-[11px] leading-snug text-slate-500">({course ? instructorFor(course) : "Pending source proof"})</p>
+                        <p className="mt-1 text-[11px] leading-snug text-slate-600">
+                          {course ? compactCourseTitleFor(course) : block.courseCode}
+                        </p>
+                        <p className="mt-0.5 text-[11px] leading-snug text-slate-500">({course ? instructorFor(course) : "Pending"})</p>
                         <div className="mt-2 space-y-1 text-[11px] font-medium leading-snug text-slate-700">
                           <p className="flex items-center gap-1">
                             <Clock className="h-3 w-3 shrink-0" />

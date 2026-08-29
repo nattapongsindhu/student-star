@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { instructorFor, sourceProofFor } from "./course-meta";
+import { compactCourseTitleFor, instructorFor, sourceProofFor } from "./course-meta";
 import { seedCourses } from "./semester";
 
 describe("course metadata helpers", () => {
@@ -21,6 +21,13 @@ describe("course metadata helpers", () => {
     expect(instructorFor(health101)).toBe("Tracy Harkins");
     expect(instructorFor(cis166)).toBe("Allan Pratt");
     expect(instructorFor(cis162)).toBe("Ray Lampano, Jr.");
+    expect(instructorFor(courseById("cis-112"))).toBe("Mike Yazdanian");
+  });
+
+  it("uses compact course titles in dense course tables", () => {
+    expect(compactCourseTitleFor(courseById("engl-c1000"))).toBe("Academic Rd&Wr");
+    expect(compactCourseTitleFor(courseById("cis-210"))).toBe("Intro to Comp Network");
+    expect(compactCourseTitleFor(courseById("cis-112"))).toBe("Operating Systems");
   });
 
   it("does not show the old unsynced instructor placeholder", () => {
