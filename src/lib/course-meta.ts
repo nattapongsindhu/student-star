@@ -89,6 +89,16 @@ export function compactCourseTitleFor(course: Course) {
 }
 
 export function classTypeLinesFor(course: Course) {
+  const modality = course.modality.toLowerCase();
+  const isAsyncOnline =
+    course.modality === "Online" ||
+    modality.includes("completed online course") ||
+    modality.includes("self-paced online") ||
+    modality === "online lecture + online lab" ||
+    modality === "late-start online lecture + lab";
+
+  if (isAsyncOnline) return ["Online Course", "(Asynchronous / Self-Paced)"];
+
   return course.modality
     .split(/\s*(?:\+|;)\s+/)
     .flatMap((line) => line.replace(/^Online live Zoom\s+(.+)$/, "Online live Zoom|$1").split("|"))

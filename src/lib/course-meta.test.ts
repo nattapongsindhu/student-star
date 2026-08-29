@@ -41,7 +41,10 @@ describe("course metadata helpers", () => {
     expect(classTypeLinesFor(courseById("cis-112"))).toEqual(["Online lecture", "Thu lab 14:30-17:40"]);
     expect(classTypeLinesFor(courseById("cis-210"))).toEqual(["Online live Zoom", "Mon/Wed 09:00-11:00", "recordings posted"]);
     expect(classTypeLinesFor(courseById("cis-166"))).toEqual(["Online live Zoom", "Mon/Wed 11:00-12:15"]);
-    expect(classTypeLinesFor(courseById("cis-214"))).toEqual(["Online lecture", "online lab"]);
+    expect(classTypeLinesFor(courseById("pols-c1000"))).toEqual(["Online Course", "(Asynchronous / Self-Paced)"]);
+    expect(classTypeLinesFor(courseById("health-101"))).toEqual(["Online Course", "(Asynchronous / Self-Paced)"]);
+    expect(classTypeLinesFor(courseById("cis-214"))).toEqual(["Online Course", "(Asynchronous / Self-Paced)"]);
+    expect(classTypeLinesFor(courseById("cs-119"))).toEqual(["Online Course", "(Asynchronous / Self-Paced)"]);
     expect(classTypeLinesFor(courseById("co-tech-002"))).toEqual([
       "Planned course from Student Educational Plan",
       "schedule TBA",
