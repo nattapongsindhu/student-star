@@ -97,8 +97,8 @@ export function sourceProofFor(course: Course) {
   const sourceProofs: Record<string, string[]> = {
     "ANTHRO 102": ["Canvas course data", "SIS weekly schedule screenshot", "SIS course history screenshot"],
     "CIS 112": ["SIS weekly schedule screenshot", "Local seed"],
-    "CIS 162": ["Canvas course detail update", "SIS schedule source"],
-    "CIS 166": ["Canvas instructor message", "Canvas assignment sync"],
+    "CIS 162": ["Canvas welcome page", "Section LEC 17890 / LAB 17891", "Saturday Zoom schedule"],
+    "CIS 166": ["Canvas syllabus", "Instructor information", "Section information"],
     "CIS 210": ["Syllabus PDF", "Canvas grade PDF", "SIS course history screenshot"],
     "CIS 214": ["Local seed", "SIS enrollment source pending"],
     "CS 101": ["Canvas course data", "SIS weekly schedule screenshot", "SIS course history screenshot"],
