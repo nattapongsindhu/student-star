@@ -102,6 +102,7 @@ export function classTypeLinesFor(course: Course) {
   return course.modality
     .split(/\s*(?:\+|;)\s+/)
     .flatMap((line) => line.replace(/^Online live Zoom\s+(.+)$/, "Online live Zoom|$1").split("|"))
+    .flatMap((line) => line.replace(/^(Lecture|Lab)\s+(.+)$/, "$1|$2").split("|"))
     .map((line) => line.trim())
     .filter(Boolean);
 }
