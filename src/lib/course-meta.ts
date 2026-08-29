@@ -91,6 +91,7 @@ export function compactCourseTitleFor(course: Course) {
 export function classTypeLinesFor(course: Course) {
   return course.modality
     .split(/\s*(?:\+|;)\s+/)
+    .flatMap((line) => line.replace(/^Online live Zoom\s+(.+)$/, "Online live Zoom|$1").split("|"))
     .map((line) => line.trim())
     .filter(Boolean);
 }
