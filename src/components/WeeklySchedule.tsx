@@ -1,4 +1,5 @@
 import { CalendarDays, Clock, MapPin } from "lucide-react";
+import { instructorFor } from "@/lib/course-meta";
 import { schoolTimeZone } from "@/lib/semester";
 import type { Course } from "@/lib/semester";
 
@@ -9,7 +10,6 @@ type ScheduleBlock = {
   day: WeekdayKey;
   location: string;
   time: string;
-  title: string;
 };
 
 const weekdayColumns: { key: WeekdayKey; label: string }[] = [
@@ -28,70 +28,60 @@ const fixedBlocks: ScheduleBlock[] = [
     day: "mon",
     location: "Zoom",
     time: "09:00-11:00",
-    title: "Intro to Computer Networking Live Lecture",
   },
   {
     courseCode: "CIS 210",
     day: "wed",
     location: "Zoom",
     time: "09:00-11:00",
-    title: "Intro to Computer Networking Live Lecture",
   },
   {
     courseCode: "CS 101",
     day: "tue",
     location: "Zoom",
     time: "11:10-12:35",
-    title: "Intro to Comp Sci Lab",
   },
   {
     courseCode: "CS 101",
     day: "thu",
     location: "Zoom",
     time: "11:10-12:35",
-    title: "Intro to Comp Sci Lab",
   },
   {
     courseCode: "ANTHRO 102",
     day: "wed",
     location: "LACC FH 221",
     time: "14:20-15:45",
-    title: "Human Ways Of Life Lecture",
   },
   {
     courseCode: "ENGL C1000",
     day: "wed",
     location: "Zoom",
     time: "18:50-22:00",
-    title: "Academic Reading & Writing Lecture",
   },
   {
     courseCode: "CIS 112",
     day: "thu",
     location: "LACC FH 201",
     time: "14:30-17:40",
-    title: "Operating Systems Lab",
   },
   {
     courseCode: "CIS 162",
     day: "sat",
     location: "Zoom",
     time: "14:00-18:00",
-    title: "Cyber Security I Live Zoom",
   },
   {
     courseCode: "CIS 166",
     day: "mon",
     location: "Zoom",
     time: "11:00-12:15",
-    title: "Computer Forensics Live Zoom",
   },
   {
     courseCode: "CIS 166",
     day: "wed",
     location: "Zoom",
     time: "11:00-12:15",
-    title: "Computer Forensics Live Zoom",
   },
 ];
 
@@ -115,12 +105,13 @@ function isPureOnlineCourse(course: Course) {
 }
 
 function isZoomBlock(block: ScheduleBlock) {
-  return `${block.location} ${block.title}`.toLowerCase().includes("zoom");
+  return block.location.toLowerCase().includes("zoom");
 }
 
 export function WeeklySchedule({ courses }: { courses: Course[] }) {
   const todayKey = getTodayKey();
   const courseCodes = new Set(courses.map((course) => course.code));
+  const coursesByCode = new Map(courses.map((course) => [course.code, course]));
   const asynchronousCourses = courses.filter(isPureOnlineCourse);
 
   return (
@@ -154,26 +145,34 @@ export function WeeklySchedule({ courses }: { courses: Course[] }) {
 
               <div className="mt-2 space-y-2">
                 {blocks.length ? (
-                  blocks.map((block) => (
-                    <article className="rounded-md bg-white p-2.5 shadow-sm" key={`${block.courseCode}-${block.day}`}>
-                      <p className="text-xs font-semibold text-slate-950">{block.courseCode}</p>
-                      <p className="mt-1 text-[11px] leading-snug text-slate-600">{block.title}</p>
-                      <div className="mt-2 space-y-1 text-[11px] font-medium leading-snug text-slate-700">
-                        <p className="flex items-center gap-1">
-                          <Clock className="h-3 w-3 shrink-0" />
-                          {day.label} {block.time}
-                        </p>
-                        {isZoomBlock(block) ? (
-                          <span className="inline-flex w-fit rounded bg-sky-50 px-1.5 py-0.5 text-[10px] font-semibold text-sky-800">Zoom</span>
-                        ) : (
-                          <p className="flex items-start gap-1">
-                            <MapPin className="mt-0.5 h-3 w-3 shrink-0" />
-                            {block.location}
+                  blocks.map((block) => {
+                    const course = coursesByCode.get(block.courseCode);
+
+                    return (
+                      <article className="rounded-md bg-white p-2.5 shadow-sm" key={`${block.courseCode}-${block.day}`}>
+                        <p className="text-xs font-semibold text-slate-950">{block.courseCode}</p>
+                        <p className="mt-1 text-[11px] leading-snug text-slate-600">{course?.title ?? block.courseCode}</p>
+                        <p className="mt-0.5 text-[11px] leading-snug text-slate-500">({course ? instructorFor(course) : "Pending source proof"})</p>
+                        <div className="mt-2 space-y-1 text-[11px] font-medium leading-snug text-slate-700">
+                          <p className="flex items-center gap-1">
+                            <Clock className="h-3 w-3 shrink-0" />
+                            {day.label} {block.time}
                           </p>
-                        )}
-                      </div>
-                    </article>
-                  ))
+                          {isZoomBlock(block) ? (
+                            <span className="inline-flex w-fit items-center gap-1 rounded bg-sky-50 px-1.5 py-0.5 text-[10px] font-semibold text-sky-800">
+                              <MapPin className="h-3 w-3 shrink-0" />
+                              Zoom
+                            </span>
+                          ) : (
+                            <p className="flex items-start gap-1">
+                              <MapPin className="mt-0.5 h-3 w-3 shrink-0" />
+                              {block.location}
+                            </p>
+                          )}
+                        </div>
+                      </article>
+                    );
+                  })
                 ) : (
                   <p className="text-xs text-slate-500">No fixed class block</p>
                 )}
