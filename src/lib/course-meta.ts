@@ -88,6 +88,13 @@ export function compactCourseTitleFor(course: Course) {
   return course.title;
 }
 
+export function classTypeLinesFor(course: Course) {
+  return course.modality
+    .split(/\s*(?:\+|;)\s+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
 export function instructorFor(course: Course) {
   if (course.code === "ASIAN 001") return "Katie Bui";
   if (course.code === "POLS C1000") return "Anika Toussant";

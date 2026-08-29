@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { compactCourseTitleFor, instructorFor, professorRatingLineFor, sourceProofFor } from "./course-meta";
+import { classTypeLinesFor, compactCourseTitleFor, instructorFor, professorRatingLineFor, sourceProofFor } from "./course-meta";
 import { seedCourses } from "./semester";
 
 describe("course metadata helpers", () => {
@@ -35,6 +35,15 @@ describe("course metadata helpers", () => {
     expect(compactCourseTitleFor(courseById("engl-c1000"))).toBe("Academic Rd&Wr");
     expect(compactCourseTitleFor(courseById("cis-210"))).toBe("Intro to Comp Network");
     expect(compactCourseTitleFor(courseById("cis-112"))).toBe("OS: Beginning Linux");
+  });
+
+  it("formats class type details as stacked lines", () => {
+    expect(classTypeLinesFor(courseById("cis-112"))).toEqual(["Online lecture", "Thu lab 14:30-17:40"]);
+    expect(classTypeLinesFor(courseById("cis-214"))).toEqual(["Online lecture", "online lab"]);
+    expect(classTypeLinesFor(courseById("co-tech-002"))).toEqual([
+      "Planned course from Student Educational Plan",
+      "schedule TBA",
+    ]);
   });
 
   it("does not show the old unsynced instructor placeholder", () => {

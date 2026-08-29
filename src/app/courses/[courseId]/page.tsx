@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, BookOpen, CalendarDays, CheckCircle2, ExternalLink, FileText, Flag } from "lucide-react";
 import {
+  classTypeLinesFor,
   courseOutcome,
   instructorFor,
   professorRatingLineFor,
@@ -105,7 +106,14 @@ export default async function CoursePage({ params, searchParams }: CoursePagePro
                   </>
                 }
               />
-              <InfoItem label="Class Type" value={course.modality} />
+              <InfoItem
+                label="Class Type"
+                value={classTypeLinesFor(course).map((line) => (
+                  <span className="block" key={line}>
+                    {line}
+                  </span>
+                ))}
+              />
               <InfoItem label="Location / Campus" value={course.campus} />
               <InfoItem label="Canvas Course ID" value={course.canvas_course_id ? `${course.canvas_course_id}` : "Not synced yet"} />
             </div>
