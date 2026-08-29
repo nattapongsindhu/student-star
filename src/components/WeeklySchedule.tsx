@@ -159,10 +159,12 @@ export function WeeklySchedule({ courses }: { courses: Course[] }) {
                             {day.label} {block.time}
                           </p>
                           {isZoomBlock(block) ? (
-                            <span className="inline-flex w-fit items-center gap-1 rounded bg-sky-50 px-1.5 py-0.5 text-[10px] font-semibold text-sky-800">
-                              <MapPin className="h-3 w-3 shrink-0" />
-                              Zoom
-                            </span>
+                            <p className="flex items-start gap-1">
+                              <MapPin className="mt-0.5 h-3 w-3 shrink-0" />
+                              <span className="inline-flex w-fit rounded bg-sky-50 px-1.5 py-0.5 text-[10px] font-semibold text-sky-800">
+                                Zoom
+                              </span>
+                            </p>
                           ) : (
                             <p className="flex items-start gap-1">
                               <MapPin className="mt-0.5 h-3 w-3 shrink-0" />
