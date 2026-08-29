@@ -108,6 +108,86 @@ export function instructorFor(course: Course) {
   return "Pending";
 }
 
+export type ProfessorRating = {
+  checkedOn: string;
+  difficulty: string | null;
+  quality: string | null;
+  reviewCount: number | null;
+  sourceUrl: string | null;
+};
+
+const rateMyProfessorRatings: Record<string, ProfessorRating> = {
+  "Allan Pratt": {
+    checkedOn: "2026-08-29",
+    difficulty: null,
+    quality: null,
+    reviewCount: 0,
+    sourceUrl: "https://www.ratemyprofessors.com/professor/2277411",
+  },
+  "Andrea Loney": {
+    checkedOn: "2026-08-29",
+    difficulty: "2.0",
+    quality: "5.0",
+    reviewCount: 3,
+    sourceUrl: "https://www.ratemyprofessors.com/professor/2166640",
+  },
+  "Brian Bartelt": {
+    checkedOn: "2026-08-29",
+    difficulty: "3.8",
+    quality: "3.2",
+    reviewCount: 183,
+    sourceUrl: "https://www.ratemyprofessors.com/professor/1241673",
+  },
+  "Kylowna Moton": {
+    checkedOn: "2026-08-29",
+    difficulty: "3.9",
+    quality: "3.2",
+    reviewCount: 56,
+    sourceUrl: "https://www.ratemyprofessors.com/professor/2324956",
+  },
+  "Mike Yazdanian": {
+    checkedOn: "2026-08-29",
+    difficulty: "2.4",
+    quality: "4.2",
+    reviewCount: 5,
+    sourceUrl: "https://www.ratemyprofessors.com/professor/2840472",
+  },
+  "Pamela Atkinson": {
+    checkedOn: "2026-08-29",
+    difficulty: "1.0",
+    quality: "1.8",
+    reviewCount: 4,
+    sourceUrl: "https://www.ratemyprofessors.com/professor/435847",
+  },
+  "Raynaldo Lampano": {
+    checkedOn: "2026-08-29",
+    difficulty: "2.6",
+    quality: "4.0",
+    reviewCount: 5,
+    sourceUrl: "https://www.ratemyprofessors.com/professor/1625718",
+  },
+  "Tracy Harkins": {
+    checkedOn: "2026-08-29",
+    difficulty: "1.8",
+    quality: "4.8",
+    reviewCount: 6,
+    sourceUrl: "https://www.ratemyprofessors.com/professor/1905542",
+  },
+};
+
+export function professorRatingFor(course: Course) {
+  return rateMyProfessorRatings[instructorFor(course)] ?? null;
+}
+
+export function professorRatingLineFor(course: Course) {
+  const rating = professorRatingFor(course);
+  if (!rating) return "RMP pending";
+  if (!rating.quality || rating.reviewCount === null) return "RMP pending";
+
+  const reviewWord = rating.reviewCount === 1 ? "review" : "reviews";
+  return `RMP ${rating.quality}/5 · ${rating.reviewCount} ${reviewWord}`;
+}
+
 export function sourceProofFor(course: Course) {
   const sourceProofs: Record<string, string[]> = {
     "ANTHRO 102": ["Canvas course data", "SIS weekly schedule screenshot", "SIS course history screenshot"],

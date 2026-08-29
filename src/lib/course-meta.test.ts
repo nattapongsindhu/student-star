@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { compactCourseTitleFor, instructorFor, sourceProofFor } from "./course-meta";
+import { compactCourseTitleFor, instructorFor, professorRatingLineFor, sourceProofFor } from "./course-meta";
 import { seedCourses } from "./semester";
 
 describe("course metadata helpers", () => {
@@ -43,6 +43,17 @@ describe("course metadata helpers", () => {
     seedCourses.forEach((course) => {
       expect(instructorFor(course)).not.toBe(oldPlaceholder);
     });
+  });
+
+  it("shows RateMyProfessors context for verified professor matches", () => {
+    expect(professorRatingLineFor(courseById("cis-112"))).toBe("RMP 4.2/5 · 5 reviews");
+    expect(professorRatingLineFor(courseById("health-101"))).toBe("RMP 4.8/5 · 6 reviews");
+    expect(professorRatingLineFor(courseById("cis-191"))).toBe("RMP 5.0/5 · 3 reviews");
+  });
+
+  it("keeps RateMyProfessors pending when the match is not verified enough", () => {
+    expect(professorRatingLineFor(courseById("asian-001"))).toBe("RMP pending");
+    expect(professorRatingLineFor(courseById("pols-c1000"))).toBe("RMP pending");
   });
 
   it("shows source proof for verified course details", () => {

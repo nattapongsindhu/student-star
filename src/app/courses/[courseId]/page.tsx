@@ -4,6 +4,7 @@ import { ArrowLeft, BookOpen, CalendarDays, CheckCircle2, ExternalLink, FileText
 import {
   courseOutcome,
   instructorFor,
+  professorRatingLineFor,
   pointsLabel,
   sanitizeSnippet,
   sourceProofFor,
@@ -95,7 +96,15 @@ export default async function CoursePage({ params, searchParams }: CoursePagePro
             <div className="mt-4 grid gap-3 text-sm">
               <InfoItem label="Semester" value={course.term_label} />
               <InfoItem label="Dates" value={`${course.starts_on} to ${course.ends_on}`} />
-              <InfoItem label="Instructor" value={instructorFor(course)} />
+              <InfoItem
+                label="Instructor"
+                value={
+                  <>
+                    <span>{instructorFor(course)}</span>
+                    <span className="mt-1 block text-xs font-semibold text-slate-500">({professorRatingLineFor(course)})</span>
+                  </>
+                }
+              />
               <InfoItem label="Class Type" value={course.modality} />
               <InfoItem label="Location / Campus" value={course.campus} />
               <InfoItem label="Canvas Course ID" value={course.canvas_course_id ? `${course.canvas_course_id}` : "Not synced yet"} />
@@ -430,7 +439,7 @@ function ArchivedSummary({ course }: { course: Course }) {
   );
 }
 
-function InfoItem({ label, value }: { label: string; value: string }) {
+function InfoItem({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="rounded-md bg-slate-50 px-3 py-2">
       <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p>
