@@ -89,6 +89,7 @@ export function compactCourseTitleFor(course: Course) {
 }
 
 export function instructorFor(course: Course) {
+  if (course.code === "ASIAN 001") return "Katie Bui";
   if (course.code === "POLS C1000") return "Anika Toussant";
   if (course.code === "CIS 112") return "Mike Yazdanian";
   if (course.code === "CIS 210") return "Mike Yazdanian";

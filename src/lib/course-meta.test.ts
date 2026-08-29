@@ -21,6 +21,7 @@ describe("course metadata helpers", () => {
     expect(instructorFor(health101)).toBe("Tracy Harkins");
     expect(instructorFor(cis166)).toBe("Allan Pratt");
     expect(instructorFor(cis162)).toBe("Raynaldo Lampano");
+    expect(instructorFor(courseById("asian-001"))).toBe("Katie Bui");
     expect(instructorFor(courseById("cis-112"))).toBe("Mike Yazdanian");
     expect(instructorFor(courseById("co-tech-002"))).toBe("Mike Yazdanian");
     expect(instructorFor(courseById("cis-212"))).toBe("Mike Yazdanian");
