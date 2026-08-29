@@ -208,7 +208,7 @@ export const seedCourses: Course[] = [
     campus: "City Online",
     modality: "Completed online course used as a Student Star case study",
     units: 3,
-    final_grade: "Expected A",
+    final_grade: "A",
     starts_on: "2026-07-20",
     ends_on: "2026-08-23",
     weekly_hours: 0,

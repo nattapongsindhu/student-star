@@ -135,7 +135,7 @@ values
   ('cis-166', null, 'CIS 166', 'Computer Forensics', 'Fall 2026', 'active', 'City Online', 'Online lecture + online lab', 3, null, '2026-08-31', '2026-12-20', 5.25, '#be123c', 'mock'),
   ('cis-214', null, 'CIS 214', 'Intro to Network Plus', 'Fall 2026', 'upcoming', 'City Online', 'Online lecture + online lab', 3, null, '2026-08-31', '2026-12-20', 4.17, '#c2410c', 'mock'),
   ('cs-119', null, 'CS 119', 'Python Programming', 'Fall 2026', 'upcoming', 'City Online', 'Late-start online lecture + lab', 3, null, '2026-10-26', '2026-12-20', 8.5, '#15803d', 'mock'),
-  ('pols-c1000', 362736, 'POLS C1000', 'American Government & Politics', 'Summer 2026', 'case_study', 'City Online', 'Completed online course used as a Student Star case study', 3, 'Expected A', '2026-07-20', '2026-08-23', 0, '#6d28d9', 'canvas'),
+  ('pols-c1000', 362736, 'POLS C1000', 'American Government & Politics', 'Summer 2026', 'case_study', 'City Online', 'Completed online course used as a Student Star case study', 3, 'A', '2026-07-20', '2026-08-23', 0, '#6d28d9', 'canvas'),
   ('cis-210', 362781, 'CIS 210', 'Intro to Computer Networking', 'Summer 2026', 'case_study', 'City Online', 'Completed Canvas course used as a networking case study', 3, 'A', '2026-05-17', '2026-08-10', 0, '#0e7490', 'canvas'),
   ('anthro-102', 341065, 'ANTHRO 102', 'Human Ways Of Life', 'Spring 2026', 'case_study', 'LACC FH 221', 'Lecture Wed 14:20-15:45', 3, 'A', '2026-01-26', '2026-06-21', 0, '#a16207', 'canvas'),
   ('cs-101', 341019, 'CS 101', 'Intro to Comp Sci', 'Spring 2026', 'case_study', 'City-OF Campus Zoom', 'Online lecture + Tue/Thu lab 11:10-12:35', 3, 'A', '2026-02-09', '2026-06-08', 0, '#4338ca', 'canvas'),
