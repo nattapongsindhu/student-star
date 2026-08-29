@@ -155,7 +155,7 @@ export const seedCourses: Course[] = [
     term_label: "Fall 2026",
     course_status: "active",
     campus: "City Online",
-    modality: "Online lecture; meeting time TBA (2h 5m); office hours Mon/Wed 11:00-12:15",
+    modality: "Online live Zoom Mon/Wed 11:00-12:15",
     units: 3,
     final_grade: null,
     starts_on: semesterStart,

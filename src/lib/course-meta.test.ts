@@ -37,7 +37,7 @@ describe("course metadata helpers", () => {
     expect(sourceProofFor(courseById("engl-c1000"))).toContain("Course roster PDF");
     expect(sourceProofFor(courseById("pols-c1000"))).toContain("SIS course history screenshot");
     expect(sourceProofFor(courseById("cis-162"))).toContain("Saturday Zoom schedule");
-    expect(sourceProofFor(courseById("cis-166"))).toContain("Canvas syllabus");
+    expect(sourceProofFor(courseById("cis-166"))).toContain("Mon/Wed Zoom schedule");
   });
 });
 

@@ -79,6 +79,20 @@ const fixedBlocks: ScheduleBlock[] = [
     time: "14:00-18:00",
     title: "Cyber Security I Live Zoom",
   },
+  {
+    courseCode: "CIS 166",
+    day: "mon",
+    location: "Zoom",
+    time: "11:00-12:15",
+    title: "Computer Forensics Live Zoom",
+  },
+  {
+    courseCode: "CIS 166",
+    day: "wed",
+    location: "Zoom",
+    time: "11:00-12:15",
+    title: "Computer Forensics Live Zoom",
+  },
 ];
 
 const fixedCourseCodes = new Set(fixedBlocks.map((block) => block.courseCode));
