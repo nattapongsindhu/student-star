@@ -125,6 +125,7 @@ export function instructorFor(course: Course) {
   if (course.code === "CIS 170") return "Raynaldo Lampano";
   if (course.code === "CIS 191") return "Andrea Loney";
   if (course.code === "CIS 162") return "Raynaldo Lampano";
+  if (course.code === "CS 119") return "Mohammed Abdelrahim";
   return "Pending";
 }
 
