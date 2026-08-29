@@ -97,7 +97,13 @@ export function instructorFor(course: Course) {
   if (course.code === "ENGL C1000") return "Kylowna Moton";
   if (course.code === "HEALTH 101") return "Tracy Harkins";
   if (course.code === "CIS 166") return "Allan Pratt";
-  if (course.code === "CIS 162") return "Ray Lampano, Jr.";
+  if (course.code === "CO TECH 002") return "Mike Yazdanian";
+  if (course.code === "CIS 212") return "Mike Yazdanian";
+  if (course.code === "CIS 213") return "Mike Yazdanian";
+  if (course.code === "CIS 211") return "Allan Pratt";
+  if (course.code === "CIS 170") return "Raynaldo Lampano";
+  if (course.code === "CIS 191") return "Andrea Loney";
+  if (course.code === "CIS 162") return "Raynaldo Lampano";
   return "Pending";
 }
 

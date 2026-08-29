@@ -20,8 +20,14 @@ describe("course metadata helpers", () => {
     expect(instructorFor(englC1000)).toBe("Kylowna Moton");
     expect(instructorFor(health101)).toBe("Tracy Harkins");
     expect(instructorFor(cis166)).toBe("Allan Pratt");
-    expect(instructorFor(cis162)).toBe("Ray Lampano, Jr.");
+    expect(instructorFor(cis162)).toBe("Raynaldo Lampano");
     expect(instructorFor(courseById("cis-112"))).toBe("Mike Yazdanian");
+    expect(instructorFor(courseById("co-tech-002"))).toBe("Mike Yazdanian");
+    expect(instructorFor(courseById("cis-212"))).toBe("Mike Yazdanian");
+    expect(instructorFor(courseById("cis-213"))).toBe("Mike Yazdanian");
+    expect(instructorFor(courseById("cis-211"))).toBe("Allan Pratt");
+    expect(instructorFor(courseById("cis-170"))).toBe("Raynaldo Lampano");
+    expect(instructorFor(courseById("cis-191"))).toBe("Andrea Loney");
   });
 
   it("uses compact course titles in dense course tables", () => {
