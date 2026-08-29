@@ -84,6 +84,7 @@ export function courseOutcome(course: Course) {
 export function compactCourseTitleFor(course: Course) {
   if (course.code === "ENGL C1000") return "Academic Rd&Wr";
   if (course.code === "CIS 210") return "Intro to Comp Network";
+  if (course.code === "CIS 112") return "OS: Beginning Linux";
   return course.title;
 }
 
