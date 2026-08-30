@@ -40,10 +40,10 @@ describe("course metadata helpers", () => {
   });
 
   it("formats class type details as stacked lines", () => {
-    expect(classTypeLinesFor(courseById("cis-112"))).toEqual(["Online", "Thu 14:30-17:40"]);
+    expect(classTypeLinesFor(courseById("cis-112"))).toEqual(["Campus", "Thu 14:30-17:40"]);
     expect(classTypeLinesFor(courseById("cis-210"))).toEqual(["Online", "Mon/Wed 09:00-11:00"]);
     expect(classTypeLinesFor(courseById("cis-166"))).toEqual(["Online", "Mon/Wed 11:00-12:15"]);
-    expect(classTypeLinesFor(courseById("anthro-102"))).toEqual(["Campus Lecture", "Wed 14:20-15:45"]);
+    expect(classTypeLinesFor(courseById("anthro-102"))).toEqual(["Campus", "Wed 14:20-15:45"]);
     expect(classTypeLinesFor(courseById("engl-c1000"))).toEqual(["Online", "Wed 18:50-22:00"]);
     expect(classTypeLinesFor(courseById("cis-162"))).toEqual(["Online", "Sat 14:00-18:00"]);
     expect(classTypeLinesFor(courseById("pols-c1000"))).toEqual(["Online", "(Asynchronous)"]);

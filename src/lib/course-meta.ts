@@ -89,6 +89,7 @@ export function compactCourseTitleFor(course: Course) {
 }
 
 export function classTypeLinesFor(course: Course) {
+  if (course.code === "CIS 112") return ["Campus", "Thu 14:30-17:40"];
   if (course.code === "ENGL C1000") return ["Online", "Wed 18:50-22:00"];
 
   const modality = course.modality.toLowerCase();
@@ -104,7 +105,7 @@ export function classTypeLinesFor(course: Course) {
   return course.modality
     .split(/\s*(?:\+|;)\s+/)
     .flatMap((line) => line.replace(/^Online(?: live Zoom| Lecture| lecture)(?:\s+(.+))?$/, (_, schedule) => schedule ? `Online|${schedule}` : "Online").split("|"))
-    .flatMap((line) => line.replace(/^Lecture\s+(.+)$/, "Campus Lecture|$1").split("|"))
+    .flatMap((line) => line.replace(/^Lecture\s+(.+)$/, "Campus|$1").split("|"))
     .map((line) => line.trim())
     .map((line) => line.replace(/\b(?:live\s+Zoom|lab)\b/gi, "").replace(/\s{2,}/g, " ").trim())
     .filter((line) => line.toLowerCase() !== "recordings posted")
