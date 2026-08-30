@@ -156,6 +156,7 @@ export default async function Home({ searchParams }: HomeProps) {
           <HomeOpsOverview
             announcements={announcements}
             canvasCoverage={`${canvasCoverageCount}/${activeTermCourses.length}`}
+            dueSoonCount={dueSoon.length}
             highValueCount={highValueCount}
             nextDue={nextDueAssignment?.due_at ? formatShortDate(nextDueAssignment.due_at) : "No live due date"}
             totalAssignments={liveTermAssignments.length}
@@ -167,13 +168,6 @@ export default async function Home({ searchParams }: HomeProps) {
               nextDueAssignment={nextDueAssignment}
               todayAssignments={todayAssignments}
             />
-            <CanvasOutagePlan
-              dueSoonCount={dueSoon.length}
-              highValueCount={highValueCount}
-              nextDue={nextDueAssignment?.due_at ? formatShortDate(nextDueAssignment.due_at) : "No live due date"}
-            />
-          </div>
-          <div className="grid gap-6 lg:col-span-2 lg:grid-cols-[0.7fr_1.3fr]">
             <div className="rounded-lg border border-slate-200 bg-white p-5">
               <h2 className="text-xl font-semibold">This Week</h2>
               <p className="mt-2 text-sm text-slate-600">{phase.risk}</p>
@@ -183,9 +177,8 @@ export default async function Home({ searchParams }: HomeProps) {
                 <ActionRow icon={<CalendarDays />} title="Thursday fixed block" body="CIS 112 lab at LACC FH 201, 14:30-17:40." />
               </div>
             </div>
-
-            <WeeklySchedule courses={activeTermCourses} />
           </div>
+          <WeeklySchedule courses={activeTermCourses} />
 
           <div className="space-y-6">
             <div className="rounded-lg border border-slate-200 bg-white p-5">
@@ -602,12 +595,14 @@ function statusActionsFor(status: TaskStatus) {
 function HomeOpsOverview({
   announcements,
   canvasCoverage,
+  dueSoonCount,
   highValueCount,
   nextDue,
   totalAssignments,
 }: {
   announcements: CanvasAnnouncement[];
   canvasCoverage: string;
+  dueSoonCount: number;
   highValueCount: number;
   nextDue: string;
   totalAssignments: number;
@@ -657,7 +652,9 @@ function HomeOpsOverview({
         </div>
       </div>
 
-      <div className="rounded-lg border border-slate-200 bg-white p-5">
+      <CanvasOutagePlan dueSoonCount={dueSoonCount} highValueCount={highValueCount} nextDue={nextDue} />
+
+      <div className="rounded-lg border border-slate-200 bg-white p-5 lg:col-span-2">
         <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-teal-700">
           <ShieldCheck className="h-4 w-4" />
           Ops Stats
