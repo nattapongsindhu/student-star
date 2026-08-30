@@ -73,12 +73,6 @@ const fixedBlocks: ScheduleBlock[] = [
   },
   {
     courseCode: "CIS 166",
-    day: "mon",
-    location: "Zoom",
-    time: "11:00-12:15",
-  },
-  {
-    courseCode: "CIS 166",
     day: "wed",
     location: "Zoom",
     time: "11:00-12:15",
