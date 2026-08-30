@@ -26,7 +26,7 @@ import {
   getPhase,
   termConfigs,
 } from "@/lib/semester";
-import type { Assignment, Course, TermConfig, TermSeason } from "@/lib/semester";
+import type { Assignment, Course, TermConfig } from "@/lib/semester";
 import { isCanvasComplete } from "@/lib/status";
 import { statusLabels } from "@/lib/status";
 import { SourceKind } from "@/types/academic";
@@ -37,13 +37,6 @@ type HomeProps = {
   searchParams?: Promise<{
     term?: string;
   }>;
-};
-
-const seasonalHeroCopy: Record<TermSeason, string> = {
-  fall: "Fall into a deep sleep.",
-  spring: "Spring brings flowers, professors bring tears.",
-  summer: "Summer sunshine, brain decline.",
-  winter: "Winter snow, motivation low.",
 };
 
 const termTabBadges: Record<string, { label: string }> = {
@@ -117,10 +110,10 @@ export default async function Home({ searchParams }: HomeProps) {
                 Student Star · {selectedTerm.label}
               </p>
               <h1 className="mt-3 max-w-4xl text-4xl font-semibold tracking-normal text-slate-950 md:text-6xl">
-                {selectedTermId === "home"
-                  ? "What should I do now to protect an A in every class?"
-                  : seasonalHeroCopy[selectedTerm.season]}
+                Los Angeles City College
               </h1>
+              <p className="mt-2 text-xl font-medium text-slate-700 md:text-2xl">Associate in Science in Cybersecurity</p>
+              <p className="mt-2 text-sm text-slate-500">855 N. Vermont Avenue, Los Angeles, CA 90029</p>
             </div>
             <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
               <div className="flex items-center gap-2 font-semibold text-slate-950">
