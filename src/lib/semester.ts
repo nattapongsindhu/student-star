@@ -220,7 +220,7 @@ export const seedCourses: Course[] = [
     term_label: "Fall 2026",
     course_status: "upcoming",
     campus: "Zoom",
-    modality: "Online live Zoom Tue 15:00-17:00; attendance recommended/not required",
+    modality: "Online live Zoom Tue 15:00-17:00",
     units: 3,
     final_grade: null,
     starts_on: semesterStart,

@@ -96,16 +96,19 @@ export function compactCourseTitleFor(course: Course) {
   if (course.code === "ENGL C1000") return "Academic Rd&Wr";
   if (course.code === "CIS 210") return "Intro to Comp Network";
   if (course.code === "CIS 112") return "OS: Beginning Linux";
+  if (course.code === "CIS 214") return "Intro to Netwk+";
   return course.title;
 }
 
 export function displayCourseTitleFor(course: Course) {
   if (course.code === "CIS 112") return "Operating Systems: Beginning Linux";
+  if (course.code === "CIS 214") return "Introduction to Network Plus";
   return course.title;
 }
 
 export function classTypeLinesFor(course: Course) {
   if (course.code === "CIS 112") return ["Campus", "Thu 14:30-17:40"];
+  if (course.code === "CIS 214") return ["Online", "Tue 15:00-17:00"];
   if (course.code === "ENGL C1000") return ["Online", "Wed 18:50-22:00"];
 
   const modality = course.modality.toLowerCase();
@@ -243,7 +246,7 @@ export function sourceProofFor(course: Course) {
     "CIS 162": ["Canvas welcome page", "Section LEC 17890 / LAB 17891", "Saturday Zoom schedule"],
     "CIS 166": ["Canvas syllabus", "Instructor information", "Mon/Wed Zoom schedule"],
     "CIS 210": ["Syllabus PDF", "Canvas grade PDF", "SIS course history screenshot"],
-    "CIS 214": ["Syllabus image", "Tuesday Zoom schedule", "Attendance recommended/not required"],
+    "CIS 214": ["Syllabus image", "Tuesday Zoom schedule"],
     "CS 101": ["Canvas course data", "SIS weekly schedule screenshot", "SIS course history screenshot"],
     "CS 119": ["Local seed", "SIS enrollment source pending"],
     "ENGL C1000": ["Course roster PDF", "Syllabus PDF", "SIS weekly schedule screenshot"],

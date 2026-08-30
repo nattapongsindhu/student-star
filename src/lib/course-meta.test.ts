@@ -44,6 +44,7 @@ describe("course metadata helpers", () => {
     expect(compactCourseTitleFor(courseById("engl-c1000"))).toBe("Academic Rd&Wr");
     expect(compactCourseTitleFor(courseById("cis-210"))).toBe("Intro to Comp Network");
     expect(compactCourseTitleFor(courseById("cis-112"))).toBe("OS: Beginning Linux");
+    expect(compactCourseTitleFor(courseById("cis-214"))).toBe("Intro to Netwk+");
   });
 
   it("formats class type details as stacked lines", () => {
@@ -55,11 +56,7 @@ describe("course metadata helpers", () => {
     expect(classTypeLinesFor(courseById("cis-162"))).toEqual(["Online", "Sat 14:00-18:00"]);
     expect(classTypeLinesFor(courseById("pols-c1000"))).toEqual(["Online", "(Asynchronous)"]);
     expect(classTypeLinesFor(courseById("health-101"))).toEqual(["Online", "(Asynchronous)"]);
-    expect(classTypeLinesFor(courseById("cis-214"))).toEqual([
-      "Online",
-      "Tue 15:00-17:00",
-      "attendance recommended/not required",
-    ]);
+    expect(classTypeLinesFor(courseById("cis-214"))).toEqual(["Online", "Tue 15:00-17:00"]);
     expect(classTypeLinesFor(courseById("cs-119"))).toEqual(["Online", "(Asynchronous)"]);
     expect(classTypeLinesFor(courseById("co-tech-002"))).toEqual([
       "Planned course from Student Educational Plan",
@@ -70,6 +67,7 @@ describe("course metadata helpers", () => {
   it("formats class type details as a compact course detail summary", () => {
     expect(classTypeSummaryFor(courseById("cis-166"))).toBe("Online Mon/Wed 11:00-12:15");
     expect(classTypeSummaryFor(courseById("cis-112"))).toBe("Campus Thu 14:30-17:40");
+    expect(classTypeSummaryFor(courseById("cis-214"))).toBe("Online Tue 15:00-17:00");
     expect(classTypeSummaryFor(courseById("health-101"))).toBe("Online (Asynchronous)");
   });
 
@@ -99,7 +97,7 @@ describe("course metadata helpers", () => {
     expect(sourceProofFor(courseById("pols-c1000"))).toContain("SIS course history screenshot");
     expect(sourceProofFor(courseById("cis-162"))).toContain("Saturday Zoom schedule");
     expect(sourceProofFor(courseById("cis-166"))).toContain("Mon/Wed Zoom schedule");
-    expect(sourceProofFor(courseById("cis-214"))).toContain("Attendance recommended/not required");
+    expect(sourceProofFor(courseById("cis-214"))).toContain("Tuesday Zoom schedule");
   });
 });
 
