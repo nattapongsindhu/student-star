@@ -109,7 +109,7 @@ export default async function Home({ searchParams }: HomeProps) {
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">
                 Student Star · {selectedTerm.label}
               </p>
-              <h1 className="mt-3 max-w-4xl text-4xl font-semibold tracking-normal text-slate-950 md:text-6xl">
+              <h1 className="mt-3 max-w-4xl text-4xl font-semibold tracking-normal text-slate-950 md:text-5xl">
                 Associate in Science in Cybersecurity
               </h1>
               <p className="mt-2 text-xl font-medium text-slate-700 md:text-2xl">Los Angeles City College</p>
