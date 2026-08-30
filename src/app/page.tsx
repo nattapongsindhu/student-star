@@ -135,16 +135,19 @@ export default async function Home({ searchParams }: HomeProps) {
             </div>
           </div>
 
-          {isHomeTab ? (
-            <div className="grid gap-3 md:grid-cols-4">
-              <Metric icon={<BookOpen />} label="Term courses" value={activeTermCourses.length.toString()} />
-              <Metric icon={<CalendarDays />} label="Due in 7 days" value={dueSoon.length.toString()} />
-              <Metric icon={<AlertTriangle />} label="At risk" value={atRiskCount.toString()} />
-              <Metric icon={<ShieldCheck />} label="Missing / mismatch" value={`${missingCount}/${mismatchCount}`} />
-            </div>
-          ) : null}
         </div>
       </section>
+
+      {isHomeTab ? (
+        <section className="border-b border-slate-200 bg-white">
+          <div className="mx-auto grid max-w-7xl gap-3 px-5 py-6 md:grid-cols-4 lg:px-8">
+            <Metric icon={<BookOpen />} label="Term courses" value={activeTermCourses.length.toString()} />
+            <Metric icon={<CalendarDays />} label="Due in 7 days" value={dueSoon.length.toString()} />
+            <Metric icon={<AlertTriangle />} label="At risk" value={atRiskCount.toString()} />
+            <Metric icon={<ShieldCheck />} label="Missing / mismatch" value={`${missingCount}/${mismatchCount}`} />
+          </div>
+        </section>
+      ) : null}
 
       {isHomeTab ? (
         <section className="mx-auto grid max-w-7xl gap-6 px-5 py-6 lg:grid-cols-[1.25fr_0.75fr] lg:px-8">
