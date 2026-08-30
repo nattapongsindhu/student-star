@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { compactCourseTitleFor, courseOutcome, sourceBadgeClass, sourceLabels } from "@/lib/course-meta";
+import { compactCourseTitleFor, courseOutcome } from "@/lib/course-meta";
 import type { Assignment, Course } from "@/lib/semester";
 
 type CourseDetailCardProps = {
@@ -28,7 +28,6 @@ export function CourseDetailCard({ assignments, course, variant }: CourseDetailC
         <ArrowRight className="mt-1 h-4 w-4 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-slate-700" />
       </div>
       <div className="mt-2 flex flex-wrap items-center gap-1.5">
-        <SourceBadge source={course.source} />
         <span className="text-sm text-slate-600">{course.term_label}</span>
         <span
           className={`rounded px-1.5 py-0.5 text-xs font-medium ${
@@ -57,8 +56,4 @@ export function CourseDetailCard({ assignments, course, variant }: CourseDetailC
       ) : null}
     </Link>
   );
-}
-
-function SourceBadge({ source }: { source: Course["source"] }) {
-  return <span className={`rounded px-1.5 py-0.5 text-xs font-medium ${sourceBadgeClass(source)}`}>{sourceLabels[source]}</span>;
 }

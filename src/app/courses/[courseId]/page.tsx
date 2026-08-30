@@ -9,8 +9,6 @@ import {
   pointsLabel,
   sanitizeSnippet,
   sourceProofFor,
-  sourceBadgeClass,
-  sourceLabels,
   submissionClass,
   submissionLabel,
   taskTypeLabels,
@@ -69,7 +67,6 @@ export default async function CoursePage({ params, searchParams }: CoursePagePro
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <p className="font-semibold text-teal-800">{course.code}</p>
-                <SourceBadge source={course.source} />
               </div>
               <h1 className="mt-3 max-w-4xl text-4xl font-semibold tracking-normal md:text-6xl">{course.title}</h1>
               <p className="mt-3 text-slate-600">
@@ -457,10 +454,6 @@ function InfoItem({ label, value }: { label: string; value: React.ReactNode }) {
       <p className="mt-1 font-medium text-slate-900">{value}</p>
     </div>
   );
-}
-
-function SourceBadge({ source }: { source: Course["source"] }) {
-  return <span className={`rounded px-2 py-1 text-xs font-medium ${sourceBadgeClass(source)}`}>{sourceLabels[source]}</span>;
 }
 
 function SourceProofList({ course }: { course: Course }) {
