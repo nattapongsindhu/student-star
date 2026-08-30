@@ -25,18 +25,16 @@ export function CourseDetailCard({ assignments, course }: CourseDetailCardProps)
         </div>
         <ArrowRight className="mt-1 h-4 w-4 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-slate-700" />
       </div>
-      <div className="mt-2 flex flex-wrap items-center gap-1.5">
-        <span className="text-sm text-slate-600">{instructorFor(course)}</span>
+      <p className="mt-2 text-sm text-slate-600">{instructorFor(course)}</p>
+      <p className="mt-1 text-xs font-medium text-slate-500">
+        {assignments.length} assignments ·
         <span
-          className={`rounded px-1.5 py-0.5 text-xs font-medium ${
+          className={`ml-1 inline-flex rounded px-1.5 py-0.5 align-middle text-xs font-semibold ${
             course.final_grade ? "bg-emerald-50 text-emerald-800" : "bg-slate-100 text-slate-700"
           }`}
         >
-          {course.final_grade ?? "Pending"}
+          {course.final_grade ?? courseOutcome(course)}
         </span>
-      </div>
-      <p className="mt-1 text-xs font-medium text-slate-500">
-        {assignments.length} assignments · {courseOutcome(course)}
       </p>
     </Link>
   );
