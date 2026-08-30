@@ -243,7 +243,7 @@ export function sourceProofFor(course: Course) {
     "CIS 162": ["Canvas welcome page", "Section LEC 17890 / LAB 17891", "Saturday Zoom schedule"],
     "CIS 166": ["Canvas syllabus", "Instructor information", "Mon/Wed Zoom schedule"],
     "CIS 210": ["Syllabus PDF", "Canvas grade PDF", "SIS course history screenshot"],
-    "CIS 214": ["Local seed", "SIS enrollment source pending"],
+    "CIS 214": ["Syllabus image", "Tuesday Zoom schedule", "Attendance recommended/not required"],
     "CS 101": ["Canvas course data", "SIS weekly schedule screenshot", "SIS course history screenshot"],
     "CS 119": ["Local seed", "SIS enrollment source pending"],
     "ENGL C1000": ["Course roster PDF", "Syllabus PDF", "SIS weekly schedule screenshot"],

@@ -136,7 +136,7 @@ values
   ('cis-112', null, 'CIS 112', 'Operating Systems: Beginning Linux', 'Fall 2026', 'upcoming', 'LACC FH 201', 'Online lecture + Thu lab 14:30-17:40', 3, null, '2026-08-31', '2026-12-20', 5.25, '#2563eb', 'mock'),
   ('cis-162', null, 'CIS 162', 'Cyber Security I', 'Fall 2026', 'upcoming', 'City Online', 'Online lecture + Sat live Zoom 14:00-18:00', 3, null, '2026-08-31', '2026-12-20', 4.17, '#7c3aed', 'mock'),
   ('cis-166', null, 'CIS 166', 'Computer Forensics', 'Fall 2026', 'active', 'City Online', 'Online live Zoom Mon/Wed 11:00-12:15', 3, null, '2026-08-31', '2026-12-20', 5.25, '#be123c', 'mock'),
-  ('cis-214', null, 'CIS 214', 'Intro to Network Plus', 'Fall 2026', 'upcoming', 'City Online', 'Online lecture + online lab', 3, null, '2026-08-31', '2026-12-20', 4.17, '#c2410c', 'mock'),
+  ('cis-214', null, 'CIS 214', 'Intro to Network Plus', 'Fall 2026', 'upcoming', 'Zoom', 'Online live Zoom Tue 15:00-17:00; attendance recommended/not required', 3, null, '2026-08-31', '2026-12-20', 4.17, '#c2410c', 'syllabus'),
   ('cs-119', null, 'CS 119', 'Python Programming', 'Fall 2026', 'upcoming', 'City Online', 'Late-start online lecture + lab', 3, null, '2026-10-26', '2026-12-20', 8.5, '#15803d', 'mock'),
   ('pols-c1000', 362736, 'POLS C1000', 'American Government & Politics', 'Summer 2026', 'case_study', 'City Online', 'Completed online course used as a Student Star case study', 3, 'A', '2026-07-20', '2026-08-23', 0, '#6d28d9', 'canvas'),
   ('cis-210', 362781, 'CIS 210', 'Intro to Computer Networking', 'Summer 2026', 'case_study', 'City Online', 'Online live Zoom Mon/Wed 09:00-11:00; recordings posted', 3, 'A', '2026-06-15', '2026-08-09', 0, '#0e7490', 'canvas'),

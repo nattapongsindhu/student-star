@@ -55,7 +55,11 @@ describe("course metadata helpers", () => {
     expect(classTypeLinesFor(courseById("cis-162"))).toEqual(["Online", "Sat 14:00-18:00"]);
     expect(classTypeLinesFor(courseById("pols-c1000"))).toEqual(["Online", "(Asynchronous)"]);
     expect(classTypeLinesFor(courseById("health-101"))).toEqual(["Online", "(Asynchronous)"]);
-    expect(classTypeLinesFor(courseById("cis-214"))).toEqual(["Online", "(Asynchronous)"]);
+    expect(classTypeLinesFor(courseById("cis-214"))).toEqual([
+      "Online",
+      "Tue 15:00-17:00",
+      "attendance recommended/not required",
+    ]);
     expect(classTypeLinesFor(courseById("cs-119"))).toEqual(["Online", "(Asynchronous)"]);
     expect(classTypeLinesFor(courseById("co-tech-002"))).toEqual([
       "Planned course from Student Educational Plan",
@@ -95,6 +99,7 @@ describe("course metadata helpers", () => {
     expect(sourceProofFor(courseById("pols-c1000"))).toContain("SIS course history screenshot");
     expect(sourceProofFor(courseById("cis-162"))).toContain("Saturday Zoom schedule");
     expect(sourceProofFor(courseById("cis-166"))).toContain("Mon/Wed Zoom schedule");
+    expect(sourceProofFor(courseById("cis-214"))).toContain("Attendance recommended/not required");
   });
 });
 
