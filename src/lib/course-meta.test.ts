@@ -30,6 +30,7 @@ describe("course metadata helpers", () => {
     expect(instructorFor(courseById("cis-170"))).toBe("Raynaldo Lampano");
     expect(instructorFor(courseById("cis-191"))).toBe("Andrea Loney");
     expect(instructorFor(courseById("cs-119"))).toBe("Mohammed Abdelrahim");
+    expect(instructorFor(courseById("cis-214"))).toBe("Farahnaz Nezhad");
   });
 
   it("uses compact course titles in dense course tables", () => {
