@@ -89,6 +89,8 @@ export function compactCourseTitleFor(course: Course) {
 }
 
 export function classTypeLinesFor(course: Course) {
+  if (course.code === "ENGL C1000") return ["Online", "Wed 18:50-22:00"];
+
   const modality = course.modality.toLowerCase();
   const isAsyncOnline =
     course.modality === "Online" ||
