@@ -384,12 +384,16 @@ function TermSwitcher({ selectedTabId, selectedTerm }: { selectedTabId: string; 
 }
 
 function SemesterOverviewView({ assignments, courses, term }: { assignments: Assignment[]; courses: Course[]; term: TermConfig }) {
+  const termDates = termDateRanges[term.label] ?? { startsOn: courses[0]?.starts_on, endsOn: courses[0]?.ends_on };
+
   return (
     <section className="mx-auto grid max-w-7xl gap-6 px-5 py-6 lg:px-8">
       <div className="rounded-lg border border-slate-200 bg-white p-5">
         <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
           <div>
-            <h2 className="text-xl font-semibold">{term.label} Courses</h2>
+            <h2 className="text-xl font-semibold">
+              {term.label} ({formatTermDate(termDates.startsOn)} to {formatTermDate(termDates.endsOn)})
+            </h2>
             <p className="text-sm text-slate-600">Courses and schedule for this semester only.</p>
           </div>
           <span className="rounded bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-700">
@@ -420,6 +424,21 @@ function SemesterOverviewView({ assignments, courses, term }: { assignments: Ass
 
       <WeeklySchedule courses={courses} />
     </section>
+  );
+}
+
+const termDateRanges: Record<string, { startsOn: string; endsOn: string }> = {
+  "Spring 2026": { startsOn: "2026-02-09", endsOn: "2026-06-08" },
+  "Summer 2026": { startsOn: "2026-06-15", endsOn: "2026-08-09" },
+  "Fall 2026": { startsOn: "2026-08-31", endsOn: "2026-12-20" },
+  "Winter 2027": { startsOn: "2027-01-04", endsOn: "2027-02-06" },
+  "Spring 2027": { startsOn: "2027-02-09", endsOn: "2027-06-08" },
+};
+
+function formatTermDate(value: string | undefined) {
+  if (!value) return "Date TBA";
+  return new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" }).format(
+    new Date(`${value}T00:00:00Z`),
   );
 }
 
