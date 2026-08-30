@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, BookOpen, CalendarDays, CheckCircle2, ExternalLink, FileText, Flag } from "lucide-react";
 import {
+  classTypeLinesFor,
   classTypeSummaryFor,
   displayCourseTitleFor,
   courseOutcome,
@@ -109,7 +110,17 @@ export default async function CoursePage({ params, searchParams }: CoursePagePro
                   </>
                 }
               />
-              <InfoItem label="Class Type" value={classTypeSummary} />
+              <InfoItem
+                label="Class Type"
+                value={classTypeLinesFor(course).map((line) => (
+                  <span className="block" key={line}>
+                    {line}
+                    {line === "(Asynchronous)" ? (
+                      <span className="ml-2 inline-block rounded bg-sky-50 px-1.5 py-0.5 align-middle text-xs font-semibold text-sky-700">Async</span>
+                    ) : null}
+                  </span>
+                ))}
+              />
               <InfoItem label="Location / Campus" value={course.campus} />
               <InfoItem label="Canvas Course ID" value={course.canvas_course_id ? `${course.canvas_course_id}` : "Not synced yet"} />
             </div>
