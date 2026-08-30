@@ -100,7 +100,7 @@ export default async function CoursePage({ params, searchParams }: CoursePagePro
             <div className="mt-4 grid gap-3 text-sm">
               <InfoItem label="Semester" value={course.term_label} />
               <InfoItem label="Dates" value={`${course.starts_on} to ${course.ends_on}`} />
-              <InfoItem label="Grades" value="Pending" />
+              <InfoItem label="Grades" value={outcome} />
               <InfoItem
                 label="Instructor"
                 value={
