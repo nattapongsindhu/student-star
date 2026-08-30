@@ -178,7 +178,9 @@ export default async function Home({ searchParams }: HomeProps) {
               </div>
             </div>
           </div>
-          <WeeklySchedule courses={activeTermCourses} />
+          <div className="lg:col-span-2">
+            <WeeklySchedule courses={activeTermCourses} />
+          </div>
 
           <div className="space-y-6">
             <div className="rounded-lg border border-slate-200 bg-white p-5">
@@ -608,7 +610,7 @@ function HomeOpsOverview({
   totalAssignments: number;
 }) {
   return (
-    <div className="grid gap-6 lg:col-span-2 lg:grid-cols-[1.1fr_0.9fr]">
+    <div className="grid gap-6 lg:col-span-2 lg:grid-cols-[1.1fr_1fr_0.9fr]">
       <div className="rounded-lg border border-amber-200 bg-amber-50 p-5">
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -654,7 +656,7 @@ function HomeOpsOverview({
 
       <CanvasOutagePlan dueSoonCount={dueSoonCount} highValueCount={highValueCount} nextDue={nextDue} />
 
-      <div className="rounded-lg border border-slate-200 bg-white p-5 lg:col-span-2">
+      <div className="rounded-lg border border-slate-200 bg-white p-5">
         <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-teal-700">
           <ShieldCheck className="h-4 w-4" />
           Ops Stats
