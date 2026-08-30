@@ -145,17 +145,18 @@ export default async function Home({ searchParams }: HomeProps) {
               <CanvasTokenAlert lastAttemptAt={lastAttemptAt ? formatShortDate(lastAttemptAt) : null} />
             </div>
           ) : null}
+          <div className="grid gap-3 lg:col-span-2 md:grid-cols-4">
+            <Metric icon={<BookOpen />} label="Term courses" value={activeTermCourses.length.toString()} />
+            <Metric icon={<CalendarDays />} label="Due in 7 days" value={dueSoon.length.toString()} />
+            <Metric icon={<AlertTriangle />} label="At risk" value={atRiskCount.toString()} />
+            <Metric icon={<ShieldCheck />} label="Missing / mismatch" value={`${missingCount}/${mismatchCount}`} />
+          </div>
           <HomeOpsOverview
             announcements={announcements}
             canvasCoverage={`${canvasCoverageCount}/${activeTermCourses.length}`}
             dueSoonCount={dueSoon.length}
             highValueCount={highValueCount}
-            missingCount={missingCount}
-            mismatchCount={mismatchCount}
             nextDue={nextDueAssignment?.due_at ? formatShortDate(nextDueAssignment.due_at) : "No live due date"}
-            termCourseCount={activeTermCourses.length}
-            dueInSevenDays={dueSoon.length}
-            atRiskCount={atRiskCount}
             totalAssignments={liveTermAssignments.length}
           />
           <div className="grid gap-6 lg:col-span-2 lg:grid-cols-[1fr_1fr]">
@@ -593,31 +594,21 @@ function statusActionsFor(status: TaskStatus) {
 
 function HomeOpsOverview({
   announcements,
-  atRiskCount,
   canvasCoverage,
   dueSoonCount,
-  dueInSevenDays,
   highValueCount,
-  missingCount,
-  mismatchCount,
   nextDue,
-  termCourseCount,
   totalAssignments,
 }: {
   announcements: CanvasAnnouncement[];
-  atRiskCount: number;
   canvasCoverage: string;
   dueSoonCount: number;
-  dueInSevenDays: number;
   highValueCount: number;
-  missingCount: number;
-  mismatchCount: number;
   nextDue: string;
-  termCourseCount: number;
   totalAssignments: number;
 }) {
   return (
-    <div className="grid gap-6 lg:col-span-2 lg:grid-cols-[1.1fr_1fr_0.95fr_1.05fr]">
+    <div className="grid gap-6 lg:col-span-2 lg:grid-cols-[1.1fr_1fr_0.95fr]">
       <div className="rounded-lg border border-amber-200 bg-amber-50 p-5">
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -676,12 +667,6 @@ function HomeOpsOverview({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <Metric icon={<BookOpen />} label="Term courses" value={termCourseCount.toString()} />
-        <Metric icon={<CalendarDays />} label="Due in 7 days" value={dueInSevenDays.toString()} />
-        <Metric icon={<AlertTriangle />} label="At risk" value={atRiskCount.toString()} />
-        <Metric icon={<ShieldCheck />} label="Missing / mismatch" value={`${missingCount}/${mismatchCount}`} />
-      </div>
     </div>
   );
 }
