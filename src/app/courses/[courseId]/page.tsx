@@ -48,6 +48,7 @@ export default async function CoursePage({ params, searchParams }: CoursePagePro
 
   const assignments = courseAssignments.filter((assignment) => assignment.course_id === course.id);
   const grades = courseGradeSummaryFor(course);
+  const outcome = courseOutcome(course);
   const roomTabs = buildCourseRoomTabs(course, assignments);
   const requestedView = query.view;
   const activeView = requestedView && roomTabs.some((tab) => tab.id === requestedView) ? requestedView : "overview";
@@ -79,8 +80,8 @@ export default async function CoursePage({ params, searchParams }: CoursePagePro
               </p>
             </div>
             <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-              <p className="text-sm font-medium text-slate-600">{course.final_grade ? "Final Grade" : "Current Status"}</p>
-              <p className="mt-2 text-3xl font-semibold">{courseOutcome(course)}</p>
+              <p className="text-sm font-medium text-slate-600">{outcome === "In progress" ? "Current Status" : "Final Grade"}</p>
+              <p className="mt-2 text-3xl font-semibold">{outcome}</p>
             </div>
           </div>
         </div>
@@ -91,7 +92,7 @@ export default async function CoursePage({ params, searchParams }: CoursePagePro
           <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
             <StatCard icon={<BookOpen />} label="Assignments" value={assignments.length.toString()} />
             <StatCard icon={<FileText />} label="Points Possible" value={points ? `${points}` : "N/A"} />
-            <StatCard icon={<CheckCircle2 />} label="Status" value={courseOutcome(course)} />
+            <StatCard icon={<CheckCircle2 />} label="Status" value={outcome} />
           </div>
 
           <div className="rounded-lg border border-slate-200 bg-white p-5">
@@ -445,11 +446,13 @@ function coursePaceLabel(course: Course, assignments: Assignment[]) {
 }
 
 function ArchivedSummary({ course }: { course: Course }) {
+  const outcome = courseOutcome(course);
+
   return (
     <div className="p-5">
       <h3 className="font-semibold">Verified Course Outcome</h3>
       <p className="mt-2 text-sm text-slate-600">
-        {course.final_grade ? `Completed with ${course.final_grade}.` : "No granular assignments are synced for this course yet."}
+        {outcome !== "In progress" ? `Completed with ${outcome}.` : "No granular assignments are synced for this course yet."}
       </p>
       <div className="mt-4 grid gap-2 sm:grid-cols-2">
         {topicsFor(course).map((topic) => (

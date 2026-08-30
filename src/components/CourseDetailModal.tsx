@@ -6,10 +6,11 @@ import type { Assignment, Course } from "@/lib/semester";
 type CourseDetailCardProps = {
   assignments: Assignment[];
   course: Course;
-  variant: "active" | "case_study" | "archived";
 };
 
 export function CourseDetailCard({ assignments, course }: CourseDetailCardProps) {
+  const outcome = courseOutcome(course);
+
   return (
     <Link
       className="group block w-full rounded-lg border border-slate-200 p-3 text-left transition-all hover:border-slate-400 hover:bg-slate-50 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
@@ -30,10 +31,10 @@ export function CourseDetailCard({ assignments, course }: CourseDetailCardProps)
         {assignments.length} assignments ·
         <span
           className={`ml-1 inline-flex rounded px-1.5 py-0.5 align-middle text-xs font-semibold ${
-            course.final_grade ? "bg-emerald-50 text-emerald-800" : "bg-slate-100 text-slate-700"
+            outcome !== "In progress" ? "bg-emerald-50 text-emerald-800" : "bg-slate-100 text-slate-700"
           }`}
         >
-          {course.final_grade ?? courseOutcome(course)}
+          {outcome}
         </span>
       </p>
     </Link>

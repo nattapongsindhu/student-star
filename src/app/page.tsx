@@ -284,7 +284,6 @@ export default async function Home({ searchParams }: HomeProps) {
                     assignments={courseAssignments.filter((assignment) => assignment.course_id === course.id)}
                     course={course}
                     key={course.id}
-                    variant="active"
                   />
                 ))}
               </div>
@@ -414,7 +413,6 @@ function SemesterOverviewView({ assignments, courses, term }: { assignments: Ass
                 assignments={assignments.filter((assignment) => assignment.course_id === course.id)}
                 course={course}
                 key={course.id}
-                variant={courseCardVariant(course)}
               />
             ))}
           </div>
@@ -446,11 +444,6 @@ function formatTermDate(value: string | undefined) {
   return new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" }).format(
     new Date(`${value}T00:00:00Z`),
   );
-}
-
-function courseCardVariant(course: Course) {
-  if (course.course_status === "case_study") return "archived";
-  return "active";
 }
 
 type CourseLookup = Pick<Course, "id" | "code" | "color">[];
