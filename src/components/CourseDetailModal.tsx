@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { instructorFor } from "@/lib/course-meta";
+import { courseOutcome, instructorFor } from "@/lib/course-meta";
 import type { Assignment, Course } from "@/lib/semester";
 
 type CourseDetailCardProps = {
@@ -9,7 +9,7 @@ type CourseDetailCardProps = {
   variant: "active" | "case_study" | "archived";
 };
 
-export function CourseDetailCard({ course }: CourseDetailCardProps) {
+export function CourseDetailCard({ assignments, course }: CourseDetailCardProps) {
   return (
     <Link
       className="group block w-full rounded-lg border border-slate-200 p-3 text-left transition-all hover:border-slate-400 hover:bg-slate-50 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
@@ -35,6 +35,9 @@ export function CourseDetailCard({ course }: CourseDetailCardProps) {
           {course.final_grade ?? "Pending"}
         </span>
       </div>
+      <p className="mt-1 text-xs font-medium text-slate-500">
+        {assignments.length} assignments · {courseOutcome(course)}
+      </p>
     </Link>
   );
 }
