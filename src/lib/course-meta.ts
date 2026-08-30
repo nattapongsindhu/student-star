@@ -128,6 +128,12 @@ export function classTypeLinesFor(course: Course) {
     .filter(Boolean);
 }
 
+export function classTypeSummaryFor(course: Course) {
+  const [type, schedule] = classTypeLinesFor(course);
+  if (!schedule) return type;
+  return `${type} ${schedule}`;
+}
+
 export function instructorFor(course: Course) {
   if (course.code === "ASIAN 001") return "Katie Bui";
   if (course.code === "POLS C1000") return "Anika Toussant";

@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { classTypeLinesFor, compactCourseTitleFor, instructorFor, professorRatingLineFor, sourceProofFor } from "./course-meta";
+import {
+  classTypeLinesFor,
+  classTypeSummaryFor,
+  compactCourseTitleFor,
+  instructorFor,
+  professorRatingLineFor,
+  sourceProofFor,
+} from "./course-meta";
 import { seedCourses } from "./semester";
 
 describe("course metadata helpers", () => {
@@ -54,6 +61,12 @@ describe("course metadata helpers", () => {
       "Planned course from Student Educational Plan",
       "schedule TBA",
     ]);
+  });
+
+  it("formats class type details as a compact course detail summary", () => {
+    expect(classTypeSummaryFor(courseById("cis-166"))).toBe("Online Mon/Wed 11:00-12:15");
+    expect(classTypeSummaryFor(courseById("cis-112"))).toBe("Campus Thu 14:30-17:40");
+    expect(classTypeSummaryFor(courseById("health-101"))).toBe("Online (Asynchronous)");
   });
 
   it("does not show the old unsynced instructor placeholder", () => {
