@@ -111,6 +111,9 @@ export default async function CoursePage({ params, searchParams }: CoursePagePro
                 value={classTypeLinesFor(course).map((line) => (
                   <span className="block" key={line}>
                     {line}
+                    {line === "(Asynchronous)" ? (
+                      <span className="ml-2 inline-block rounded bg-sky-50 px-1.5 py-0.5 align-middle text-xs font-semibold text-sky-700">Async</span>
+                    ) : null}
                   </span>
                 ))}
               />
