@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { courseOutcome, instructorFor } from "@/lib/course-meta";
+import { courseOutcome, displayCourseTitleFor, instructorFor } from "@/lib/course-meta";
 import type { Assignment, Course } from "@/lib/semester";
 
 type CourseDetailCardProps = {
@@ -21,7 +21,7 @@ export function CourseDetailCard({ assignments, course }: CourseDetailCardProps)
           <p className="text-sm font-semibold" style={{ color: course.color }}>
             {course.code}
           </p>
-          <h3 className="mt-1 text-base font-semibold leading-snug">{course.title}</h3>
+          <h3 className="mt-1 text-base font-semibold leading-snug">{displayCourseTitleFor(course)}</h3>
         </div>
         <ArrowRight className="mt-1 h-4 w-4 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-slate-700" />
       </div>

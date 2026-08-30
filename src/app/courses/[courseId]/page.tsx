@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, BookOpen, CalendarDays, CheckCircle2, ExternalLink, FileText, Flag } from "lucide-react";
 import {
   classTypeLinesFor,
+  displayCourseTitleFor,
   courseGradeSummaryFor,
   courseOutcome,
   instructorFor,
@@ -70,7 +71,9 @@ export default async function CoursePage({ params, searchParams }: CoursePagePro
               <div className="flex flex-wrap items-center gap-2">
                 <p className="font-semibold text-teal-800">{course.code}</p>
               </div>
-              <h1 className="mt-3 max-w-4xl text-4xl font-semibold tracking-normal md:text-6xl">{course.title}</h1>
+              <h1 className="mt-3 max-w-4xl text-4xl font-semibold tracking-normal md:text-6xl">
+                {displayCourseTitleFor(course)}
+              </h1>
               <p className="mt-3 text-slate-600">
                 {course.term_label} · {course.units} units · {course.modality}
               </p>

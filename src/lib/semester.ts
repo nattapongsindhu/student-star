@@ -165,7 +165,7 @@ export const seedCourses: Course[] = [
     id: "cis-112",
     canvas_course_id: null,
     code: "CIS 112",
-    title: "OS: Beginning Linux",
+    title: "Operating Systems: Beginning Linux",
     term_label: "Fall 2026",
     course_status: "upcoming",
     campus: "LACC FH 201",

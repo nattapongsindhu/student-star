@@ -36,7 +36,7 @@ describe("course metadata helpers", () => {
   it("uses compact course titles in dense course tables", () => {
     expect(compactCourseTitleFor(courseById("engl-c1000"))).toBe("Academic Rd&Wr");
     expect(compactCourseTitleFor(courseById("cis-210"))).toBe("Intro to Comp Network");
-    expect(compactCourseTitleFor(courseById("cis-112"))).toBe("OS: Beginning Linux");
+    expect(compactCourseTitleFor(courseById("cis-112"))).toBe("Operating Systems: Beginning Linux");
   });
 
   it("formats class type details as stacked lines", () => {
