@@ -1,5 +1,6 @@
 import { CalendarDays, Clock, MapPin } from "lucide-react";
 import { compactCourseTitleFor, instructorFor } from "@/lib/course-meta";
+import { schoolTimeZone } from "@/lib/semester";
 import type { Course } from "@/lib/semester";
 
 type WeekdayKey = "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun";
@@ -86,6 +87,17 @@ const fixedBlocks: ScheduleBlock[] = [
 
 const fixedCourseCodes = new Set(fixedBlocks.map((block) => block.courseCode));
 
+function getTodayKey() {
+  const weekday = new Intl.DateTimeFormat("en-US", {
+    timeZone: schoolTimeZone,
+    weekday: "short",
+  })
+    .format(new Date())
+    .toLowerCase();
+
+  return weekday.slice(0, 3) as WeekdayKey;
+}
+
 function isPureOnlineCourse(course: Course) {
   const text = `${course.campus} ${course.modality}`.toLowerCase();
   const hasPhysicalRoom = text.includes("fh ") || text.includes("lacc");
@@ -97,6 +109,7 @@ function isZoomBlock(block: ScheduleBlock) {
 }
 
 export function WeeklySchedule({ courses }: { courses: Course[] }) {
+  const todayKey = getTodayKey();
   const courseCodes = new Set(courses.map((course) => course.code));
   const coursesByCode = new Map(courses.map((course) => [course.code, course]));
   const asynchronousCourses = courses.filter(isPureOnlineCourse);
@@ -116,17 +129,19 @@ export function WeeklySchedule({ courses }: { courses: Course[] }) {
       <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-7">
         {weekdayColumns.map((day) => {
           const blocks = fixedBlocks.filter((block) => block.day === day.key && courseCodes.has(block.courseCode));
+          const isToday = day.key === todayKey;
           const isSunday = day.key === "sun";
 
           return (
             <section
               className={`min-h-24 rounded-lg border p-2.5 ${
-                isSunday ? "border-teal-300 bg-teal-50" : "border-slate-200 bg-slate-50"
+                isSunday ? "border-red-300 bg-red-50" : isToday ? "border-teal-300 bg-teal-50" : "border-slate-200 bg-slate-50"
               }`}
               key={day.key}
             >
               <div className="flex items-center justify-between gap-2">
                 <h3 className="text-sm font-semibold text-slate-900">{day.label}</h3>
+                {isToday ? <span className={`rounded bg-white px-1.5 py-0.5 text-xs font-semibold ${isSunday ? "text-red-800" : "text-teal-800"}`}>Today</span> : null}
               </div>
 
               <div className="mt-2 space-y-2">
