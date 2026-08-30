@@ -47,7 +47,19 @@ const termTabBadges: Record<string, { label: string }> = {
 
 export default async function Home({ searchParams }: HomeProps) {
   const params = searchParams ? await searchParams : {};
-  const { courses, assignments, courseAssignments, lastSyncAt, lastAttemptAt, syncStatus, source } = await getDashboardData();
+  const {
+    courses,
+    assignments,
+    courseAssignments,
+    lastSyncAt,
+    lastAttemptAt,
+    syncStatus,
+    source,
+    lastSyncCourses,
+    lastSyncAssignments,
+    lastSyncChanges,
+    lastSyncError,
+  } = await getDashboardData();
   const activeTerm = getActiveTermConfig();
   const requestedTermId = params.term;
   const selectedTermId = requestedTermId && termConfigs.some((term) => term.id === requestedTermId) ? requestedTermId : "home";
@@ -123,12 +135,20 @@ export default async function Home({ searchParams }: HomeProps) {
               <p className="mt-2">
                 {syncStatus === "token_expired"
                   ? "Outdated / Sync Paused"
-                  : lastSyncAt
+                  : syncStatus === "sync_failed"
+                    ? "Sync failed"
+                    : lastSyncAt
                   ? `Last synced ${formatShortDate(lastSyncAt)}`
                   : source === "seed"
                     ? "Using starter data until Supabase and Canvas keys are added."
                     : "Waiting for first sync."}
               </p>
+              {lastSyncAt ? (
+                <p className="mt-1 text-xs text-slate-500">
+                  {lastSyncCourses} courses · {lastSyncAssignments} assignments · {lastSyncChanges} changes
+                </p>
+              ) : null}
+              {lastSyncError ? <p className="mt-1 text-xs font-medium text-rose-700">{lastSyncError}</p> : null}
               <Link className="mt-3 inline-flex font-semibold text-teal-800" href="/sync">
                 Open Sync Console
               </Link>
