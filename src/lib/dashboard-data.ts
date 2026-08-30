@@ -11,11 +11,18 @@ export type DashboardData = {
   lastSyncAt: string | null;
   lastAttemptAt: string | null;
   syncStatus: CanvasSyncStatus;
+  lastSyncCourses: number;
+  lastSyncAssignments: number;
+  lastSyncChanges: number;
+  lastSyncError: string | null;
   source: "supabase" | "seed";
 };
 
 type SyncRunRow = {
   status: string;
+  courses_seen: number;
+  assignments_seen: number;
+  changes_seen: number;
   error_message: string | null;
   finished_at: string;
 };
@@ -47,6 +54,10 @@ export async function getDashboardData(): Promise<DashboardData> {
       lastSyncAt: null,
       lastAttemptAt: null,
       syncStatus: "ok",
+      lastSyncCourses: 0,
+      lastSyncAssignments: 0,
+      lastSyncChanges: 0,
+      lastSyncError: null,
       source: "seed",
     };
   }
@@ -62,7 +73,7 @@ export async function getDashboardData(): Promise<DashboardData> {
     supabase.from("assignments").select("*").order("due_at", { ascending: true, nullsFirst: false }),
     supabase
       .from("sync_runs")
-      .select("status, error_message, finished_at")
+      .select("status, courses_seen, assignments_seen, changes_seen, error_message, finished_at")
       .order("finished_at", { ascending: false })
       .limit(1)
       .maybeSingle(),
@@ -83,6 +94,10 @@ export async function getDashboardData(): Promise<DashboardData> {
       lastSyncAt: null,
       lastAttemptAt: null,
       syncStatus: "sync_failed",
+      lastSyncCourses: 0,
+      lastSyncAssignments: 0,
+      lastSyncChanges: 0,
+      lastSyncError: "Unable to read sync history.",
       source: "seed",
     };
   }
@@ -96,6 +111,10 @@ export async function getDashboardData(): Promise<DashboardData> {
     lastSyncAt: successfulSyncResult.data?.finished_at ?? null,
     lastAttemptAt: latestSync?.finished_at ?? successfulSyncResult.data?.finished_at ?? null,
     syncStatus: statusFromSyncRun(latestSync),
+    lastSyncCourses: latestSync?.courses_seen ?? 0,
+    lastSyncAssignments: latestSync?.assignments_seen ?? 0,
+    lastSyncChanges: latestSync?.changes_seen ?? 0,
+    lastSyncError: latestSync?.error_message ?? null,
     source: "supabase",
   };
 }

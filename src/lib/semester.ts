@@ -11,6 +11,9 @@ export type Course = {
   modality: string;
   units: number;
   final_grade: string | null;
+  current_canvas_grade?: string | null;
+  expected_grade?: string | null;
+  official_grade?: string | null;
   starts_on: string;
   ends_on: string;
   weekly_hours: number;

@@ -76,9 +76,20 @@ export function totalPoints(assignments: Assignment[]) {
 }
 
 export function courseOutcome(course: Course) {
-  if (course.final_grade) return course.final_grade;
+  if (course.official_grade) return course.official_grade;
+  if (course.final_grade && !course.final_grade.startsWith("Expected ")) return course.final_grade;
   if (course.course_status === "case_study") return "Verified outcome";
   return "In progress";
+}
+
+export function courseGradeSummaryFor(course: Course) {
+  const expected = course.expected_grade ?? (course.final_grade?.startsWith("Expected ") ? course.final_grade.slice(9) : null);
+  const official = course.official_grade ?? (course.final_grade && !course.final_grade.startsWith("Expected ") ? course.final_grade : null);
+  return {
+    currentCanvas: course.current_canvas_grade ?? "Not synced",
+    expected: expected ?? "Not set",
+    official: official ?? "Not posted",
+  };
 }
 
 export function compactCourseTitleFor(course: Course) {
