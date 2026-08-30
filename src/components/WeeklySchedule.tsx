@@ -135,12 +135,12 @@ export function WeeklySchedule({ courses }: { courses: Course[] }) {
           return (
             <section
               className={`min-h-24 rounded-lg border p-2.5 ${
-                isSunday ? "border-red-300 bg-red-50" : isToday ? "border-teal-300 bg-teal-50" : "border-slate-200 bg-slate-50"
+                isToday ? "border-teal-300 bg-teal-50" : "border-slate-200 bg-slate-50"
               }`}
               key={day.key}
             >
               <div className="flex items-center justify-between gap-2">
-                <h3 className="text-sm font-semibold text-slate-900">{day.label}</h3>
+                <h3 className={`text-sm font-semibold ${isSunday ? "text-red-600" : "text-slate-900"}`}>{day.label}</h3>
                 {isToday ? <span className={`rounded bg-white px-1.5 py-0.5 text-xs font-semibold ${isSunday ? "text-red-800" : "text-teal-800"}`}>Today</span> : null}
               </div>
 
