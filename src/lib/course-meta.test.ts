@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  campusDisplayFor,
   classTypeLinesFor,
   classTypeSummaryFor,
   compactCourseTitleFor,
@@ -48,7 +49,12 @@ describe("course metadata helpers", () => {
   });
 
   it("formats class type details as stacked lines", () => {
-    expect(classTypeLinesFor(courseById("cis-112"))).toEqual(["Campus", "Thu 14:30-17:40"]);
+    expect(classTypeLinesFor(courseById("cis-112"))).toEqual([
+      "Online (Lecture)",
+      "Mon 16:00-18:00",
+      "Campus (Labs)",
+      "Thu 14:30-17:40",
+    ]);
     expect(classTypeLinesFor(courseById("cis-210"))).toEqual(["Online", "Mon/Wed 09:00-11:00"]);
     expect(classTypeLinesFor(courseById("cis-166"))).toEqual(["Online", "Mon/Wed 11:00-12:15"]);
     expect(classTypeLinesFor(courseById("anthro-102"))).toEqual(["Campus", "Wed 14:20-15:45"]);
@@ -66,9 +72,13 @@ describe("course metadata helpers", () => {
 
   it("formats class type details as a compact course detail summary", () => {
     expect(classTypeSummaryFor(courseById("cis-166"))).toBe("Online Mon/Wed 11:00-12:15");
-    expect(classTypeSummaryFor(courseById("cis-112"))).toBe("Campus Thu 14:30-17:40");
+    expect(classTypeSummaryFor(courseById("cis-112"))).toBe("Online (Lecture) Mon 16:00-18:00");
     expect(classTypeSummaryFor(courseById("cis-214"))).toBe("Online Tue 15:00-17:00");
     expect(classTypeSummaryFor(courseById("health-101"))).toBe("Online (Asynchronous)");
+  });
+
+  it("shows display-safe campus labels", () => {
+    expect(campusDisplayFor(courseById("cis-112"))).toBe("LACC FH-201");
   });
 
   it("does not show the old unsynced instructor placeholder", () => {

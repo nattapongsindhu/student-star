@@ -107,7 +107,7 @@ export function displayCourseTitleFor(course: Course) {
 }
 
 export function classTypeLinesFor(course: Course) {
-  if (course.code === "CIS 112") return ["Campus", "Thu 14:30-17:40"];
+  if (course.code === "CIS 112") return ["Online (Lecture)", "Mon 16:00-18:00", "Campus (Labs)", "Thu 14:30-17:40"];
   if (course.code === "CIS 214") return ["Online", "Tue 15:00-17:00"];
   if (course.code === "ENGL C1000") return ["Online", "Wed 18:50-22:00"];
 
@@ -135,6 +135,11 @@ export function classTypeSummaryFor(course: Course) {
   const [type, schedule] = classTypeLinesFor(course);
   if (!schedule) return type;
   return `${type} ${schedule}`;
+}
+
+export function campusDisplayFor(course: Course) {
+  if (course.code === "CIS 112") return "LACC FH-201";
+  return course.campus;
 }
 
 export function instructorFor(course: Course) {

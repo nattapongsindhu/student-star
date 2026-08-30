@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, BookOpen, CalendarDays, CheckCircle2, ExternalLink, FileText, Flag } from "lucide-react";
 import {
+  campusDisplayFor,
   classTypeLinesFor,
   classTypeSummaryFor,
   displayCourseTitleFor,
@@ -121,7 +122,7 @@ export default async function CoursePage({ params, searchParams }: CoursePagePro
                   </span>
                 ))}
               />
-              <InfoItem label="Location / Campus" value={course.campus} />
+              <InfoItem label="Location / Campus" value={campusDisplayFor(course)} />
               <InfoItem label="Canvas Course ID" value={course.canvas_course_id ? `${course.canvas_course_id}` : "Not synced yet"} />
             </div>
             <SourceProofList course={course} />
