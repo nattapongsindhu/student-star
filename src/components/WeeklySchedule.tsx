@@ -9,6 +9,7 @@ type ScheduleBlock = {
   courseCode: string;
   day: WeekdayKey;
   location: string;
+  meetingLabel?: string;
   time: string;
 };
 
@@ -60,9 +61,24 @@ const fixedBlocks: ScheduleBlock[] = [
     time: "18:50-22:00",
   },
   {
+    courseCode: "CIS 166",
+    day: "mon",
+    location: "Zoom",
+    meetingLabel: "Mon/Wed 11:00-12:15",
+    time: "11:00-12:15",
+  },
+  {
+    courseCode: "CIS 112",
+    day: "mon",
+    location: "Zoom",
+    meetingLabel: "Lecture 16:00-18:00",
+    time: "16:00-18:00",
+  },
+  {
     courseCode: "CIS 112",
     day: "thu",
-    location: "LACC FH 201",
+    location: "LACC FH-201",
+    meetingLabel: "Lab 14:30-17:40",
     time: "14:30-17:40",
   },
   {
@@ -75,6 +91,7 @@ const fixedBlocks: ScheduleBlock[] = [
     courseCode: "CIS 166",
     day: "wed",
     location: "Zoom",
+    meetingLabel: "Mon/Wed 11:00-12:15",
     time: "11:00-12:15",
   },
   {
@@ -159,7 +176,7 @@ export function WeeklySchedule({ courses }: { courses: Course[] }) {
                         <div className="mt-2 space-y-1 text-[11px] font-medium leading-snug text-slate-700">
                           <p className="flex items-center gap-1">
                             <Clock className="h-3 w-3 shrink-0" />
-                            {day.label} {block.time}
+                            {block.meetingLabel ?? `${day.label} ${block.time}`}
                           </p>
                           {isZoomBlock(block) ? (
                             <p className="flex items-start gap-1">
