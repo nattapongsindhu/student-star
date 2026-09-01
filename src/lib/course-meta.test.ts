@@ -46,6 +46,7 @@ describe("course metadata helpers", () => {
     expect(compactCourseTitleFor(courseById("cis-210"))).toBe("Intro to Comp Network");
     expect(compactCourseTitleFor(courseById("cis-112"))).toBe("OS: Beginning Linux");
     expect(compactCourseTitleFor(courseById("cis-214"))).toBe("Intro to Netwk+");
+    expect(compactCourseTitleFor(courseById("cis-162"))).toBe("Intro to Cyber Security I");
   });
 
   it("formats class type details as stacked lines", () => {
