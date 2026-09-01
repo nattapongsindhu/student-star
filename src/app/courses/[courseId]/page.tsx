@@ -179,7 +179,7 @@ function buildCourseRoomTabs(course: Course, assignments: Assignment[]): CourseR
   const monthTabs = monthGroups(assignments).map((month) => ({
     href: `${baseHref}?view=${month.id}`,
     id: month.id,
-    label: `${month.shortLabel} (${month.count})`,
+    label: `${month.label} (${month.count})`,
     titleLabel: `${month.label} (${month.count})`,
   }));
 
@@ -227,7 +227,7 @@ function assignmentsForView(assignments: Assignment[], activeView: string) {
 }
 
 function monthGroups(assignments: Assignment[]) {
-  const months = new Map<string, { count: number; label: string; shortLabel: string }>();
+  const months = new Map<string, { count: number; label: string }>();
 
   assignments.forEach((assignment) => {
     const id = assignmentMonthKey(assignment.due_at);
@@ -242,7 +242,6 @@ function monthGroups(assignments: Assignment[]) {
     months.set(id, {
       count: 1,
       label: assignmentMonthLabel(assignment.due_at),
-      shortLabel: assignmentMonthShortLabel(assignment.due_at),
     });
   });
 
@@ -267,14 +266,6 @@ function assignmentMonthLabel(value: string | null) {
     month: "long",
     timeZone: schoolTimeZone,
     year: "numeric",
-  }).format(new Date(value));
-}
-
-function assignmentMonthShortLabel(value: string | null) {
-  if (!value) return "No Month";
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    timeZone: schoolTimeZone,
   }).format(new Date(value));
 }
 
