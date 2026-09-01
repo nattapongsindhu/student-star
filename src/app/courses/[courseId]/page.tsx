@@ -178,7 +178,7 @@ function buildCourseRoomTabs(course: Course, assignments: Assignment[]): CourseR
   const monthTabs = monthGroups(assignments).map((month) => ({
     href: `${baseHref}?view=${month.id}`,
     id: month.id,
-    label: month.label,
+    label: `${month.label} (${month.count})`,
   }));
 
   return [
@@ -224,15 +224,22 @@ function assignmentsForView(assignments: Assignment[], activeView: string) {
 }
 
 function monthGroups(assignments: Assignment[]) {
-  const months = new Map<string, string>();
+  const months = new Map<string, { count: number; label: string }>();
 
   assignments.forEach((assignment) => {
     const id = assignmentMonthKey(assignment.due_at);
-    if (!id || months.has(id)) return;
-    months.set(id, assignmentMonthLabel(assignment.due_at));
+    if (!id) return;
+
+    const month = months.get(id);
+    if (month) {
+      month.count += 1;
+      return;
+    }
+
+    months.set(id, { count: 1, label: assignmentMonthLabel(assignment.due_at) });
   });
 
-  return Array.from(months.entries()).map(([id, label]) => ({ id, label }));
+  return Array.from(months.entries()).map(([id, month]) => ({ id, ...month }));
 }
 
 function assignmentMonthKey(value: string | null) {
