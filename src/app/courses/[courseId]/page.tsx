@@ -35,6 +35,7 @@ type CourseRoomTab = {
   href: string;
   id: string;
   label: string;
+  titleLabel?: string;
 };
 
 export default async function CoursePage({ params, searchParams }: CoursePageProps) {
@@ -178,7 +179,8 @@ function buildCourseRoomTabs(course: Course, assignments: Assignment[]): CourseR
   const monthTabs = monthGroups(assignments).map((month) => ({
     href: `${baseHref}?view=${month.id}`,
     id: month.id,
-    label: `${month.label} (${month.count})`,
+    label: `${month.shortLabel} (${month.count})`,
+    titleLabel: `${month.label} (${month.count})`,
   }));
 
   return [
@@ -214,7 +216,8 @@ function CourseRoomTabs({ activeView, tabs }: { activeView: string; tabs: Course
 
 function assignmentPanelTitle(activeView: string, tabs: CourseRoomTab[]) {
   if (activeView === "assignments") return "All Assignments";
-  return `${tabs.find((tab) => tab.id === activeView)?.label ?? "Monthly"} Assignments`;
+  const tab = tabs.find((item) => item.id === activeView);
+  return `${tab?.titleLabel ?? tab?.label ?? "Monthly"} Assignments`;
 }
 
 function assignmentsForView(assignments: Assignment[], activeView: string) {
@@ -224,7 +227,7 @@ function assignmentsForView(assignments: Assignment[], activeView: string) {
 }
 
 function monthGroups(assignments: Assignment[]) {
-  const months = new Map<string, { count: number; label: string }>();
+  const months = new Map<string, { count: number; label: string; shortLabel: string }>();
 
   assignments.forEach((assignment) => {
     const id = assignmentMonthKey(assignment.due_at);
@@ -236,7 +239,11 @@ function monthGroups(assignments: Assignment[]) {
       return;
     }
 
-    months.set(id, { count: 1, label: assignmentMonthLabel(assignment.due_at) });
+    months.set(id, {
+      count: 1,
+      label: assignmentMonthLabel(assignment.due_at),
+      shortLabel: assignmentMonthShortLabel(assignment.due_at),
+    });
   });
 
   return Array.from(months.entries()).map(([id, month]) => ({ id, ...month }));
@@ -260,6 +267,14 @@ function assignmentMonthLabel(value: string | null) {
     month: "long",
     timeZone: schoolTimeZone,
     year: "numeric",
+  }).format(new Date(value));
+}
+
+function assignmentMonthShortLabel(value: string | null) {
+  if (!value) return "No Month";
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    timeZone: schoolTimeZone,
   }).format(new Date(value));
 }
 
