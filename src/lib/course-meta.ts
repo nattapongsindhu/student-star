@@ -103,6 +103,7 @@ export function compactCourseTitleFor(course: Course) {
 
 export function displayCourseTitleFor(course: Course) {
   if (course.code === "CIS 112") return "Operating Systems: Beginning Linux";
+  if (course.code === "CIS 162") return "Introduction to Cyber Security I";
   if (course.code === "CIS 214") return "Introduction to Network Plus";
   return course.title;
 }

@@ -4,6 +4,7 @@ import {
   classTypeLinesFor,
   classTypeSummaryFor,
   compactCourseTitleFor,
+  displayCourseTitleFor,
   instructorFor,
   professorRatingLineFor,
   sourceProofFor,
@@ -47,6 +48,10 @@ describe("course metadata helpers", () => {
     expect(compactCourseTitleFor(courseById("cis-112"))).toBe("OS: Beginning Linux");
     expect(compactCourseTitleFor(courseById("cis-214"))).toBe("Intro to Netwk+");
     expect(compactCourseTitleFor(courseById("cis-162"))).toBe("Intro to Cyber Sec I");
+  });
+
+  it("uses display-safe full course titles outside dense tables", () => {
+    expect(displayCourseTitleFor(courseById("cis-162"))).toBe("Introduction to Cyber Security I");
   });
 
   it("formats class type details as stacked lines", () => {

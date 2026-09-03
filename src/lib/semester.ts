@@ -182,7 +182,7 @@ export const seedCourses: Course[] = [
     id: "cis-162",
     canvas_course_id: null,
     code: "CIS 162",
-    title: "Introduction to Cybersecurity I",
+    title: "Introduction to Cyber Security I",
     term_label: "Fall 2026",
     course_status: "upcoming",
     campus: "City Online",
