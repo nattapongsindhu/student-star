@@ -171,7 +171,7 @@ export function WeeklySchedule({ courses }: { courses: Course[] }) {
                         <div className="mt-2 space-y-1 text-[11px] font-medium leading-snug text-slate-700">
                           <p className="flex items-center gap-1">
                             <Clock className="h-3 w-3 shrink-0" />
-                            {block.meetingLabel ?? `${day.label} ${block.time}`}
+                            {block.meetingLabel ?? block.time}
                           </p>
                           {isZoomBlock(block) ? (
                             <p className="flex items-start gap-1">
