@@ -190,13 +190,13 @@ function buildCourseRoomTabs(course: Course, assignments: Assignment[]): CourseR
 function CourseRoomTabs({ activeView, tabs }: { activeView: string; tabs: CourseRoomTab[] }) {
   return (
     <nav aria-label="Course room sections" className="overflow-x-auto rounded-lg border border-slate-200 bg-white p-1.5">
-      <div className="flex min-w-max gap-1.5">
+      <div className="flex min-w-max gap-1">
         {tabs.map((tab) => {
           const isActive = tab.id === activeView;
           return (
             <Link
               aria-current={isActive ? "page" : undefined}
-              className={`rounded-md px-3 py-2 text-sm font-semibold transition-colors ${
+              className={`rounded-md px-2.5 py-2 text-sm font-semibold transition-colors ${
                 isActive ? "bg-slate-900 text-white shadow-sm" : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
               }`}
               href={tab.href}
