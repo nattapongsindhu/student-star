@@ -11,7 +11,6 @@ import {
   professorRatingLineFor,
   pointsLabel,
   sanitizeSnippet,
-  sourceProofFor,
   submissionClass,
   submissionLabel,
   taskTypeLabels,
@@ -102,7 +101,6 @@ export default async function CoursePage({ params, searchParams }: CoursePagePro
             <div className="mt-4 grid gap-3 text-sm">
               <InfoItem label="Semester" value={course.term_label} />
               <InfoItem label="Dates" value={`${course.starts_on} to ${course.ends_on}`} />
-              <InfoItem label="Grades" value={outcome} />
               <InfoItem
                 label="Instructor"
                 value={
@@ -126,7 +124,6 @@ export default async function CoursePage({ params, searchParams }: CoursePagePro
               <InfoItem label="Location / Campus" value={campusDisplayFor(course)} />
               <InfoItem label="Canvas Course ID" value={course.canvas_course_id ? `${course.canvas_course_id}` : "Not synced yet"} />
             </div>
-            <SourceProofList course={course} />
           </div>
         </div>
 
@@ -282,12 +279,9 @@ function CourseOverviewInsights({ assignments, course }: { assignments: Assignme
 
   return (
     <div className="rounded-lg border border-slate-200 bg-white p-5">
-      <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
-        <div>
-          <h2 className="text-xl font-semibold">{course.code} Summary</h2>
-          <p className="mt-1 text-sm text-slate-600">A quick read of the course rhythm before drilling into monthly tabs.</p>
-        </div>
-        <span className="rounded bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-800">{courseOutcome(course)}</span>
+      <div>
+        <h2 className="text-xl font-semibold">{course.code} Summary</h2>
+        <p className="mt-1 text-sm text-slate-600">A quick read of the course rhythm before drilling into monthly tabs.</p>
       </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-4">
         <MiniInsight label="Submitted" value={`${submittedCount}/${assignments.length}`} />
@@ -315,10 +309,9 @@ function CourseStrategy({ assignments, course }: { assignments: Assignment[]; co
         This course is useful as a case study because it shows the rhythm of a recently completed online class: frequent
         small Canvas items, module unlock work, and steady submission proof.
       </p>
-      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <MiniInsight label="Active months" value={months.length.toString()} />
         <MiniInsight label="High-point tasks" value={highPointTasks.toString()} />
-        <MiniInsight label="Final outcome" value={courseOutcome(course)} />
       </div>
       <div className="mt-4 grid gap-2 text-sm text-slate-700">
         <StrategyStep text="Use month tabs to see where workload spikes happened." />
@@ -475,21 +468,6 @@ function InfoItem({ label, value }: { label: string; value: React.ReactNode }) {
     <div className="rounded-md bg-slate-50 px-3 py-2">
       <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p>
       <p className="mt-1 font-medium text-slate-900">{value}</p>
-    </div>
-  );
-}
-
-function SourceProofList({ course }: { course: Course }) {
-  return (
-    <div className="mt-4 rounded-md border border-slate-200 bg-white p-3">
-      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Source Proof</p>
-      <div className="mt-2 flex flex-wrap gap-2">
-        {sourceProofFor(course).map((proof) => (
-          <span className="rounded bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-700" key={proof}>
-            {proof}
-          </span>
-        ))}
-      </div>
     </div>
   );
 }
