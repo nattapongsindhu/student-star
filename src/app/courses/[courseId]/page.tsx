@@ -88,7 +88,7 @@ export default async function CoursePage({ params, searchParams }: CoursePagePro
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-6xl gap-6 px-5 py-6 lg:grid-cols-[0.7fr_minmax(0,1.3fr)] lg:px-8">
+      <section className="mx-auto grid max-w-6xl gap-6 px-5 py-6 lg:grid-cols-[0.55fr_minmax(0,1.45fr)] lg:px-8">
         <div className="space-y-6">
           <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
             <StatCard icon={<BookOpen />} label="Assignments" value={assignments.length.toString()} />
