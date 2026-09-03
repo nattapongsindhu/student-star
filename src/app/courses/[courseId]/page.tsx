@@ -93,7 +93,6 @@ export default async function CoursePage({ params, searchParams }: CoursePagePro
           <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
             <StatCard icon={<BookOpen />} label="Assignments" value={assignments.length.toString()} />
             <StatCard icon={<FileText />} label="Points Possible" value={points ? `${points}` : "N/A"} />
-            <StatCard icon={<CheckCircle2 />} label="Status" value={outcome} />
           </div>
 
           <div className="rounded-lg border border-slate-200 bg-white p-5">
