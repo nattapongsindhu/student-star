@@ -75,13 +75,6 @@ const fixedBlocks: ScheduleBlock[] = [
     time: "16:00-18:00",
   },
   {
-    courseCode: "CIS 112",
-    day: "thu",
-    location: "LACC FH-201",
-    meetingLabel: "Lab 14:30-17:40",
-    time: "14:30-17:40",
-  },
-  {
     courseCode: "CIS 162",
     day: "sat",
     location: "Zoom",
