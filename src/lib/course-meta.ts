@@ -97,8 +97,8 @@ export function compactCourseTitleFor(course: Course) {
   if (course.code === "CIS 210") return "Intro to Comp Network";
   if (course.code === "CIS 112") return "OS: Beginning Linux";
   if (course.code === "CIS 166") return "Comp Forens";
-  if (course.code === "CIS 214") return "Intro to Netwk+";
-  if (course.code === "CIS 162") return "Intro to Cyber Sec I";
+  if (course.code === "CIS 214") return "Network+";
+  if (course.code === "CIS 162") return "Cyber Security I";
   return course.title;
 }
 
