@@ -183,7 +183,7 @@ function buildCourseRoomTabs(course: Course, assignments: Assignment[]): CourseR
   return [
     { href: baseHref, id: "overview", label: "Overview" },
     ...monthTabs,
-    { href: `${baseHref}?view=assignments`, id: "assignments", label: "Assignments" },
+    { href: `${baseHref}?view=assignments`, id: "assignments", label: "All" },
   ];
 }
 
