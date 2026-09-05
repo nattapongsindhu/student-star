@@ -6,6 +6,7 @@ import {
   CalendarDays,
   CheckCircle2,
   Clock,
+  ExternalLink,
   FlaskConical,
   HomeIcon,
   KanbanSquare,
@@ -35,15 +36,67 @@ import type { TaskStatus } from "@/types/academic";
 
 type HomeProps = {
   searchParams?: Promise<{
+    focus?: string;
     term?: string;
   }>;
 };
+
+type FocusFilter = "due-soon" | "at-risk" | "missing";
 
 const termTabBadges: Record<string, { label: string }> = {
   "2026-spring": {
     label: "Full Time Dean's Honor List",
   },
 };
+
+function focusFilterFromParam(value: string | undefined): FocusFilter | null {
+  return value === "due-soon" || value === "at-risk" || value === "missing" ? value : null;
+}
+
+function assignmentsForFocus(
+  focus: FocusFilter | null,
+  assignments: {
+    atRisk: Assignment[];
+    dueSoon: Assignment[];
+    missing: Assignment[];
+    priority: Assignment[];
+  },
+) {
+  if (focus === "due-soon") return assignments.dueSoon;
+  if (focus === "at-risk") return assignments.atRisk;
+  if (focus === "missing") return assignments.missing;
+  return assignments.priority;
+}
+
+function decisionCopyForFocus(focus: FocusFilter | null) {
+  if (focus === "due-soon") {
+    return {
+      title: "Due in 7 days",
+      body: "Live Canvas work due soon and not confirmed complete yet.",
+    };
+  }
+  if (focus === "at-risk") {
+    return {
+      title: "At risk",
+      body: "Assignments currently marked high or critical risk.",
+    };
+  }
+  if (focus === "missing") {
+    return {
+      title: "Missing / mismatch",
+      body: "Overdue Canvas work plus items you marked submitted that Canvas has not confirmed yet.",
+    };
+  }
+
+  return {
+    title: "What Should I Do Now?",
+    body: "Sorted by deadline pressure, points, progress, workload, and Canvas submission state.",
+  };
+}
+
+function uniqueAssignments(assignments: Assignment[]) {
+  return Array.from(new Map(assignments.map((assignment) => [assignment.id, assignment])).values());
+}
 
 export default async function Home({ searchParams }: HomeProps) {
   const params = searchParams ? await searchParams : {};
@@ -62,6 +115,7 @@ export default async function Home({ searchParams }: HomeProps) {
   } = await getDashboardData();
   const activeTerm = getActiveTermConfig();
   const requestedTermId = params.term;
+  const requestedFocus = focusFilterFromParam(params.focus);
   const selectedTermId = requestedTermId && termConfigs.some((term) => term.id === requestedTermId) ? requestedTermId : "home";
   const isHomeTab = selectedTermId === "home";
   const selectedTerm = termConfigs.find((term) => term.id === selectedTermId) ?? activeTerm;
@@ -71,7 +125,7 @@ export default async function Home({ searchParams }: HomeProps) {
   const selectedTermCourseIds = new Set(selectedTermCourses.map((course) => course.id));
   const currentAssignments = assignments.filter((assignment) => selectedTermCourseIds.has(assignment.course_id));
   const liveAssignments = currentAssignments.filter((assignment) => assignment.source === "canvas");
-  const activeAssignments = liveAssignments
+  const priorityAssignments = liveAssignments
     .slice()
     .sort((a, b) => b.priority_score - a.priority_score)
     .slice(0, 6);
@@ -80,16 +134,24 @@ export default async function Home({ searchParams }: HomeProps) {
     return days !== null && days <= 7 && !isCanvasComplete(assignment.status);
   });
   const labCount = liveAssignments.filter((assignment) => assignment.task_type === "lab").length;
-  const mismatchCount = liveAssignments.filter(
+  const mismatchAssignments = liveAssignments.filter(
     (assignment) => assignment.status === "USER_MARKED_SUBMITTED" && !assignment.canvas_submission_confirmed,
-  ).length;
-  const missingCount = liveAssignments.filter((assignment) => {
+  );
+  const missingAssignments = liveAssignments.filter((assignment) => {
     const days = daysUntil(assignment.due_at);
     return days !== null && days < 0 && !assignment.canvas_submission_confirmed;
-  }).length;
-  const atRiskCount = liveAssignments.filter(
+  });
+  const missingMismatchAssignments = uniqueAssignments([...missingAssignments, ...mismatchAssignments]);
+  const atRiskAssignments = liveAssignments.filter(
     (assignment) => assignment.risk_level === "HIGH" || assignment.risk_level === "CRITICAL",
-  ).length;
+  );
+  const decisionAssignments = assignmentsForFocus(requestedFocus, {
+    atRisk: atRiskAssignments,
+    dueSoon,
+    missing: missingMismatchAssignments,
+    priority: priorityAssignments,
+  });
+  const decisionCopy = decisionCopyForFocus(requestedFocus);
   const activeTermCourseAssignments = courseAssignments.filter((assignment) => selectedTermCourseIds.has(assignment.course_id));
   const liveTermAssignments = activeTermCourseAssignments.filter((assignment) => assignment.source === "canvas");
   const upcomingLiveAssignments = liveAssignments.filter((assignment) => {
@@ -166,10 +228,10 @@ export default async function Home({ searchParams }: HomeProps) {
             </div>
           ) : null}
           <div className="grid gap-3 lg:col-span-2 md:grid-cols-4">
-            <Metric icon={<BookOpen />} label="Term courses" value={activeTermCourses.length.toString()} />
-            <Metric icon={<CalendarDays />} label="Due in 7 days" value={dueSoon.length.toString()} />
-            <Metric icon={<AlertTriangle />} label="At risk" value={atRiskCount.toString()} />
-            <Metric icon={<ShieldCheck />} label="Missing / mismatch" value={`${missingCount}/${mismatchCount}`} />
+            <Metric href="#course-load" icon={<BookOpen />} label="Term courses" value={activeTermCourses.length.toString()} />
+            <Metric href="/?focus=due-soon#priority-work" icon={<CalendarDays />} label="Due in 7 days" value={dueSoon.length.toString()} />
+            <Metric href="/?focus=at-risk#priority-work" icon={<AlertTriangle />} label="At risk" value={atRiskAssignments.length.toString()} />
+            <Metric href="/?focus=missing#priority-work" icon={<ShieldCheck />} label="Missing / mismatch" value={`${missingAssignments.length}/${mismatchAssignments.length}`} />
           </div>
           <HomeOpsOverview
             announcements={announcements}
@@ -202,11 +264,11 @@ export default async function Home({ searchParams }: HomeProps) {
 
           <div className="space-y-6">
             <div className="rounded-lg border border-slate-200 bg-white p-5">
-              <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
+              <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center" id="priority-work">
                 <div>
-                  <h2 className="text-xl font-semibold">What Should I Do Now?</h2>
+                  <h2 className="text-xl font-semibold">{decisionCopy.title}</h2>
                   <p className="text-sm text-slate-600">
-                    Sorted by deadline pressure, points, progress, workload, and Canvas submission state.
+                    {decisionCopy.body}
                   </p>
                 </div>
                 <span className="inline-flex w-fit items-center gap-2 rounded-md bg-teal-50 px-3 py-2 text-sm font-medium text-teal-800">
@@ -216,8 +278,8 @@ export default async function Home({ searchParams }: HomeProps) {
               </div>
 
               <div className="mt-5 grid gap-3">
-                {activeAssignments.length ? (
-                  activeAssignments.map((assignment) => {
+                {decisionAssignments.length ? (
+                  decisionAssignments.map((assignment) => {
                     const course = courses.find((item) => item.id === assignment.course_id);
                     return (
                       <article
@@ -246,6 +308,16 @@ export default async function Home({ searchParams }: HomeProps) {
                             assignmentId={assignment.id}
                             currentStatus={assignment.status}
                           />
+                          {assignment.url ? (
+                            <Link
+                              className="mt-3 inline-flex w-fit items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:border-slate-400"
+                              href={assignment.url}
+                              target="_blank"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                              Canvas
+                            </Link>
+                          ) : null}
                         </div>
                         <div className="flex min-w-40 flex-col justify-between gap-3 text-sm md:text-right">
                           <div>
@@ -276,7 +348,7 @@ export default async function Home({ searchParams }: HomeProps) {
               </div>
             </div>
 
-            <div className="rounded-lg border border-slate-200 bg-white p-5">
+            <div className="rounded-lg border border-slate-200 bg-white p-5" id="course-load">
               <h2 className="text-xl font-semibold">{selectedTerm.label} Course Load</h2>
               <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                 {activeTermCourses.map((course) => (
@@ -732,9 +804,9 @@ function EmptyState({ title, body, href, action }: { title: string; body: string
   );
 }
 
-function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-  return (
-    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+function Metric({ href, icon, label, value }: { href?: string; icon: React.ReactNode; label: string; value: string }) {
+  const content = (
+    <>
       <div className="flex items-center gap-2 text-slate-600">
         <span className="flex h-8 w-8 items-center justify-center rounded-md bg-white text-teal-700 [&_svg]:h-4 [&_svg]:w-4">
           {icon}
@@ -742,8 +814,18 @@ function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; 
         <span className="text-sm font-medium">{label}</span>
       </div>
       <p className="mt-3 text-3xl font-semibold">{value}</p>
-    </div>
+    </>
   );
+
+  if (href) {
+    return (
+      <Link className="block rounded-lg border border-slate-200 bg-slate-50 p-4 transition-colors hover:border-teal-300 hover:bg-white" href={href}>
+        {content}
+      </Link>
+    );
+  }
+
+  return <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">{content}</div>;
 }
 
 function ActionRow({ icon, title, body }: { icon: React.ReactNode; title: string; body: string }) {
