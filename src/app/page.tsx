@@ -798,6 +798,13 @@ function HomeOpsOverview({
 }
 
 function ScholarshipCard() {
+  const formattedDate = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "America/Los_Angeles",
+  }).format(new Date());
+
   const items = [
     {
       id: "microsoft",
@@ -806,7 +813,7 @@ function ScholarshipCard() {
       status: "✓ Transferring",
       title: "Microsoft Cybersecurity Scholarship",
       summary:
-        "$500 cash assistance via Tremendous, 1-yr LinkedIn Premium, CompTIA/Cisco exam vouchers, and GitHub Student Pack.",
+        "CIS 166 Lead, $500 cash via Tremendous + 1-yr LinkedIn Premium & cert vouchers.",
       perks: ["LinkedIn Premium 1-Yr", "Exam Vouchers"],
       link: "https://www.lastmile-ed.org/Microsoft",
       actionText: "Open in Website",
@@ -847,8 +854,8 @@ function ScholarshipCard() {
           </div>
           <h2 className="mt-2 text-xl font-semibold text-slate-950">Active awards and student benefits</h2>
         </div>
-        <span className="rounded bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-900">
-          $500+ &amp; AI Pro Active
+        <span className="rounded bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-900">
+          {formattedDate}
         </span>
       </div>
 
