@@ -266,7 +266,9 @@ function assignmentMonthLabel(value: string | null) {
 }
 
 function CourseOverviewInsights({ assignments, course }: { assignments: Assignment[]; course: Course }) {
-  const submittedCount = assignments.filter((assignment) => assignment.canvas_submission_confirmed).length;
+  const submittedCount = assignments.filter(
+    (assignment) => assignment.canvas_submission_confirmed || assignment.status === "USER_MARKED_SUBMITTED" || assignment.status === "GRADED",
+  ).length;
   const gradedCount = assignments.filter((assignment) => assignment.status === "GRADED").length;
   const discussionCount = assignments.filter((assignment) => assignment.task_type === "discussion").length;
   const quizCount = assignments.filter((assignment) => assignment.task_type === "quiz").length;
@@ -342,7 +344,10 @@ function StrategyStep({ text }: { text: string }) {
 
 function AssignmentRow({ assignment }: { assignment: Assignment }) {
   const guide = assignment.notes ? sanitizeSnippet(assignment.notes) : null;
-  const isComplete = assignment.status === "GRADED" || assignment.canvas_submission_confirmed;
+  const isComplete =
+    assignment.status === "GRADED" ||
+    assignment.canvas_submission_confirmed ||
+    assignment.status === "USER_MARKED_SUBMITTED";
   const majorExamLabel = majorExamAssignmentLabel(assignment);
 
   return (
