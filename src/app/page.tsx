@@ -804,27 +804,28 @@ function ScholarshipCard() {
         <div>
           <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-emerald-800">
             <Award className="h-4 w-4" />
-            Scholarship
+            Scholarships & Perks
           </div>
-          <h2 className="mt-2 text-xl font-semibold text-slate-950">Active awards and verified funding</h2>
+          <h2 className="mt-2 text-xl font-semibold text-slate-950">Active awards and student benefits</h2>
         </div>
         <span className="rounded bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-900">
-          $500 Awarded
+          $500+ &amp; AI Pro Active
         </span>
       </div>
 
       <div className="mt-4 space-y-3">
+        {/* Award 1: Microsoft Cybersecurity Scholarship */}
         <article className="rounded-lg border border-emerald-200 bg-white p-3">
           <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold">
             <div className="flex items-center gap-1.5">
               <span className="rounded bg-emerald-100 px-2 py-0.5 text-emerald-900">CIS 166 Lead</span>
               <span className="text-slate-600">Last Mile Fund</span>
             </div>
-            <span className="font-bold text-emerald-700">✓ Transferring</span>
+            <span className="font-bold text-emerald-700">✓ $500 Transferring</span>
           </div>
           <h3 className="mt-2 text-sm font-semibold text-slate-950">Microsoft Cybersecurity Scholarship</h3>
           <p className="mt-1 line-clamp-2 text-sm text-slate-700">
-            $500 cash assistance via Tremendous. Unlocks 1-yr LinkedIn Premium, exam vouchers (CompTIA/Cisco/MS), and GitHub Campus.
+            $500 cash assistance via Tremendous, 1-yr LinkedIn Premium, CompTIA/Cisco exam vouchers, and GitHub Student Pack.
           </p>
           <div className="mt-2 flex flex-wrap gap-1.5 text-[11px] font-medium text-slate-600">
             <span className="rounded bg-emerald-50 px-2 py-0.5 text-emerald-800">LinkedIn Premium 1-Yr</span>
@@ -835,21 +836,51 @@ function ScholarshipCard() {
             href="https://www.lastmile-ed.org/Microsoft"
             target="_blank"
           >
-            Program Details & Vouchers
+            Program Details &amp; Perks
           </Link>
         </article>
 
+        {/* Award 2: Google AI Pro / Gemini 1-Year Free Student Plan */}
         <article className="rounded-lg border border-emerald-200 bg-white p-3">
-          <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-600">
-            <span className="rounded bg-emerald-100 px-2 py-0.5 text-emerald-900">LACC Foundation</span>
-            <span>Local Campus Only</span>
+          <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold">
+            <div className="flex items-center gap-1.5">
+              <span className="rounded bg-emerald-100 px-2 py-0.5 text-emerald-900">Google for Students</span>
+              <span className="text-slate-600">5 TB Storage</span>
+            </div>
+            <span className="font-bold text-emerald-700">✓ Active to Oct 2027</span>
+          </div>
+          <h3 className="mt-2 text-sm font-semibold text-slate-950">Google AI Pro (Gemini 1-Yr Student Plan)</h3>
+          <p className="mt-1 line-clamp-2 text-sm text-slate-700">
+            Free 1-year student plan ($240 value): 5 TB Google One cloud storage, 4x Gemini usage limits, Gemini Live, and YouTube Premium.
+          </p>
+          <div className="mt-2 flex flex-wrap gap-1.5 text-[11px] font-medium text-slate-600">
+            <span className="rounded bg-emerald-50 px-2 py-0.5 text-emerald-800">5 TB Google One</span>
+            <span className="rounded bg-emerald-50 px-2 py-0.5 text-emerald-800">YouTube Premium</span>
+          </div>
+          <Link
+            className="mt-2.5 inline-flex text-sm font-semibold text-emerald-800 hover:text-emerald-950"
+            href="https://gemini.google.com"
+            target="_blank"
+          >
+            Open Gemini AI Pro
+          </Link>
+        </article>
+
+        {/* Opportunity 3: LACC Foundation Scholarships */}
+        <article className="rounded-lg border border-emerald-200 bg-white p-3">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold">
+            <div className="flex items-center gap-1.5">
+              <span className="rounded bg-emerald-100 px-2 py-0.5 text-emerald-900">LACC Foundation</span>
+              <span className="text-slate-600">Local Campus Only</span>
+            </div>
+            <span className="font-bold text-teal-800">Spring 2027 Cycle</span>
           </div>
           <h3 className="mt-2 text-sm font-semibold text-slate-950">LACC Foundation Scholarships</h3>
           <p className="mt-1 line-clamp-2 text-sm text-slate-700">
-            Up to $1,000 per cycle. Fill out ONE application for all donor awards. Spring 2027 cycle opens January.
+            Up to $1,000 per cycle. Fill out ONE online application for all campus donor awards. Spring cycle opens January.
           </p>
           <Link
-            className="mt-2 inline-flex text-sm font-semibold text-emerald-800 hover:text-emerald-950"
+            className="mt-2.5 inline-flex text-sm font-semibold text-emerald-800 hover:text-emerald-950"
             href="https://laccfoundation.org/apply-for-scholarships/"
             target="_blank"
           >
