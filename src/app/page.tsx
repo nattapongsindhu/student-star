@@ -8,6 +8,7 @@ import {
   Clock,
   ExternalLink,
   FlaskConical,
+  GraduationCap,
   HomeIcon,
   KanbanSquare,
   Megaphone,
@@ -261,13 +262,15 @@ export default async function Home({ searchParams }: HomeProps) {
             <Metric href="#course-load" icon={<BookOpen />} label="Term courses" value={activeTermCourses.length.toString()} />
             <Metric href="/?focus=due-soon#priority-work" icon={<CalendarDays />} label="Due in 7 days" value={dueSoon.length.toString()} />
             <Metric href="/?focus=at-risk#priority-work" icon={<AlertTriangle />} label="At risk" value={atRiskAssignments.length.toString()} />
-            <Metric href="/?focus=missing#priority-work" icon={<ShieldCheck />} label="Missing / mismatch" value={`${missingAssignments.length}/${mismatchAssignments.length}`} />
+            <Metric href="#priority-work" icon={<Clock />} label="Next due" value={nextDueAssignment?.due_at ? formatShortDate(nextDueAssignment.due_at) : "No live due date"} />
           </div>
           <HomeOpsOverview
             announcements={announcements}
             canvasCoverage={`${canvasCoverageCount}/${activeTermCourses.length}`}
             dueSoonCount={dueSoon.length}
             highValueCount={highValueCount}
+            missingCount={missingAssignments.length}
+            mismatchCount={mismatchAssignments.length}
             nextDue={nextDueAssignment?.due_at ? formatShortDate(nextDueAssignment.due_at) : "No live due date"}
             totalAssignments={liveTermAssignments.length}
           />
@@ -623,30 +626,71 @@ function FocusGroup({
   );
 }
 
-function CanvasOutagePlan({
-  dueSoonCount,
-  highValueCount,
-  nextDue,
-}: {
-  dueSoonCount: number;
-  highValueCount: number;
-  nextDue: string;
-}) {
+function CollegeNews() {
+  const newsItems = [
+    {
+      id: 'priority-reg',
+      category: 'Registration',
+      term: 'Winter & Spring 2027',
+      title: 'Priority Registration Underway',
+      summary:
+        'Check SIS under Manage Classes > Enrollment Dates to view your appointment date and enroll early.',
+      link: 'https://mycollege.laccd.edu',
+      actionText: 'Open SIS Portal',
+    },
+    {
+      id: 'counseling',
+      category: 'Counseling',
+      term: 'Appointments Open',
+      title: 'SEP & Prerequisites Review',
+      summary:
+        'Meet with an academic counselor to review your student education plan and clear prerequisite holds.',
+      link: 'https://www.lacitycollege.edu/student-services/counseling',
+      actionText: 'Book Counseling',
+    },
+    {
+      id: 'tutoring',
+      category: 'Student Support',
+      term: 'Free Services',
+      title: 'Free Tutoring & EOPS Assistance',
+      summary:
+        'Free in-person and online tutoring in writing, math, and STEM, plus textbook assistance through EOPS.',
+      link: 'https://www.lacitycollege.edu/academics/academic-support',
+      actionText: 'LACC Tutoring Services',
+    },
+  ];
+
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-5">
-      <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-amber-700">
-        <AlertTriangle className="h-4 w-4" />
-        Canvas Outage Plan
+    <div className="rounded-lg border border-sky-200 bg-sky-50 p-5">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-sky-800">
+            <GraduationCap className="h-4 w-4" />
+            College News
+          </div>
+          <h2 className="mt-2 text-xl font-semibold text-slate-950">LACC announcements and student services</h2>
+        </div>
+        <span className="rounded bg-sky-100 px-2 py-1 text-xs font-semibold text-sky-900">Week 10</span>
       </div>
-      <h2 className="mt-2 text-xl font-semibold">Submit before the platform becomes the problem</h2>
-      <div className="mt-4 grid gap-3 sm:grid-cols-3">
-        <MiniStat icon={<CalendarDays />} label="7-day buffer" value={`${dueSoonCount} tasks`} />
-        <MiniStat icon={<AlertTriangle />} label="High value" value={`${highValueCount}`} />
-        <MiniStat icon={<Clock />} label="Next due" value={nextDue} />
-      </div>
-      <div className="mt-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-950">
-        Keep screenshots, filenames, and timestamps ready before due dates. If Canvas, Cengage, or NetLab has maintenance,
-        submit early and keep proof outside the browser.
+
+      <div className="mt-4 space-y-3">
+        {newsItems.map((item) => (
+          <article className="rounded-lg border border-sky-200 bg-white p-3" key={item.id}>
+            <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-600">
+              <span className="rounded bg-sky-100 px-2 py-1 text-sky-900">{item.category}</span>
+              <span>{item.term}</span>
+            </div>
+            <h3 className="mt-2 text-sm font-semibold text-slate-950">{item.title}</h3>
+            <p className="mt-1 line-clamp-2 text-sm text-slate-700">{item.summary}</p>
+            <Link
+              className="mt-2 inline-flex text-sm font-semibold text-sky-800 hover:text-sky-950"
+              href={item.link}
+              target="_blank"
+            >
+              {item.actionText}
+            </Link>
+          </article>
+        ))}
       </div>
     </div>
   );
@@ -712,14 +756,18 @@ function HomeOpsOverview({
   canvasCoverage,
   dueSoonCount,
   highValueCount,
+  missingCount,
+  mismatchCount,
   nextDue,
   totalAssignments,
 }: {
   announcements: CanvasAnnouncement[];
   canvasCoverage: string;
-  dueSoonCount: number;
+  dueSoonCount?: number;
   highValueCount: number;
-  nextDue: string;
+  missingCount: number;
+  mismatchCount: number;
+  nextDue?: string;
   totalAssignments: number;
 }) {
   return (
@@ -767,7 +815,7 @@ function HomeOpsOverview({
         </div>
       </div>
 
-      <CanvasOutagePlan dueSoonCount={dueSoonCount} highValueCount={highValueCount} nextDue={nextDue} />
+      <CollegeNews />
 
       <div className="rounded-lg border border-slate-200 bg-white p-5">
         <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-teal-700">
@@ -777,7 +825,7 @@ function HomeOpsOverview({
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <MiniStat icon={<BookOpen />} label="Live coverage" value={canvasCoverage} />
           <MiniStat icon={<KanbanSquare />} label="Canvas items" value={totalAssignments.toString()} />
-          <MiniStat icon={<Clock />} label="Next due" value={nextDue} />
+          <MiniStat href="/?focus=missing#priority-work" icon={<ShieldCheck />} label="Missing / mismatch" value={`${missingCount}/${mismatchCount}`} />
           <MiniStat icon={<AlertTriangle />} label="100+ point tasks" value={highValueCount.toString()} />
         </div>
       </div>
@@ -808,9 +856,9 @@ function SourceBadge({ source }: { source: SourceKind }) {
   return <span className={`rounded px-2 py-1 text-xs font-medium ${color}`}>{label}</span>;
 }
 
-function MiniStat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-  return (
-    <div className="rounded-lg bg-slate-50 p-3">
+function MiniStat({ href, icon, label, value }: { href?: string; icon: React.ReactNode; label: string; value: string }) {
+  const content = (
+    <>
       <div className="flex items-center gap-2 text-slate-600">
         <span className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-teal-700 [&_svg]:h-4 [&_svg]:w-4">
           {icon}
@@ -818,8 +866,18 @@ function MiniStat({ icon, label, value }: { icon: React.ReactNode; label: string
         <span className="text-xs font-semibold uppercase tracking-wide">{label}</span>
       </div>
       <p className="mt-2 text-lg font-semibold text-slate-950">{value}</p>
-    </div>
+    </>
   );
+
+  if (href) {
+    return (
+      <Link className="block rounded-lg bg-slate-50 p-3 transition hover:bg-slate-100" href={href}>
+        {content}
+      </Link>
+    );
+  }
+
+  return <div className="rounded-lg bg-slate-50 p-3">{content}</div>;
 }
 
 function EmptyState({ title, body, href, action }: { title: string; body: string; href: string; action: string }) {
@@ -843,7 +901,7 @@ function Metric({ href, icon, label, value }: { href?: string; icon: React.React
         </span>
         <span className="text-sm font-medium">{label}</span>
       </div>
-      <p className="mt-3 text-3xl font-semibold">{value}</p>
+      <p className={`mt-3 font-semibold ${value.length > 8 ? "text-2xl" : "text-3xl"}`}>{value}</p>
     </>
   );
 
