@@ -264,16 +264,7 @@ export default async function Home({ searchParams }: HomeProps) {
             <Metric href="/?focus=at-risk#priority-work" icon={<AlertTriangle />} label="At risk" value={atRiskAssignments.length.toString()} />
             <Metric href="#priority-work" icon={<Clock />} label="Next due" value={nextDueAssignment?.due_at ? formatShortDate(nextDueAssignment.due_at) : "No live due date"} />
           </div>
-          <HomeOpsOverview
-            announcements={announcements}
-            canvasCoverage={`${canvasCoverageCount}/${activeTermCourses.length}`}
-            dueSoonCount={dueSoon.length}
-            highValueCount={highValueCount}
-            missingCount={missingAssignments.length}
-            mismatchCount={mismatchAssignments.length}
-            nextDue={nextDueAssignment?.due_at ? formatShortDate(nextDueAssignment.due_at) : "No live due date"}
-            totalAssignments={liveTermAssignments.length}
-          />
+          <HomeOpsOverview announcements={announcements} />
           <div className="grid gap-6 lg:col-span-2 lg:grid-cols-[1fr_1fr]">
             <TodayFocusPanel
               courses={courses}
@@ -751,25 +742,11 @@ function statusActionsFor(status: TaskStatus) {
 
 function HomeOpsOverview({
   announcements,
-  canvasCoverage,
-  dueSoonCount,
-  highValueCount,
-  missingCount,
-  mismatchCount,
-  nextDue,
-  totalAssignments,
 }: {
   announcements: CanvasAnnouncement[];
-  canvasCoverage: string;
-  dueSoonCount?: number;
-  highValueCount: number;
-  missingCount: number;
-  mismatchCount: number;
-  nextDue?: string;
-  totalAssignments: number;
 }) {
   return (
-    <div className="grid gap-6 lg:col-span-2 lg:grid-cols-[1.1fr_1fr_0.95fr]">
+    <div className="grid gap-6 lg:col-span-2 lg:grid-cols-3">
       <div className="rounded-lg border border-amber-200 bg-amber-50 p-5">
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -815,19 +792,71 @@ function HomeOpsOverview({
 
       <CollegeNews />
 
-      <div className="rounded-lg border border-slate-200 bg-white p-5">
-        <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-teal-700">
-          <ShieldCheck className="h-4 w-4" />
-          Ops Stats
+      <ScholarshipCard />
+    </div>
+  );
+}
+
+function ScholarshipCard() {
+  return (
+    <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-5">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-emerald-800">
+            <Award className="h-4 w-4" />
+            Scholarship
+          </div>
+          <h2 className="mt-2 text-xl font-semibold text-slate-950">Active awards and verified funding</h2>
         </div>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <MiniStat icon={<BookOpen />} label="Live coverage" value={canvasCoverage} />
-          <MiniStat icon={<KanbanSquare />} label="Canvas items" value={totalAssignments.toString()} />
-          <MiniStat href="/?focus=missing#priority-work" icon={<ShieldCheck />} label="Missing / mismatch" value={`${missingCount}/${mismatchCount}`} />
-          <MiniStat icon={<AlertTriangle />} label="100+ point tasks" value={highValueCount.toString()} />
-        </div>
+        <span className="rounded bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-900">
+          $500 Awarded
+        </span>
       </div>
 
+      <div className="mt-4 space-y-3">
+        <article className="rounded-lg border border-emerald-200 bg-white p-3">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold">
+            <div className="flex items-center gap-1.5">
+              <span className="rounded bg-emerald-100 px-2 py-0.5 text-emerald-900">CIS 166 Lead</span>
+              <span className="text-slate-600">Last Mile Fund</span>
+            </div>
+            <span className="font-bold text-emerald-700">✓ Transferring</span>
+          </div>
+          <h3 className="mt-2 text-sm font-semibold text-slate-950">Microsoft Cybersecurity Scholarship</h3>
+          <p className="mt-1 line-clamp-2 text-sm text-slate-700">
+            $500 cash assistance via Tremendous. Unlocks 1-yr LinkedIn Premium, exam vouchers (CompTIA/Cisco/MS), and GitHub Campus.
+          </p>
+          <div className="mt-2 flex flex-wrap gap-1.5 text-[11px] font-medium text-slate-600">
+            <span className="rounded bg-emerald-50 px-2 py-0.5 text-emerald-800">LinkedIn Premium 1-Yr</span>
+            <span className="rounded bg-emerald-50 px-2 py-0.5 text-emerald-800">Exam Vouchers</span>
+          </div>
+          <Link
+            className="mt-2.5 inline-flex text-sm font-semibold text-emerald-800 hover:text-emerald-950"
+            href="https://www.lastmile-ed.org/Microsoft"
+            target="_blank"
+          >
+            Program Details & Vouchers
+          </Link>
+        </article>
+
+        <article className="rounded-lg border border-emerald-200 bg-white p-3">
+          <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-600">
+            <span className="rounded bg-emerald-100 px-2 py-0.5 text-emerald-900">LACC Foundation</span>
+            <span>Local Campus Only</span>
+          </div>
+          <h3 className="mt-2 text-sm font-semibold text-slate-950">LACC Foundation Scholarships</h3>
+          <p className="mt-1 line-clamp-2 text-sm text-slate-700">
+            Up to $1,000 per cycle. Fill out ONE application for all donor awards. Spring 2027 cycle opens January.
+          </p>
+          <Link
+            className="mt-2 inline-flex text-sm font-semibold text-emerald-800 hover:text-emerald-950"
+            href="https://laccfoundation.org/apply-for-scholarships/"
+            target="_blank"
+          >
+            Apply on LACC Foundation
+          </Link>
+        </article>
+      </div>
     </div>
   );
 }
