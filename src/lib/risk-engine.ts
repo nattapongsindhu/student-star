@@ -23,7 +23,9 @@ export function calculateAssignmentRisk(input: RiskInput, now = new Date()): Ris
     dueMs === null || days === null
       ? 8
       : dueMs < 0
-        ? 35
+        ? input.status === "USER_MARKED_SUBMITTED"
+          ? 0
+          : 35
         : dueMs <= 86_400_000
           ? 32
           : days <= 2

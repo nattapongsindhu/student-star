@@ -133,12 +133,20 @@ export default async function Home({ searchParams }: HomeProps) {
   const currentAssignments = assignments.filter((assignment) => selectedTermCourseIds.has(assignment.course_id));
   const liveAssignments = currentAssignments.filter((assignment) => assignment.source === "canvas");
   const priorityAssignments = liveAssignments
+    .filter((assignment) => assignment.status !== "USER_MARKED_SUBMITTED" && assignment.status !== "CANCELLED")
     .slice()
     .sort((a, b) => b.priority_score - a.priority_score)
     .slice(0, 6);
   const dueSoon = liveAssignments.filter((assignment) => {
     const days = daysUntil(assignment.due_at);
-    return days !== null && days <= 7 && !isCanvasComplete(assignment.status);
+    return (
+      days !== null &&
+      days >= 0 &&
+      days <= 7 &&
+      !isCanvasComplete(assignment.status) &&
+      assignment.status !== "USER_MARKED_SUBMITTED" &&
+      assignment.status !== "CANCELLED"
+    );
   });
   const labCount = liveAssignments.filter((assignment) => assignment.task_type === "lab").length;
   const mismatchAssignments = liveAssignments.filter(
@@ -156,7 +164,10 @@ export default async function Home({ searchParams }: HomeProps) {
   });
   const missingMismatchAssignments = uniqueAssignments([...missingAssignments, ...mismatchAssignments]);
   const atRiskAssignments = liveAssignments.filter(
-    (assignment) => assignment.risk_level === "HIGH" || assignment.risk_level === "CRITICAL",
+    (assignment) =>
+      (assignment.risk_level === "HIGH" || assignment.risk_level === "CRITICAL") &&
+      assignment.status !== "USER_MARKED_SUBMITTED" &&
+      assignment.status !== "CANCELLED",
   );
   const decisionAssignments = assignmentsForFocus(requestedFocus, {
     atRisk: atRiskAssignments,
@@ -169,7 +180,13 @@ export default async function Home({ searchParams }: HomeProps) {
   const liveTermAssignments = activeTermCourseAssignments.filter((assignment) => assignment.source === "canvas");
   const upcomingLiveAssignments = liveAssignments.filter((assignment) => {
     const days = daysUntil(assignment.due_at);
-    return days !== null && days >= 0 && !isCanvasComplete(assignment.status);
+    return (
+      days !== null &&
+      days >= 0 &&
+      !isCanvasComplete(assignment.status) &&
+      assignment.status !== "USER_MARKED_SUBMITTED" &&
+      assignment.status !== "CANCELLED"
+    );
   });
   const todayAssignments = upcomingLiveAssignments.filter((assignment) => daysUntil(assignment.due_at) === 0).slice(0, 4);
   const next72HourAssignments = upcomingLiveAssignments
