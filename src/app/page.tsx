@@ -819,7 +819,7 @@ function ScholarshipCard() {
     {
       id: "google-ai",
       provider: "Google for Students",
-      value: "5 TB Storage",
+      value: "Free 1 Year",
       title: "Google AI Pro (Gemini 1-Yr Student Plan)",
       summary:
         "Free 1-year student plan ($240 value): 5 TB Google One cloud storage, 4x Gemini usage limits, and YouTube Premium.",
