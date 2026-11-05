@@ -806,7 +806,7 @@ function ScholarshipCard() {
       title: "Microsoft Cybersecurity Scholarship",
       summary:
         "CIS 166 Lead, $500 cash via Tremendous + 1-yr LinkedIn Premium & cert vouchers.",
-      link: "https://www.lastmile-ed.org/Microsoft",
+      link: "https://www.lastmile-ed.org/student-funding-ops",
       actionText: "Open in Website",
     },
     {
@@ -816,7 +816,7 @@ function ScholarshipCard() {
       title: "Google AI Pro (Gemini 1-Yr Student Plan)",
       summary:
         "Free 1-year student plan ($240 value): 5 TB Google One cloud storage, 4x Gemini usage limits, and YouTube Premium.",
-      link: "https://gemini.google.com",
+      link: "https://gemini.google/students/",
       actionText: "Open Gemini AI Pro",
     },
     {
