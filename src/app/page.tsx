@@ -798,13 +798,6 @@ function HomeOpsOverview({
 }
 
 function ScholarshipCard() {
-  const formattedDate = new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    timeZone: "America/Los_Angeles",
-  }).format(new Date());
-
   const items = [
     {
       id: "microsoft",
@@ -849,7 +842,7 @@ function ScholarshipCard() {
           <h2 className="mt-2 text-xl font-semibold text-slate-950">Active awards and student benefits</h2>
         </div>
         <span className="rounded bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-900">
-          {formattedDate}
+          Best Choice
         </span>
       </div>
 
