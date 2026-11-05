@@ -804,7 +804,7 @@ function ScholarshipCard() {
         <div>
           <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-emerald-800">
             <Award className="h-4 w-4" />
-            Scholarships & Perks
+            Scholarship
           </div>
           <h2 className="mt-2 text-xl font-semibold text-slate-950">Active awards and student benefits</h2>
         </div>
