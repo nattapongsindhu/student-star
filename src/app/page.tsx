@@ -356,12 +356,10 @@ export default async function Home({ searchParams }: HomeProps) {
                           <div>
                             <p className="font-semibold">{formatShortDate(assignment.due_at)}</p>
                             <p className="text-slate-500">
-                              {assignment.estimated_minutes} min · {assignment.progress_percent}% done
+                              {assignment.estimated_minutes} min{assignment.points_possible !== null ? ` · ${assignment.points_possible} pts` : ""} · {assignment.progress_percent}% done
                             </p>
                           </div>
-                          <span className="rounded-md bg-slate-950 px-3 py-2 text-center font-semibold text-white">
-                            {assignment.priority_score}/100
-                          </span>
+                          <PriorityMeter level={assignment.risk_level} score={assignment.priority_score} />
                         </div>
                       </article>
                     );
@@ -830,6 +828,54 @@ function HomeOpsOverview({
         </div>
       </div>
 
+    </div>
+  );
+}
+
+function PriorityMeter({ score, level }: { score: number; level: string }) {
+  const barColor =
+    level === "CRITICAL"
+      ? "bg-rose-500"
+      : level === "HIGH"
+        ? "bg-amber-500"
+        : level === "WATCH"
+          ? "bg-amber-400"
+          : "bg-emerald-500";
+
+  const textColor =
+    level === "CRITICAL"
+      ? "text-rose-700"
+      : level === "HIGH"
+        ? "text-amber-700"
+        : level === "WATCH"
+          ? "text-amber-700"
+          : "text-emerald-700";
+
+  const label =
+    level === "CRITICAL"
+      ? "Critical"
+      : level === "HIGH"
+        ? "High"
+        : level === "WATCH"
+          ? "Watch"
+          : "Low";
+
+  return (
+    <div
+      className="flex flex-col gap-1.5 md:items-end"
+      title={`Priority Urgency: ${label} (${score}/100)`}
+    >
+      <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500">
+        <span>Priority</span>
+        <span className="text-slate-300">·</span>
+        <span className={textColor}>{label}</span>
+      </div>
+      <div className="h-2 w-32 overflow-hidden rounded-full bg-slate-100">
+        <div
+          className={`h-full rounded-full transition-all ${barColor}`}
+          style={{ width: `${Math.max(12, Math.min(100, score))}%` }}
+        />
+      </div>
     </div>
   );
 }
