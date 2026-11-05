@@ -798,6 +798,36 @@ function HomeOpsOverview({
 }
 
 function ScholarshipCard() {
+  const items = [
+    {
+      id: "microsoft",
+      category: "CIS 166 Lead",
+      badge: "$500 Awarded",
+      title: "Microsoft Cybersecurity Scholarship",
+      summary: "$500 cash via Tremendous + 1-yr LinkedIn Premium & cert vouchers.",
+      link: "https://www.lastmile-ed.org/Microsoft",
+      actionText: "Program & Perks",
+    },
+    {
+      id: "google-ai",
+      category: "Google Student",
+      badge: "Free 1 Year",
+      title: "Google AI Pro & Gemini (5 TB)",
+      summary: "5 TB Google One cloud storage, Gemini Live, and YouTube Premium.",
+      link: "https://gemini.google.com",
+      actionText: "Open Gemini",
+    },
+    {
+      id: "lacc-foundation",
+      category: "LACC Foundation",
+      badge: "Up to $1,000",
+      title: "Campus Scholarships (Spring 2027)",
+      summary: "One online application for all campus awards. Opens January 2027.",
+      link: "https://laccfoundation.org/apply-for-scholarships/",
+      actionText: "LACC Portal",
+    },
+  ];
+
   return (
     <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-5">
       <div className="flex items-start justify-between gap-3">
@@ -809,84 +839,28 @@ function ScholarshipCard() {
           <h2 className="mt-2 text-xl font-semibold text-slate-950">Active awards and student benefits</h2>
         </div>
         <span className="rounded bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-900">
-          $500+ &amp; AI Pro Active
+          $500+ Active
         </span>
       </div>
 
       <div className="mt-4 space-y-3">
-        {/* Award 1: Microsoft Cybersecurity Scholarship */}
-        <article className="rounded-lg border border-emerald-200 bg-white p-3">
-          <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold">
-            <div className="flex items-center gap-1.5">
-              <span className="rounded bg-emerald-100 px-2 py-0.5 text-emerald-900">CIS 166 Lead</span>
-              <span className="text-slate-600">Last Mile Fund</span>
+        {items.map((item) => (
+          <article className="rounded-lg border border-emerald-200 bg-white p-3" key={item.id}>
+            <div className="flex items-center justify-between gap-2 text-xs font-semibold">
+              <span className="rounded bg-emerald-100 px-2 py-0.5 text-emerald-900">{item.category}</span>
+              <span className="font-bold text-emerald-700">{item.badge}</span>
             </div>
-            <span className="font-bold text-emerald-700">✓ $500 Transferring</span>
-          </div>
-          <h3 className="mt-2 text-sm font-semibold text-slate-950">Microsoft Cybersecurity Scholarship</h3>
-          <p className="mt-1 line-clamp-2 text-sm text-slate-700">
-            $500 cash assistance via Tremendous, 1-yr LinkedIn Premium, CompTIA/Cisco exam vouchers, and GitHub Student Pack.
-          </p>
-          <div className="mt-2 flex flex-wrap gap-1.5 text-[11px] font-medium text-slate-600">
-            <span className="rounded bg-emerald-50 px-2 py-0.5 text-emerald-800">LinkedIn Premium 1-Yr</span>
-            <span className="rounded bg-emerald-50 px-2 py-0.5 text-emerald-800">Exam Vouchers</span>
-          </div>
-          <Link
-            className="mt-2.5 inline-flex text-sm font-semibold text-emerald-800 hover:text-emerald-950"
-            href="https://www.lastmile-ed.org/Microsoft"
-            target="_blank"
-          >
-            Program Details &amp; Perks
-          </Link>
-        </article>
-
-        {/* Award 2: Google AI Pro / Gemini 1-Year Free Student Plan */}
-        <article className="rounded-lg border border-emerald-200 bg-white p-3">
-          <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold">
-            <div className="flex items-center gap-1.5">
-              <span className="rounded bg-emerald-100 px-2 py-0.5 text-emerald-900">Google for Students</span>
-              <span className="text-slate-600">5 TB Storage</span>
-            </div>
-            <span className="font-bold text-emerald-700">✓ Active to Oct 2027</span>
-          </div>
-          <h3 className="mt-2 text-sm font-semibold text-slate-950">Google AI Pro (Gemini 1-Yr Student Plan)</h3>
-          <p className="mt-1 line-clamp-2 text-sm text-slate-700">
-            Free 1-year student plan ($240 value): 5 TB Google One cloud storage, 4x Gemini usage limits, Gemini Live, and YouTube Premium.
-          </p>
-          <div className="mt-2 flex flex-wrap gap-1.5 text-[11px] font-medium text-slate-600">
-            <span className="rounded bg-emerald-50 px-2 py-0.5 text-emerald-800">5 TB Google One</span>
-            <span className="rounded bg-emerald-50 px-2 py-0.5 text-emerald-800">YouTube Premium</span>
-          </div>
-          <Link
-            className="mt-2.5 inline-flex text-sm font-semibold text-emerald-800 hover:text-emerald-950"
-            href="https://gemini.google.com"
-            target="_blank"
-          >
-            Open Gemini AI Pro
-          </Link>
-        </article>
-
-        {/* Opportunity 3: LACC Foundation Scholarships */}
-        <article className="rounded-lg border border-emerald-200 bg-white p-3">
-          <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold">
-            <div className="flex items-center gap-1.5">
-              <span className="rounded bg-emerald-100 px-2 py-0.5 text-emerald-900">LACC Foundation</span>
-              <span className="text-slate-600">Local Campus Only</span>
-            </div>
-            <span className="font-bold text-teal-800">Spring 2027 Cycle</span>
-          </div>
-          <h3 className="mt-2 text-sm font-semibold text-slate-950">LACC Foundation Scholarships</h3>
-          <p className="mt-1 line-clamp-2 text-sm text-slate-700">
-            Up to $1,000 per cycle. Fill out ONE online application for all campus donor awards. Spring cycle opens January.
-          </p>
-          <Link
-            className="mt-2.5 inline-flex text-sm font-semibold text-emerald-800 hover:text-emerald-950"
-            href="https://laccfoundation.org/apply-for-scholarships/"
-            target="_blank"
-          >
-            Apply on LACC Foundation
-          </Link>
-        </article>
+            <h3 className="mt-1.5 text-sm font-semibold text-slate-950">{item.title}</h3>
+            <p className="mt-0.5 text-sm text-slate-600">{item.summary}</p>
+            <Link
+              className="mt-2 inline-flex text-sm font-semibold text-emerald-800 hover:text-emerald-950"
+              href={item.link}
+              target="_blank"
+            >
+              {item.actionText}
+            </Link>
+          </article>
+        ))}
       </div>
     </div>
   );
