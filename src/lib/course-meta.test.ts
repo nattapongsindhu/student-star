@@ -52,7 +52,7 @@ describe("course metadata helpers", () => {
   });
 
   it("uses display-safe full course titles outside dense tables", () => {
-    expect(displayCourseTitleFor(courseById("cis-162"))).toBe("Introduction to Cyber Security I");
+    expect(displayCourseTitleFor(courseById("cis-162"))).toBe("Cyber Security I");
   });
 
   it("formats class type details as stacked lines", () => {

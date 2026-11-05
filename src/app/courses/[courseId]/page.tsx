@@ -47,7 +47,7 @@ export default async function CoursePage({ params, searchParams }: CoursePagePro
     notFound();
   }
 
-  const assignments = courseAssignments.filter((assignment) => assignment.course_id === course.id);
+  const assignments = courseAssignments.filter((assignment) => assignment.course_id === course.id && assignment.status !== "CANCELLED");
   const outcome = courseOutcome(course);
   const classTypeSummary = classTypeSummaryFor(course);
   const roomTabs = buildCourseRoomTabs(course, assignments);

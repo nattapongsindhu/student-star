@@ -139,7 +139,13 @@ export default async function Home({ searchParams }: HomeProps) {
   );
   const missingAssignments = liveAssignments.filter((assignment) => {
     const days = daysUntil(assignment.due_at);
-    return days !== null && days < 0 && !assignment.canvas_submission_confirmed;
+    return (
+      days !== null &&
+      days < 0 &&
+      !assignment.canvas_submission_confirmed &&
+      assignment.status !== "USER_MARKED_SUBMITTED" &&
+      assignment.status !== "CANCELLED"
+    );
   });
   const missingMismatchAssignments = uniqueAssignments([...missingAssignments, ...mismatchAssignments]);
   const atRiskAssignments = liveAssignments.filter(

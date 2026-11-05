@@ -69,6 +69,7 @@ export async function getDashboardData(): Promise<DashboardData> {
       .select("*")
       .neq("status", "GRADED")
       .neq("status", "CANVAS_CONFIRMED")
+      .neq("status", "CANCELLED")
       .order("due_at", { ascending: true, nullsFirst: false }),
     supabase.from("assignments").select("*").order("due_at", { ascending: true, nullsFirst: false }),
     supabase

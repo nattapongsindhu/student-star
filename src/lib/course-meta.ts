@@ -50,6 +50,7 @@ export function sanitizeSnippet(value: string | null) {
 }
 
 export function submissionLabel(status: TaskStatus, confirmed: boolean) {
+  if (status === "CANCELLED") return "Cancelled";
   if (status === "GRADED") return "Graded";
   if (status === "CANVAS_CONFIRMED" || confirmed) return "Submitted";
   if (status === "USER_MARKED_SUBMITTED") return "Marked Submitted";
@@ -57,6 +58,7 @@ export function submissionLabel(status: TaskStatus, confirmed: boolean) {
 }
 
 export function submissionClass(status: TaskStatus, confirmed: boolean) {
+  if (status === "CANCELLED") return "bg-slate-100 text-slate-500 line-through";
   if (status === "GRADED") return "bg-emerald-50 text-emerald-800";
   if (status === "CANVAS_CONFIRMED" || confirmed || status === "USER_MARKED_SUBMITTED") {
     return "bg-sky-50 text-sky-800";
@@ -97,7 +99,7 @@ export function compactCourseTitleFor(course: Course) {
   if (course.code === "CS 101") return "Comp Sci";
   if (course.code === "CIS 210") return "Comp Network";
   if (course.code === "CIS 112") return "OS: Beginning Linux";
-  if (course.code === "CIS 166") return "Comp Forens";
+  if (course.code === "CIS 166") return "Computer Security I";
   if (course.code === "CIS 214") return "Network+";
   if (course.code === "CIS 162") return "Cyber Security I";
   return course.title;
@@ -105,7 +107,7 @@ export function compactCourseTitleFor(course: Course) {
 
 export function displayCourseTitleFor(course: Course) {
   if (course.code === "CIS 112") return "Operating Systems: Beginning Linux";
-  if (course.code === "CIS 162") return "Introduction to Cyber Security I";
+  if (course.code === "CIS 162") return "Cyber Security I";
   if (course.code === "CIS 214") return "Introduction to Network Plus";
   return course.title;
 }

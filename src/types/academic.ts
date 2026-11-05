@@ -9,7 +9,8 @@ export type TaskStatus =
   | "READY_TO_SUBMIT"
   | "USER_MARKED_SUBMITTED"
   | "CANVAS_CONFIRMED"
-  | "GRADED";
+  | "GRADED"
+  | "CANCELLED";
 
 export type RiskLevel = "LOW" | "WATCH" | "HIGH" | "CRITICAL";
 

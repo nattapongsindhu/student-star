@@ -14,6 +14,7 @@ const taskStatuses = [
   "USER_MARKED_SUBMITTED",
   "CANVAS_CONFIRMED",
   "GRADED",
+  "CANCELLED",
 ] as const satisfies readonly TaskStatus[];
 
 const statusProgress: Record<TaskStatus, number> = {
@@ -26,6 +27,7 @@ const statusProgress: Record<TaskStatus, number> = {
   USER_MARKED_SUBMITTED: 100,
   CANVAS_CONFIRMED: 100,
   GRADED: 100,
+  CANCELLED: 0,
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {

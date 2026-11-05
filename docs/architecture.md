@@ -238,7 +238,7 @@ Fall 2026 courses:
 
 - CIS 112 Operating Systems
 - CIS 162 Cyber Security I
-- CIS 166 Computer Forensics
+- CIS 166 Computer Security I
 - CIS 214 Intro to Network Plus
 - ASIAN 001 Asian American History
 - CS 119 Python Programming

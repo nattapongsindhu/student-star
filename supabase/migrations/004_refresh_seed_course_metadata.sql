@@ -4,7 +4,7 @@ values
   ('asian-001', null, 'ASIAN 001', 'Asian American History', 'Fall 2026', 'upcoming', 'Harbor Online', 'Online', 3, null, '2026-10-05', '2026-12-20', 4.58, '#0f766e', 'mock'),
   ('cis-112', null, 'CIS 112', 'Operating Systems: Beginning Linux', 'Fall 2026', 'upcoming', 'LACC FH 201', 'Online lecture + Thu lab 2:30-5:40 PM', 3, null, '2026-08-31', '2026-12-20', 5.25, '#2563eb', 'mock'),
   ('cis-162', null, 'CIS 162', 'Cyber Security I', 'Fall 2026', 'upcoming', 'City Online', 'Online lecture + online lab', 3, null, '2026-08-31', '2026-12-20', 4.17, '#7c3aed', 'mock'),
-  ('cis-166', 364809, 'CIS 166', 'Computer Forensics', 'Fall 2026', 'active', 'City Online', 'Online lecture + online lab', 3, null, '2026-08-31', '2026-12-20', 5.25, '#be123c', 'canvas'),
+  ('cis-166', 364809, 'CIS 166', 'Computer Security I', 'Fall 2026', 'active', 'City Online', 'Online lecture + online lab', 3, null, '2026-08-31', '2026-12-20', 5.25, '#be123c', 'canvas'),
   ('cis-214', null, 'CIS 214', 'Intro to Network Plus', 'Fall 2026', 'upcoming', 'City Online', 'Online lecture + online lab', 3, null, '2026-08-31', '2026-12-20', 4.17, '#c2410c', 'mock'),
   ('cs-119', null, 'CS 119', 'Python Programming', 'Fall 2026', 'upcoming', 'City Online', 'Late-start online lecture + lab', 3, null, '2026-10-26', '2026-12-20', 8.5, '#15803d', 'mock'),
   ('pols-c1000', 362736, 'POLS C1000', 'American Government & Politics', 'Summer 2026', 'case_study', 'City Online', 'Completed online course used as a Student Star case study', 3, 'Expected A', '2026-07-20', '2026-08-23', 0, '#6d28d9', 'canvas'),

@@ -10,6 +10,7 @@ export const statusLabels: Record<TaskStatus, string> = {
   USER_MARKED_SUBMITTED: "Marked Submitted",
   CANVAS_CONFIRMED: "Canvas Confirmed",
   GRADED: "Graded",
+  CANCELLED: "Cancelled",
 };
 
 export function isCanvasComplete(status: TaskStatus) {

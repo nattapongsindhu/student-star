@@ -251,25 +251,29 @@ export async function syncCanvasToSupabase() {
     const assignmentIds = assignments.map((assignment) => `${courseId}-${assignment.id}`);
     const { data: existingAssignments, error: existingError } = await supabase
       .from("assignments")
-      .select("id, course_id, title, due_at, points_possible, status, canvas_submission_confirmed")
+      .select("id, course_id, title, due_at, points_possible, status, canvas_submission_confirmed, notes")
       .in("id", assignmentIds);
 
     if (existingError) throw existingError;
 
     const existingById = new Map(
-      (existingAssignments as AssignmentSnapshot[] | null | undefined)?.map((assignment) => [assignment.id, assignment]) ?? [],
+      (existingAssignments as (AssignmentSnapshot & { notes?: string | null })[] | null | undefined)?.map((assignment) => [assignment.id, assignment]) ?? [],
     );
     const pendingChanges: ReturnType<typeof detectAssignmentChanges> = [];
 
     const rows = assignments.map((assignment) => {
       const estimatedMinutes = estimateMinutes(assignment);
-      const status = statusFor(assignment);
+      const existing = existingById.get(`${courseId}-${assignment.id}`);
+      let status = statusFor(assignment);
+      if (status === "DISCOVERED" && existing?.status === "USER_MARKED_SUBMITTED") {
+        status = "USER_MARKED_SUBMITTED";
+      }
       const canvasSubmissionConfirmed = status === "CANVAS_CONFIRMED" || status === "GRADED";
       const risk = calculateAssignmentRisk({
         dueAt: assignment.due_at,
         pointsPossible: assignment.points_possible,
         estimatedMinutes,
-        progressPercent: canvasSubmissionConfirmed ? 100 : 0,
+        progressPercent: status === "USER_MARKED_SUBMITTED" || canvasSubmissionConfirmed ? 100 : 0,
         status,
         difficulty: estimatedMinutes >= 180 ? "heavy" : estimatedMinutes >= 120 ? "medium" : "light",
         courseGradePercent: null,
@@ -291,9 +295,9 @@ export async function syncCanvasToSupabase() {
         task_type: taskType(assignment),
         priority_score: risk.score,
         risk_level: risk.level,
-        progress_percent: canvasSubmissionConfirmed ? 100 : 0,
+        progress_percent: status === "USER_MARKED_SUBMITTED" || canvasSubmissionConfirmed ? 100 : 0,
         canvas_submission_confirmed: canvasSubmissionConfirmed,
-        notes: null,
+        notes: existing?.notes ?? null,
         url: assignment.html_url ?? null,
         source: "canvas",
         last_seen_at: new Date().toISOString(),
@@ -307,6 +311,52 @@ export async function syncCanvasToSupabase() {
     if (rows.length) {
       const { error } = await supabase.from("assignments").upsert(rows, { onConflict: "id" });
       if (error) throw error;
+    }
+
+    const { data: allDbAssignments, error: allDbError } = await supabase
+      .from("assignments")
+      .select("id, title, status, canvas_assignment_id")
+      .eq("course_id", courseId)
+      .eq("source", "canvas");
+
+    if (allDbError) throw allDbError;
+
+    const activeCanvasIds = new Set(assignments.map((assignment) => assignment.id));
+    const staleAssignments = (allDbAssignments || []).filter(
+      (a) => a.canvas_assignment_id && !activeCanvasIds.has(Number(a.canvas_assignment_id)) && a.status !== "CANCELLED",
+    );
+
+    if (staleAssignments.length) {
+      const staleIds = staleAssignments.map((a) => a.id);
+      const { error: cancelError } = await supabase
+        .from("assignments")
+        .update({
+          status: "CANCELLED",
+          risk_level: "LOW",
+          priority_score: 0,
+          updated_at: new Date().toISOString(),
+        })
+        .in("id", staleIds);
+
+      if (cancelError) throw cancelError;
+
+      const cancelEvents = staleAssignments.map((a) => ({
+        event_key: `${a.id}:cancelled:${new Date().toISOString().slice(0, 10)}`,
+        course_id: courseId,
+        assignment_id: a.id,
+        event_type: "assignment_cancelled",
+        severity: "info" as const,
+        title: `Assignment removed or hidden in Canvas: ${a.title}`,
+        previous_value: a.status,
+        new_value: "CANCELLED",
+        source: "canvas" as const,
+      }));
+
+      await supabase
+        .from("change_events")
+        .upsert(cancelEvents, { onConflict: "event_key", ignoreDuplicates: true });
+
+      changeCount += staleAssignments.length;
     }
 
     if (pendingChanges.length) {
