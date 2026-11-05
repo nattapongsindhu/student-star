@@ -265,22 +265,25 @@ export async function syncCanvasToSupabase() {
       const estimatedMinutes = estimateMinutes(assignment);
       const existing = existingById.get(`${courseId}-${assignment.id}`);
       let status = statusFor(assignment);
-      if (status === "DISCOVERED" && existing?.status === "USER_MARKED_SUBMITTED") {
-        status = "USER_MARKED_SUBMITTED";
+      if (status === "DISCOVERED" && (existing?.status === "USER_MARKED_SUBMITTED" || existing?.status === "CANCELLED")) {
+        status = existing.status;
       }
       const canvasSubmissionConfirmed = status === "CANVAS_CONFIRMED" || status === "GRADED";
-      const risk = calculateAssignmentRisk({
-        dueAt: assignment.due_at,
-        pointsPossible: assignment.points_possible,
-        estimatedMinutes,
-        progressPercent: status === "USER_MARKED_SUBMITTED" || canvasSubmissionConfirmed ? 100 : 0,
-        status,
-        difficulty: estimatedMinutes >= 180 ? "heavy" : estimatedMinutes >= 120 ? "medium" : "light",
-        courseGradePercent: null,
-        aSafetyMargin: null,
-        isAcceleratedCourse: courseId === "asian-001" || courseId === "cs-119",
-        canvasSubmissionConfirmed,
-      });
+      const isCancelled = status === "CANCELLED";
+      const risk = isCancelled
+        ? { score: 0, level: "LOW" as const }
+        : calculateAssignmentRisk({
+            dueAt: assignment.due_at,
+            pointsPossible: assignment.points_possible,
+            estimatedMinutes,
+            progressPercent: status === "USER_MARKED_SUBMITTED" || canvasSubmissionConfirmed ? 100 : 0,
+            status,
+            difficulty: estimatedMinutes >= 180 ? "heavy" : estimatedMinutes >= 120 ? "medium" : "light",
+            courseGradePercent: null,
+            aSafetyMargin: null,
+            isAcceleratedCourse: courseId === "asian-001" || courseId === "cs-119",
+            canvasSubmissionConfirmed,
+          });
 
       const row = {
         id: `${courseId}-${assignment.id}`,
@@ -293,9 +296,9 @@ export async function syncCanvasToSupabase() {
         estimated_minutes: estimatedMinutes,
         difficulty: estimatedMinutes >= 180 ? "heavy" : estimatedMinutes >= 120 ? "medium" : "light",
         task_type: taskType(assignment),
-        priority_score: risk.score,
-        risk_level: risk.level,
-        progress_percent: status === "USER_MARKED_SUBMITTED" || canvasSubmissionConfirmed ? 100 : 0,
+        priority_score: isCancelled ? 0 : risk.score,
+        risk_level: isCancelled ? "LOW" : risk.level,
+        progress_percent: isCancelled ? 0 : (status === "USER_MARKED_SUBMITTED" || canvasSubmissionConfirmed ? 100 : 0),
         canvas_submission_confirmed: canvasSubmissionConfirmed,
         notes: existing?.notes ?? null,
         url: assignment.html_url ?? null,
