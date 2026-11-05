@@ -10,6 +10,7 @@ type CourseDetailCardProps = {
 
 export function CourseDetailCard({ assignments, course }: CourseDetailCardProps) {
   const outcome = courseOutcome(course);
+  const activeAssignments = assignments.filter((assignment) => assignment.status !== "CANCELLED");
 
   return (
     <Link
@@ -28,7 +29,7 @@ export function CourseDetailCard({ assignments, course }: CourseDetailCardProps)
       </div>
       <p className="mt-2 text-sm text-slate-600">{instructorFor(course)}</p>
       <p className="mt-1 text-xs font-medium text-slate-500">
-        {assignments.length} assignments ·
+        {activeAssignments.length} assignments ·
         <span
           className={`ml-1 inline-flex rounded px-1.5 py-0.5 align-middle text-xs font-semibold ${
             outcome !== "In progress" ? "bg-emerald-50 text-emerald-800" : "bg-slate-100 text-slate-700"
