@@ -47,6 +47,13 @@ const termTabBadges: Record<string, { label: string }> = {
   "2026-spring": {
     label: "Full Time Dean's Honor List",
   },
+  "2026-summer": {
+    label: "Perfect Summer Session (4.00 GPA)",
+  },
+  // Ready for Winter 2027 once completed (uncomment when final grades are posted):
+  // "2027-winter": {
+  //   label: "Perfect Winter Session (4.00 GPA)",
+  // },
 };
 
 function focusFilterFromParam(value: string | undefined): FocusFilter | null {
