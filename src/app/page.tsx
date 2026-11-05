@@ -810,11 +810,9 @@ function ScholarshipCard() {
       id: "microsoft",
       provider: "Last Mile Fund",
       value: "$500",
-      status: "✓ Transferring",
       title: "Microsoft Cybersecurity Scholarship",
       summary:
         "CIS 166 Lead, $500 cash via Tremendous + 1-yr LinkedIn Premium & cert vouchers.",
-      perks: ["LinkedIn Premium 1-Yr", "Exam Vouchers"],
       link: "https://www.lastmile-ed.org/Microsoft",
       actionText: "Open in Website",
     },
@@ -822,11 +820,9 @@ function ScholarshipCard() {
       id: "google-ai",
       provider: "Google for Students",
       value: "5 TB Storage",
-      status: "✓ Active to Oct 2027",
       title: "Google AI Pro (Gemini 1-Yr Student Plan)",
       summary:
         "Free 1-year student plan ($240 value): 5 TB Google One cloud storage, 4x Gemini usage limits, and YouTube Premium.",
-      perks: ["5 TB Google One", "YouTube Premium"],
       link: "https://gemini.google.com",
       actionText: "Open Gemini AI Pro",
     },
@@ -834,11 +830,9 @@ function ScholarshipCard() {
       id: "lacc-foundation",
       provider: "LACC Foundation",
       value: "Up to $1,000",
-      status: "Spring 2027 Cycle",
       title: "LACC Foundation Scholarships",
       summary:
         "Up to $1,000 per cycle. Fill out ONE online application for all campus donor awards. Spring cycle opens January.",
-      perks: ["Local Campus Only", "ONE Online Application"],
       link: "https://laccfoundation.org/apply-for-scholarships/",
       actionText: "Apply on LACC Foundation",
     },
@@ -863,27 +857,13 @@ function ScholarshipCard() {
         {items.map((item) => (
           <article className="rounded-lg border border-emerald-200 bg-white p-3.5" key={item.id}>
             <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold">
-              <div className="flex items-center gap-1.5">
-                <span className="rounded bg-emerald-100 px-2 py-0.5 text-emerald-900">{item.provider}</span>
-                {item.status ? <span className="font-medium text-emerald-700">{item.status}</span> : null}
-              </div>
+              <span className="rounded bg-emerald-100 px-2 py-0.5 text-emerald-900">{item.provider}</span>
               <span className="font-bold text-emerald-800">{item.value}</span>
             </div>
 
             <h3 className="mt-2 text-sm font-semibold text-slate-950">{item.title}</h3>
 
             <p className="mt-1 line-clamp-2 text-sm text-slate-700">{item.summary}</p>
-
-            <div className="mt-2.5 flex flex-wrap gap-1.5 text-[11px] font-medium text-slate-600">
-              {item.perks.map((perk) => (
-                <span
-                  className="rounded border border-emerald-100 bg-emerald-50 px-2 py-0.5 text-emerald-800"
-                  key={perk}
-                >
-                  {perk}
-                </span>
-              ))}
-            </div>
 
             <Link
               className="mt-2.5 inline-flex text-sm font-semibold text-emerald-800 hover:text-emerald-950"
