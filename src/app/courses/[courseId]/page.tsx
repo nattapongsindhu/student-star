@@ -48,6 +48,13 @@ export default async function CoursePage({ params, searchParams }: CoursePagePro
   }
 
   const assignments = courseAssignments.filter((assignment) => assignment.course_id === course.id && assignment.status !== "CANCELLED");
+  const completedAssignments = assignments.filter(
+    (assignment) =>
+      assignment.status === "GRADED" ||
+      assignment.canvas_submission_confirmed ||
+      assignment.status === "USER_MARKED_SUBMITTED" ||
+      assignment.progress_percent === 100
+  );
   const outcome = courseOutcome(course);
   const classTypeSummary = classTypeSummaryFor(course);
   const roomTabs = buildCourseRoomTabs(course, assignments);
@@ -91,7 +98,7 @@ export default async function CoursePage({ params, searchParams }: CoursePagePro
       <section className="mx-auto grid max-w-6xl gap-6 px-5 py-6 lg:grid-cols-[0.55fr_minmax(0,1.45fr)] lg:px-8">
         <div className="space-y-6">
           <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
-            <StatCard icon={<BookOpen />} label="Assignments" value={assignments.length.toString()} />
+            <StatCard icon={<BookOpen />} label="Assignments" value={`${completedAssignments.length}/${assignments.length}`} />
             <StatCard icon={<FileText />} label="Points Possible" value={points ? `${points}` : "N/A"} />
           </div>
 
