@@ -259,7 +259,7 @@ export default async function Home({ searchParams }: HomeProps) {
             </div>
           ) : null}
           <div className="grid gap-3 lg:col-span-2 md:grid-cols-4">
-            <Metric href="#course-load" icon={<BookOpen />} label="Term courses" value={activeTermCourses.length.toString()} />
+            <Metric icon={<BookOpen />} label="Term courses" value={activeTermCourses.length.toString()} />
             <Metric href="/?focus=due-soon#priority-work" icon={<CalendarDays />} label="Due in 7 days" value={dueSoon.length.toString()} />
             <Metric href="/?focus=at-risk#priority-work" icon={<AlertTriangle />} label="At risk" value={atRiskAssignments.length.toString()} />
             <Metric href="#priority-work" icon={<Clock />} label="Next due" value={nextDueAssignment?.due_at ? formatShortDate(nextDueAssignment.due_at) : "No live due date"} />
@@ -367,19 +367,6 @@ export default async function Home({ searchParams }: HomeProps) {
                     action="Open Sync Console"
                   />
                 )}
-              </div>
-            </div>
-
-            <div className="rounded-lg border border-slate-200 bg-white p-5" id="course-load">
-              <h2 className="text-xl font-semibold">{selectedTerm.label} Course Load</h2>
-              <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                {activeTermCourses.map((course) => (
-                  <CourseDetailCard
-                    assignments={courseAssignments.filter((assignment) => assignment.course_id === course.id)}
-                    course={course}
-                    key={course.id}
-                  />
-                ))}
               </div>
             </div>
         </div>
