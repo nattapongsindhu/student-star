@@ -624,7 +624,7 @@ function CollegeNews() {
       title: 'Priority Registration Underway',
       summary:
         'Check SIS under Manage Classes > Enrollment Dates to view your appointment date and enroll early.',
-      link: 'https://mycollege.laccd.edu',
+      link: 'https://www.lacc.edu/admissions',
       actionText: 'Open SIS Portal',
     },
     {
@@ -644,7 +644,7 @@ function CollegeNews() {
       title: 'Free Tutoring & EOPS Assistance',
       summary:
         'Free in-person and online tutoring in writing, math, and STEM, plus textbook assistance through EOPS.',
-      link: 'https://www.lacitycollege.edu/academics/academic-support',
+      link: 'https://www.lacc.edu/academic-services/tutoring',
       actionText: 'LACC Tutoring Services',
     },
   ];
