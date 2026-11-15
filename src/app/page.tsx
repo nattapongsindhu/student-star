@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   AlertTriangle,
   Award,
@@ -285,6 +286,7 @@ export default async function Home({ searchParams }: HomeProps) {
           <div className="lg:col-span-2">
             <WeeklySchedule courses={activeTermCourses} />
           </div>
+          <LaccGeSheet />
 
           <div className="space-y-6">
             <div className="rounded-lg border border-slate-200 bg-white p-5">
@@ -781,6 +783,50 @@ function HomeOpsOverview({
 
       <ScholarshipCard />
     </div>
+  );
+}
+
+function LaccGeSheet() {
+  return (
+    <section className="rounded-lg border border-slate-200 bg-white p-5 lg:col-span-2">
+      <div className="flex flex-col justify-between gap-2 md:flex-row md:items-end">
+        <div>
+          <h2 className="text-xl font-semibold">LACC GE Advisement Sheet</h2>
+          <p className="mt-1 text-sm text-slate-600">2026-2027</p>
+        </div>
+        <span className="text-sm text-slate-500">2 pages</span>
+      </div>
+      <div className="mt-5 grid gap-5 xl:grid-cols-2">
+        <a
+          className="block overflow-hidden rounded-md border border-slate-200 bg-slate-50"
+          href="/lacc-ge-2026-2027-page-1.jpg"
+          rel="noreferrer"
+          target="_blank"
+        >
+          <Image
+            alt="LACC GE Advisement Sheet 2026-2027, page 1"
+            className="h-auto w-full"
+            height={1320}
+            src="/lacc-ge-2026-2027-page-1.jpg"
+            width={1020}
+          />
+        </a>
+        <a
+          className="block overflow-hidden rounded-md border border-slate-200 bg-slate-50"
+          href="/lacc-ge-2026-2027-page-2.jpg"
+          rel="noreferrer"
+          target="_blank"
+        >
+          <Image
+            alt="LACC GE Advisement Sheet 2026-2027, page 2"
+            className="h-auto w-full"
+            height={1320}
+            src="/lacc-ge-2026-2027-page-2.jpg"
+            width={1020}
+          />
+        </a>
+      </div>
+    </section>
   );
 }
 
