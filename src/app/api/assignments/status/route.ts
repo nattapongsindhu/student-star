@@ -52,7 +52,12 @@ export async function POST(request: NextRequest) {
 
   const body: unknown = await request.json();
 
-  if (!isRecord(body) || typeof body.assignmentId !== "string" || !isTaskStatus(body.status)) {
+  if (
+    !isRecord(body) ||
+    typeof body.assignmentId !== "string" ||
+    !isTaskStatus(body.status) ||
+    (body.notes !== undefined && typeof body.notes !== "string")
+  ) {
     return NextResponse.json({ error: "Invalid assignment status payload." }, { status: 400 });
   }
 
@@ -63,12 +68,35 @@ export async function POST(request: NextRequest) {
 
   const status = body.status;
   const canvasSubmissionConfirmed = status === "CANVAS_CONFIRMED" || status === "GRADED";
+  const { data: existingAssignment, error: lookupError } = await supabase
+    .from("assignments")
+    .select("course_id,title,status,notes")
+    .eq("id", body.assignmentId)
+    .maybeSingle();
+
+  if (lookupError) {
+    return NextResponse.json({ error: lookupError.message }, { status: 500 });
+  }
+
+  if (!existingAssignment) {
+    return NextResponse.json({ error: "Assignment not found." }, { status: 404 });
+  }
+
+  const submittedNotes = typeof body.notes === "string" && body.notes.trim() ? body.notes.trim() : null;
+  const isUserMarkedSubmitted = status === "USER_MARKED_SUBMITTED";
 
   const { error } = await supabase
     .from("assignments")
     .update({
       canvas_submission_confirmed: canvasSubmissionConfirmed,
       progress_percent: statusProgress[status],
+      ...(isUserMarkedSubmitted
+        ? {
+            notes: submittedNotes ?? existingAssignment.notes ?? "Marked submitted by user; awaiting Canvas confirmation.",
+            priority_score: 0,
+            risk_level: "LOW",
+          }
+        : {}),
       status,
       updated_at: new Date().toISOString(),
     })
@@ -76,6 +104,24 @@ export async function POST(request: NextRequest) {
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  if (isUserMarkedSubmitted && existingAssignment.status !== status) {
+    const { error: eventError } = await supabase.from("change_events").insert({
+      event_key: `${body.assignmentId}:user_marked_submitted:${new Date().toISOString()}`,
+      course_id: existingAssignment.course_id,
+      assignment_id: body.assignmentId,
+      event_type: "user_marked_submitted",
+      severity: "watch",
+      title: `User marked submitted: ${existingAssignment.title}`,
+      previous_value: existingAssignment.status,
+      new_value: "USER_MARKED_SUBMITTED",
+      source: "user",
+    });
+
+    if (eventError) {
+      return NextResponse.json({ error: eventError.message }, { status: 500 });
+    }
   }
 
   return NextResponse.json({ ok: true, status });

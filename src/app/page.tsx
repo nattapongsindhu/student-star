@@ -713,15 +713,20 @@ function statusActionsFor(status: TaskStatus) {
   if (status === "DISCOVERED") {
     actions.push({ status: "ACKNOWLEDGED", label: "Acknowledge" });
     actions.push({ status: "STARTED", label: "Start" });
+    actions.push({ status: "USER_MARKED_SUBMITTED", label: "Mark Submitted" });
   } else if (status === "ACKNOWLEDGED") {
     actions.push({ status: "STARTED", label: "Start" });
+    actions.push({ status: "USER_MARKED_SUBMITTED", label: "Mark Submitted" });
   } else if (status === "STARTED") {
     actions.push({ status: "READY_FOR_AUDIT", label: "Ready for Audit" });
+    actions.push({ status: "USER_MARKED_SUBMITTED", label: "Mark Submitted" });
   } else if (status === "READY_FOR_AUDIT") {
     actions.push({ status: "AI_AUDITED", label: "AI Audited" });
     actions.push({ status: "READY_TO_SUBMIT", label: "Ready to Submit" });
+    actions.push({ status: "USER_MARKED_SUBMITTED", label: "Mark Submitted" });
   } else if (status === "AI_AUDITED") {
     actions.push({ status: "READY_TO_SUBMIT", label: "Ready to Submit" });
+    actions.push({ status: "USER_MARKED_SUBMITTED", label: "Mark Submitted" });
   } else if (status === "READY_TO_SUBMIT") {
     actions.push({ status: "USER_MARKED_SUBMITTED", label: "Mark Submitted" });
   }
