@@ -32,6 +32,23 @@ describe("professor intel dataset", () => {
     expect(profNames).toContain("Jeffrey Nishimura");
   });
 
+  it("MATH 260 has verified Spring 2027 City schedule professors and flags", () => {
+    const math260 = getIntelByCourseCode("MATH 260");
+    expect(math260).toBeDefined();
+    const profNames = math260!.professors.map((p) => p.name);
+    expect(profNames).toContain("Phuong Duong");
+    expect(profNames).toContain("John Ngo");
+    expect(profNames).toContain("Keun Woong Park");
+    expect(profNames).toContain("Yelena Aladadyan");
+
+    const duong = math260!.professors.find((p) => p.name === "Phuong Duong");
+    expect(duong?.tier).toBe("TOP_PICK");
+    expect(duong?.scheduleSection).toContain("Class# 14985");
+
+    const aladadyan = math260!.professors.find((p) => p.name === "Yelena Aladadyan");
+    expect(aladadyan?.tier).toBe("AVOID");
+  });
+
   it("STAT C1000 has verified Spring 2027 professors and deleted all winter ones", () => {
     const statCourse = getIntelByCourseCode("STAT C1000");
     expect(statCourse).toBeDefined();
