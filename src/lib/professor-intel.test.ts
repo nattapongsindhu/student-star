@@ -32,17 +32,18 @@ describe("professor intel dataset", () => {
     expect(profNames).toContain("Jeffrey Nishimura");
   });
 
-  it("STAT C1000 has verified LACCD professors and does not include outside names", () => {
+  it("STAT C1000 has verified Spring 2027 professors and deleted all winter ones", () => {
     const statCourse = getIntelByCourseCode("STAT C1000");
     expect(statCourse).toBeDefined();
     const profNames = statCourse!.professors.map((p) => p.name);
-    // Verified LACCD professors from schedule
-    expect(profNames).toContain("Bret Carthew");
-    expect(profNames).toContain("Kee Lam");
-    expect(profNames).toContain("Angela Chung");
-    expect(profNames).toContain("Zachary Brown");
+    // Verified Spring 2027 professors from City schedule
     expect(profNames).toContain("Kayvon Sarvi");
-    // Verify non-LACCD name removed
+    expect(profNames).toContain("Hong Kim");
+    expect(profNames).toContain("Juliet Salazar");
+    expect(profNames).toContain("Raymond Badalian");
+    expect(profNames).toContain("Ronald Kendis");
+    // Verify Winter-only professors removed from STAT
+    expect(profNames).not.toContain("Bret Carthew");
     expect(profNames).not.toContain("Ruzanna Mardirosian");
   });
 

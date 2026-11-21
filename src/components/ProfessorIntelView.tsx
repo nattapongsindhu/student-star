@@ -110,7 +110,7 @@ export function ProfessorIntelView() {
             p.name.toLowerCase().includes(q) ||
             p.campus.toLowerCase().includes(q) ||
             p.summary.toLowerCase().includes(q) ||
-            (p.winter2027Section && p.winter2027Section.toLowerCase().includes(q));
+            (p.scheduleSection && p.scheduleSection.toLowerCase().includes(q));
           return matchCourse || matchProf;
         }
         return true;
@@ -190,7 +190,7 @@ export function ProfessorIntelView() {
             <p className="text-xs text-emerald-700">⭐ 4.2 - 5.0 Rating / Open-Notes / Fair</p>
           </div>
           <div className="rounded-lg border border-teal-200 bg-teal-50/60 p-3">
-            <p className="text-xs font-semibold text-teal-800 uppercase">Winter 2027 Live</p>
+            <p className="text-xs font-semibold uppercase text-teal-800">Spring 2027 Live</p>
             <p className="mt-1 text-2xl font-bold text-teal-900">Sections Mapped</p>
             <p className="text-xs text-teal-700">Mapped with Open Seats in SIS</p>
           </div>
@@ -363,10 +363,10 @@ function ProfessorRow({
 
           <p className="text-sm font-medium text-slate-700">{prof.summary}</p>
 
-          {prof.winter2027Section ? (
+          {prof.scheduleSection ? (
             <div className="inline-flex items-center gap-1.5 rounded-md border border-teal-200 bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-900">
               <CalendarCheck2 className="h-3.5 w-3.5 text-teal-700" />
-              <span>{prof.winter2027Section}</span>
+              <span>{prof.scheduleSection}</span>
             </div>
           ) : null}
         </div>
