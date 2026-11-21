@@ -466,6 +466,17 @@ function TermSwitcher({ selectedTabId, selectedTerm }: { selectedTabId: string; 
             </Link>
           );
         })}
+        <div className="mx-1 h-5 w-[1px] self-center bg-slate-300" />
+        <Link
+          className="flex items-center gap-2 rounded-lg border border-teal-200/80 bg-teal-50 px-3 py-2 text-sm font-semibold text-teal-950 transition-colors hover:bg-teal-100"
+          href="/professors"
+        >
+          <GraduationCap className="h-4 w-4 text-teal-700" />
+          <span>Professor Intel</span>
+          <span className="rounded bg-teal-200/80 px-1.5 py-0.5 text-[10px] font-bold uppercase text-teal-950">
+            Planner
+          </span>
+        </Link>
       </div>
     </nav>
   );
