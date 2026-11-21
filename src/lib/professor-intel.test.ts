@@ -21,6 +21,17 @@ describe("professor intel dataset", () => {
     expect(codes).not.toContain("ENGL C1001");
   });
 
+  it("ENGL 102 has verified Spring 2027 LACCD title and professors", () => {
+    const englCourse = getIntelByCourseCode("ENGL 102");
+    expect(englCourse).toBeDefined();
+    expect(englCourse!.title).toBe("Academic Writing and Literature");
+    const profNames = englCourse!.professors.map((p) => p.name);
+    expect(profNames).toContain("Darren Borg");
+    expect(profNames).toContain("Dylan Altman");
+    expect(profNames).toContain("Stella Setka");
+    expect(profNames).toContain("Jeffrey Nishimura");
+  });
+
   it("STAT C1000 has verified LACCD professors and does not include outside names", () => {
     const statCourse = getIntelByCourseCode("STAT C1000");
     expect(statCourse).toBeDefined();
