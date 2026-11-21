@@ -9,6 +9,10 @@ import {
   Building2,
   CalendarCheck2,
   CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  ChevronsDownUp,
+  ChevronsUpDown,
   ExternalLink,
   Flame,
   GraduationCap,
@@ -83,6 +87,26 @@ export function ProfessorIntelView() {
   const [selectedDept, setSelectedDept] = useState<string>("ALL");
   const [selectedCampus, setSelectedCampus] = useState<string>("ALL");
   const [tierFilter, setTierFilter] = useState<string>("ALL");
+  const [collapsedMap, setCollapsedMap] = useState<Record<string, boolean>>({});
+
+  const toggleCourseCollapse = (code: string) => {
+    setCollapsedMap((prev) => ({
+      ...prev,
+      [code]: !prev[code],
+    }));
+  };
+
+  const collapseAll = () => {
+    const next: Record<string, boolean> = {};
+    for (const c of filteredCourses) {
+      next[c.code] = true;
+    }
+    setCollapsedMap(next);
+  };
+
+  const expandAll = () => {
+    setCollapsedMap({});
+  };
 
   const departments = [
     { key: "ALL", label: "All Subjects" },
@@ -251,11 +275,48 @@ export function ProfessorIntelView() {
         </div>
       </div>
 
+      {/* Control bar: Results count and Collapse/Expand all buttons */}
+      <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+        <p className="text-xs font-semibold text-slate-500">
+          แสดง <span className="font-bold text-slate-900">{filteredCourses.length}</span> รายวิชา · ทั้งหมด{" "}
+          <span className="font-bold text-teal-800">
+            {filteredCourses.reduce((sum, c) => sum + c.professors.length, 0)}
+          </span>{" "}
+          อาจารย์
+        </p>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={collapseAll}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-slate-900 active:scale-95"
+            title="ยุบการ์ดทุกวิชาเพื่อดูภาพรวมแบบย่อ"
+          >
+            <ChevronsDownUp className="h-3.5 w-3.5 text-slate-500" />
+            <span>ยุบการ์ดทั้งหมด</span>
+          </button>
+          <button
+            type="button"
+            onClick={expandAll}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-slate-900 active:scale-95"
+            title="ขยายการ์ดทุกวิชาเพื่อดูรายละเอียดทั้งหมด"
+          >
+            <ChevronsUpDown className="h-3.5 w-3.5 text-slate-500" />
+            <span>ขยายการ์ดทั้งหมด</span>
+          </button>
+        </div>
+      </div>
+
       {/* Course List */}
       <div className="space-y-6">
         {filteredCourses.length > 0 ? (
           filteredCourses.map((course) => (
-            <CourseCard key={course.code} course={course} />
+            <CourseCard
+              key={course.code}
+              course={course}
+              isCollapsed={Boolean(collapsedMap[course.code])}
+              onToggleCollapse={() => toggleCourseCollapse(course.code)}
+            />
           ))
         ) : (
           <div className="rounded-xl border border-dashed border-slate-300 bg-white p-12 text-center">
@@ -271,15 +332,24 @@ export function ProfessorIntelView() {
   );
 }
 
-function CourseCard({ course }: { course: CourseIntel }) {
+function CourseCard({
+  course,
+  isCollapsed,
+  onToggleCollapse,
+}: {
+  course: CourseIntel;
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
+}) {
   const warning = warningBadge[course.difficultyWarning];
+  const topPicks = course.professors.filter((p) => p.tier === "TOP_PICK");
 
   return (
     <article className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md">
       {/* Course Header */}
       <div className="border-b border-slate-100 bg-slate-50/70 p-5">
-        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
-          <div>
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-start">
+          <div className="flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <span className="rounded bg-teal-800 px-2.5 py-1 text-xs font-bold tracking-wider text-white">
                 {course.code}
@@ -292,38 +362,115 @@ function CourseCard({ course }: { course: CourseIntel }) {
               >
                 {warning.label}
               </span>
+              <span className="rounded-md border border-slate-200 bg-white px-2 py-0.5 text-xs font-semibold text-slate-600">
+                {course.professors.length} ตัวเลือก
+              </span>
             </div>
-            <h2 className="mt-2 text-2xl font-bold text-slate-950">{course.title}</h2>
+            <div className="mt-2 flex items-center justify-between gap-2">
+              <h2 className="text-2xl font-bold text-slate-950">{course.title}</h2>
+            </div>
             <p className="mt-1 text-xs text-slate-500">{course.laccDescription}</p>
-          </div>
 
-          <div className="rounded-lg border border-amber-200 bg-amber-50/80 p-3 text-xs text-amber-900 sm:max-w-md">
-            <div className="flex items-start gap-2">
-              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" />
-              <div>
-                <span className="font-bold">คำเตือนสำหรับเกรด A: </span>
-                <span>{course.warningText}</span>
+            {/* Quick Preview when Collapsed */}
+            {isCollapsed && topPicks.length > 0 ? (
+              <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs">
+                <span className="font-bold text-emerald-800">🏆 Top Picks:</span>
+                {topPicks.map((tp) => (
+                  <span
+                    key={tp.name}
+                    className="inline-flex items-center gap-1 rounded bg-emerald-50 px-2 py-0.5 font-medium text-emerald-900 border border-emerald-200"
+                  >
+                    ⭐ {tp.name} ({tp.campus})
+                  </span>
+                ))}
               </div>
-            </div>
+            ) : null}
+          </div>
+
+          <div className="flex flex-col items-end gap-3 sm:flex-row sm:items-center md:flex-col md:items-end">
+            {/* Collapse / Expand Button */}
+            <button
+              type="button"
+              onClick={onToggleCollapse}
+              className={`inline-flex items-center gap-1.5 rounded-lg border px-3.5 py-2 text-xs font-bold shadow-sm transition active:scale-95 ${
+                isCollapsed
+                  ? "border-teal-300 bg-teal-50 text-teal-800 hover:bg-teal-100"
+                  : "border-slate-300 bg-white text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+              }`}
+              aria-expanded={!isCollapsed}
+            >
+              {isCollapsed ? (
+                <>
+                  <ChevronDown className="h-4 w-4 text-teal-700" />
+                  <span>ขยายการ์ด ({course.professors.length} ท่าน)</span>
+                </>
+              ) : (
+                <>
+                  <ChevronUp className="h-4 w-4 text-slate-500" />
+                  <span>ยุบการ์ด</span>
+                </>
+              )}
+            </button>
+
+            {!isCollapsed ? (
+              <div className="rounded-lg border border-amber-200 bg-amber-50/80 p-3 text-xs text-amber-900 sm:max-w-md">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" />
+                  <div>
+                    <span className="font-bold">คำเตือนสำหรับเกรด A: </span>
+                    <span>{course.warningText}</span>
+                  </div>
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
 
-      {/* Professors List */}
-      <div className="divide-y divide-slate-100 p-5">
-        <div className="mb-3 flex items-center justify-between">
-          <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
-            อาจารย์คุณภาพสูงที่แนะนำ ({course.professors.length} ตัวเลือกทั่ว LACCD)
-          </p>
-          <span className="text-xs text-slate-500">คัดกรองเฉพาะอาจารย์ที่มีรีวิวดีและแฟร์กับนักศึกษา</span>
-        </div>
+      {/* Professors List (Collapsible Body) */}
+      {!isCollapsed ? (
+        <div className="divide-y divide-slate-100 p-5">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              อาจารย์คุณภาพสูงที่แนะนำ ({course.professors.length} ตัวเลือกทั่ว LACCD)
+            </p>
+            <span className="text-xs text-slate-500">คัดกรองเฉพาะอาจารย์ที่มีรีวิวดีและแฟร์กับนักศึกษา</span>
+          </div>
 
-        <div className="space-y-4 pt-2">
-          {course.professors.map((prof) => (
-            <ProfessorRow key={prof.name + prof.campus} prof={prof} courseCode={course.code} />
-          ))}
+          <div className="space-y-4 pt-2">
+            {course.professors.map((prof) => (
+              <ProfessorRow key={prof.name + prof.campus} prof={prof} courseCode={course.code} />
+            ))}
+          </div>
+
+          {/* Bottom collapse button for convenience on long cards */}
+          {course.professors.length > 2 ? (
+            <div className="mt-6 flex justify-center border-t border-slate-100 pt-4">
+              <button
+                type="button"
+                onClick={onToggleCollapse}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-xs font-semibold text-slate-600 shadow-sm transition hover:bg-slate-100 hover:text-slate-900 active:scale-95"
+              >
+                <ChevronUp className="h-4 w-4 text-slate-500" />
+                <span>ยุบการ์ด {course.code} กลับด้านบน</span>
+              </button>
+            </div>
+          ) : null}
         </div>
-      </div>
+      ) : (
+        /* Collapsed footer reminder */
+        <div
+          onClick={onToggleCollapse}
+          className="flex cursor-pointer items-center justify-between bg-white px-5 py-3 text-xs text-slate-500 transition hover:bg-slate-50"
+        >
+          <span>
+            ซ่อนข้อมูลอาจารย์ {course.professors.length} ท่านเพื่อประหยัดพื้นที่หน้าจอ
+          </span>
+          <span className="inline-flex items-center gap-1 font-semibold text-teal-800">
+            คลิกเพื่อแสดงรายละเอียด <ChevronDown className="h-3.5 w-3.5" />
+          </span>
+        </div>
+      )}
     </article>
   );
 }
