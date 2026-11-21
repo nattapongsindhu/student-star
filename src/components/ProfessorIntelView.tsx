@@ -6,6 +6,8 @@ import {
   AlertTriangle,
   Award,
   BookOpen,
+  Building2,
+  CalendarCheck2,
   CheckCircle2,
   ExternalLink,
   Flame,
@@ -21,8 +23,10 @@ import {
 } from "lucide-react";
 import {
   type CourseIntel,
+  type LaccdCampus,
   type ProfessorRecord,
   type RecommendationTier,
+  laccdCampusList,
   professorIntelCourses,
 } from "@/lib/professor-intel";
 
@@ -77,42 +81,52 @@ const warningBadge: Record<
 export function ProfessorIntelView() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDept, setSelectedDept] = useState<string>("ALL");
+  const [selectedCampus, setSelectedCampus] = useState<string>("ALL");
   const [tierFilter, setTierFilter] = useState<string>("ALL");
 
   const departments = [
     { key: "ALL", label: "All Subjects" },
-    { key: "MATH", label: "Mathematics (MATH)" },
-    { key: "PHYS", label: "Physics (PHYS)" },
-    { key: "CHEM", label: "Chemistry (CHEM)" },
-    { key: "ENGL", label: "English (ENGL)" },
-    { key: "STAT", label: "Statistics (STAT)" },
+    { key: "STAT", label: "Statistics (STAT C1000)" },
+    { key: "MATH", label: "Mathematics (MATH 260-275)" },
+    { key: "PHYS", label: "Physics (PHYS 101-102)" },
+    { key: "CHEM", label: "Chemistry (CHEM 101)" },
+    { key: "ENGL", label: "English (ENGL 102)" },
   ];
 
-  const filteredCourses = professorIntelCourses.filter((course) => {
-    if (selectedDept !== "ALL" && course.department !== selectedDept) {
-      return false;
-    }
+  const filteredCourses = professorIntelCourses
+    .map((course) => {
+      // Filter professors by campus and tier
+      const matchingProfs = course.professors.filter((p) => {
+        if (selectedCampus !== "ALL" && p.campus !== selectedCampus) {
+          return false;
+        }
+        if (tierFilter !== "ALL" && p.tier !== tierFilter) {
+          return false;
+        }
+        if (searchTerm.trim()) {
+          const q = searchTerm.toLowerCase();
+          const matchCourse = course.code.toLowerCase().includes(q) || course.title.toLowerCase().includes(q);
+          const matchProf =
+            p.name.toLowerCase().includes(q) ||
+            p.campus.toLowerCase().includes(q) ||
+            p.summary.toLowerCase().includes(q) ||
+            (p.winter2027Section && p.winter2027Section.toLowerCase().includes(q));
+          return matchCourse || matchProf;
+        }
+        return true;
+      });
 
-    if (searchTerm.trim()) {
-      const q = searchTerm.toLowerCase();
-      const matchCode = course.code.toLowerCase().includes(q);
-      const matchTitle = course.title.toLowerCase().includes(q);
-      const matchProf = course.professors.some(
-        (p) =>
-          p.name.toLowerCase().includes(q) ||
-          p.summary.toLowerCase().includes(q) ||
-          p.tipsForSuccess.toLowerCase().includes(q)
-      );
-      if (!matchCode && !matchTitle && !matchProf) return false;
-    }
-
-    if (tierFilter !== "ALL") {
-      const hasTier = course.professors.some((p) => p.tier === tierFilter);
-      if (!hasTier) return false;
-    }
-
-    return true;
-  });
+      return {
+        ...course,
+        professors: matchingProfs,
+      };
+    })
+    .filter((course) => {
+      if (selectedDept !== "ALL" && course.department !== selectedDept) {
+        return false;
+      }
+      return course.professors.length > 0;
+    });
 
   const totalProfsCount = professorIntelCourses.reduce(
     (sum, c) => sum + c.professors.length,
@@ -134,16 +148,16 @@ export function ProfessorIntelView() {
                 <GraduationCap className="h-5 w-5" />
               </span>
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-teal-800">
-                Course Registration & Professor Intel
+                All-District LACCD · Course Registration & Professor Intel
               </p>
             </div>
             <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
               Zero Bad Professors → Protect an A in Every Class
             </h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600 md:text-base">
-              ฐานข้อมูลคัดกรองอาจารย์สำหรับวิชา STEM และวิชาบังคับยากที่ Los Angeles City College (LACC) 
-              วิเคราะห์จาก RateMyProfessors เพื่อป้องกันการเจออาจารย์ตรวจงานช้า กดเกรด สอนไม่รู้เรื่อง หรือทิ้งเด็ก 
-              คัดสรรอาจารย์ที่สอนดี มี Extra credit และพร้อมช่วยให้นักศึกษาคว้าเกรด A
+              ระบบคัดกรองอาจารย์คุณภาพสูงทั่วทั้ง 9 วิทยาเขตของ <strong>LACCD</strong> (City, Valley, Pierce, West, East, Harbor, Mission) 
+              สำหรับลงเรียน Online / Hybrid / In-Person คัดเฉพาะอาจารย์ที่สอนดี แฟร์ มี Extra credit หรือข้อสอบ Open-notes 
+              พร้อมเทียบตารางจริง Winter 2027 เพื่อล็อกเกรด A ได้อย่างมั่นใจ
             </p>
           </div>
 
@@ -163,28 +177,22 @@ export function ProfessorIntelView() {
           <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
             <p className="text-xs font-semibold text-slate-500 uppercase">Target Courses</p>
             <p className="mt-1 text-2xl font-bold text-slate-900">{professorIntelCourses.length} วิชา</p>
-            <p className="text-xs text-slate-600">Math, Phys, Chem, Engl, Stat</p>
+            <p className="text-xs text-slate-600">Cross-enrollment across LACCD</p>
           </div>
           <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-            <p className="text-xs font-semibold text-slate-500 uppercase">Professors Profiled</p>
-            <p className="mt-2 text-2xl font-bold text-slate-900">{totalProfsCount} ท่าน</p>
-            <p className="text-xs text-slate-600">Verified LACC RMP records</p>
+            <p className="text-xs font-semibold text-slate-500 uppercase">LACCD Campuses</p>
+            <p className="mt-2 text-2xl font-bold text-slate-900">9 Colleges</p>
+            <p className="text-xs text-slate-600">City, Valley, Pierce, West, East...</p>
           </div>
           <div className="rounded-lg border border-emerald-200 bg-emerald-50/60 p-3">
-            <p className="text-xs font-semibold text-emerald-800 uppercase">Top Recommended</p>
+            <p className="text-xs font-semibold text-emerald-800 uppercase">Top Picks</p>
             <p className="mt-1 text-2xl font-bold text-emerald-900">{topPicksCount} ท่าน</p>
-            <p className="text-xs text-emerald-700">⭐ 4.0 - 5.0 Rating / High A rate</p>
+            <p className="text-xs text-emerald-700">⭐ 4.2 - 5.0 Rating / Open-Notes / Fair</p>
           </div>
-          <div className="rounded-lg border border-rose-200 bg-rose-50/60 p-3">
-            <p className="text-xs font-semibold text-rose-800 uppercase">Flagged / Avoid</p>
-            <p className="mt-1 text-2xl font-bold text-rose-900">
-              {professorIntelCourses.reduce(
-                (sum, c) => sum + c.professors.filter((p) => p.tier === "AVOID").length,
-                0
-              )}{" "}
-              ท่าน
-            </p>
-            <p className="text-xs text-rose-700">กดเกรด / ตรวจงานช้า / งานล้น</p>
+          <div className="rounded-lg border border-teal-200 bg-teal-50/60 p-3">
+            <p className="text-xs font-semibold text-teal-800 uppercase">Winter 2027 Live</p>
+            <p className="mt-1 text-2xl font-bold text-teal-900">Sections Mapped</p>
+            <p className="text-xs text-teal-700">Mapped with Open Seats in SIS</p>
           </div>
         </div>
       </div>
@@ -195,7 +203,7 @@ export function ProfessorIntelView() {
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
-            placeholder="ค้นหาชื่อวิชา เช่น MATH 260, PHYS 101 หรือชื่ออาจารย์ เช่น Kee Lam, Arvidson..."
+            placeholder="ค้นหาชื่อวิชา เช่น STAT C1000, MATH 260 หรือชื่ออาจารย์ เช่น Carthew, Kee Lam, Zachary Brown..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full rounded-lg border border-slate-200 py-2 pl-9 pr-4 text-sm outline-none ring-teal-700 focus:border-teal-700 focus:ring-1"
@@ -203,6 +211,7 @@ export function ProfessorIntelView() {
         </div>
 
         <div className="flex flex-wrap gap-2">
+          {/* Department Filter */}
           <select
             value={selectedDept}
             onChange={(e) => setSelectedDept(e.target.value)}
@@ -215,6 +224,21 @@ export function ProfessorIntelView() {
             ))}
           </select>
 
+          {/* Campus Filter */}
+          <select
+            value={selectedCampus}
+            onChange={(e) => setSelectedCampus(e.target.value)}
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 outline-none"
+          >
+            <option value="ALL">All Campuses (ทุกวิทยาเขต)</option>
+            {laccdCampusList.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+
+          {/* Tier Filter */}
           <select
             value={tierFilter}
             onChange={(e) => setTierFilter(e.target.value)}
@@ -223,8 +247,6 @@ export function ProfessorIntelView() {
             <option value="ALL">All Tiers (ทุกกลุ่ม)</option>
             <option value="TOP_PICK">⭐ Top Pick Only (อาจารย์ยอดเยี่ยม)</option>
             <option value="FAIR_SOLID">⚖️ Fair & Solid (สอนดี เกรดยุติธรรม)</option>
-            <option value="STRICT_TOUGH">⚡ Strict (เข้มงวด/ข้อสอบยาก)</option>
-            <option value="AVOID">🚫 Avoid Only (ควรหลีกเลี่ยง)</option>
           </select>
         </div>
       </div>
@@ -238,9 +260,9 @@ export function ProfessorIntelView() {
         ) : (
           <div className="rounded-xl border border-dashed border-slate-300 bg-white p-12 text-center">
             <BookOpen className="mx-auto h-10 w-10 text-slate-400" />
-            <h3 className="mt-3 text-lg font-semibold text-slate-900">ไม่พบวิชาหรืออาจารย์ที่ค้นหา</h3>
+            <h3 className="mt-3 text-lg font-semibold text-slate-900">ไม่พบวิชาหรืออาจารย์ที่ตรงกับตัวกรอง</h3>
             <p className="mt-1 text-sm text-slate-500">
-              ลองปรับเปลี่ยนคำค้นหา หรือเลือกตัวกรองเป็น All Subjects
+              ลองปรับตัวกรอง Campus เป็น All Campuses หรือเปลี่ยนคำค้นหา
             </p>
           </div>
         )}
@@ -291,14 +313,14 @@ function CourseCard({ course }: { course: CourseIntel }) {
       <div className="divide-y divide-slate-100 p-5">
         <div className="mb-3 flex items-center justify-between">
           <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
-            อาจารย์ที่สอนวิชานี้ที่ LACC ({course.professors.length} ตัวเลือก)
+            อาจารย์คุณภาพสูงที่แนะนำ ({course.professors.length} ตัวเลือกทั่ว LACCD)
           </p>
-          <span className="text-xs text-slate-500">เรียงตามความเหมาะสมในการเก็บเกรด A</span>
+          <span className="text-xs text-slate-500">คัดกรองเฉพาะอาจารย์ที่มีรีวิวดีและแฟร์กับนักศึกษา</span>
         </div>
 
         <div className="space-y-4 pt-2">
           {course.professors.map((prof) => (
-            <ProfessorRow key={prof.name} prof={prof} courseCode={course.code} />
+            <ProfessorRow key={prof.name + prof.campus} prof={prof} courseCode={course.code} />
           ))}
         </div>
       </div>
@@ -327,15 +349,26 @@ function ProfessorRow({
         <div className="space-y-1.5">
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="text-xl font-bold text-slate-950">{prof.name}</h3>
+            <span className="inline-flex items-center gap-1 rounded-md border border-slate-300 bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-800">
+              <Building2 className="h-3 w-3 text-slate-500" />
+              {prof.campus}
+            </span>
             <span
               className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${tier.badgeClass}`}
             >
               {tier.icon}
               {tier.label}
             </span>
-            <span className="text-xs text-slate-500">{prof.department}</span>
           </div>
+
           <p className="text-sm font-medium text-slate-700">{prof.summary}</p>
+
+          {prof.winter2027Section ? (
+            <div className="inline-flex items-center gap-1.5 rounded-md border border-teal-200 bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-900">
+              <CalendarCheck2 className="h-3.5 w-3.5 text-teal-700" />
+              <span>{prof.winter2027Section}</span>
+            </div>
+          ) : null}
         </div>
 
         {/* Rating Metrics & Action Buttons */}
@@ -455,7 +488,7 @@ function ProfessorRow({
           <div className="mt-3 grid gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3.5 md:grid-cols-[1.5fr_1fr]">
             <div>
               <p className="text-xs font-bold uppercase tracking-wide text-teal-800">
-                🎯 เคล็ดลับทำเกรด A ในวิชา {courseCode} กับ {prof.name}
+                🎯 เคล็ดลับทำเกรด A ในวิชา {courseCode} กับ {prof.name} ({prof.campus})
               </p>
               <p className="mt-1 text-xs leading-relaxed text-slate-800">
                 {prof.tipsForSuccess}

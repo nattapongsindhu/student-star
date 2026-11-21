@@ -1,7 +1,19 @@
 export type RecommendationTier = "TOP_PICK" | "FAIR_SOLID" | "STRICT_TOUGH" | "AVOID";
 
+export type LaccdCampus =
+  | "City (LACC)"
+  | "Valley (LAVC)"
+  | "Pierce (LAPC)"
+  | "West (WLAC)"
+  | "East (ELAC)"
+  | "Mission (LAMC)"
+  | "Harbor (LAHC)"
+  | "Southwest (LASC)"
+  | "Trade-Tech (LATTC)";
+
 export type ProfessorRecord = {
   name: string;
+  campus: LaccdCampus;
   department: string;
   overallRating: number; // e.g. 4.8
   difficulty: number; // e.g. 2.4
@@ -14,6 +26,7 @@ export type ProfessorRecord = {
   cons: string[];
   tipsForSuccess: string;
   teachingStyle: string;
+  winter2027Section?: string;
   redFlags?: string[];
 };
 
@@ -28,18 +41,247 @@ export type CourseIntel = {
   professors: ProfessorRecord[];
 };
 
+export const laccdCampusList: LaccdCampus[] = [
+  "City (LACC)",
+  "Valley (LAVC)",
+  "Pierce (LAPC)",
+  "West (WLAC)",
+  "East (ELAC)",
+  "Mission (LAMC)",
+  "Harbor (LAHC)",
+  "Southwest (LASC)",
+  "Trade-Tech (LATTC)",
+];
+
 export const professorIntelCourses: CourseIntel[] = [
+  {
+    code: "STAT C1000",
+    title: "Introduction to Statistics",
+    department: "STAT",
+    units: 4,
+    difficultyWarning: "HIGH",
+    warningText: "วิชาสถิติบังคับ (เดิมรหัส MATH 227) อิงตามตารางจริง LACCD Winter 2027 ทั้ง 27 Sections สามารถลงข้าม Campus ได้ทันที!",
+    laccDescription: "Descriptive statistics, probability, sampling distributions, hypothesis testing, correlation, regression, ANOVA.",
+    professors: [
+      {
+        name: "Bret Carthew",
+        campus: "Valley (LAVC)",
+        department: "Mathematics & Statistics",
+        overallRating: 4.6,
+        difficulty: 2.2,
+        reviewCount: 115,
+        wouldTakeAgainPercent: 92,
+        rmpUrl: "https://www.ratemyprofessors.com/search/professors/1360?q=Bret%20Carthew",
+        tier: "TOP_PICK",
+        summary: "👑 ตัวเลือกอันดับ 1 ในตาราง Winter 2027 (Option 13)! ข้อสอบ Open-notes เอกสารแจกตรงกับข้อสอบจริง ตรวจงานแฟร์ ไม่กดดัน",
+        pros: [
+          "ข้อสอบอนุญาตให้เปิดสมุดจด (Open-notes) ได้ ลดความเครียดได้ 100%",
+          "แจก Handouts และชีทสรุปที่ตรงกับแนวข้อสอบอย่างแม่นยำ",
+          "ตรวจงานยุติธรรม มีเวลาอธิบายละเอียด ไม่ปล่อยให้เด็กเคว้ง",
+          "Winter 2027 มีที่นั่งว่าง (Open Seats 18 of 40)",
+        ],
+        cons: [
+          "Winter 2027 เป็นรอบ On-campus ที่ Valley (VAH 325)",
+        ],
+        tipsForSuccess: "จดบันทึกตามเอกสาร Handouts ที่อาจารย์แจกให้ครบ จะทำข้อสอบได้สบายมาก",
+        teachingStyle: "Open-notes exams, Clear handouts, Exam-mirrored reviews",
+        winter2027Section: "Option 13: Class# 11741 (Section V01 LEC + V01A LAB) · Valley-VAH 325 · 18 seats open",
+      },
+      {
+        name: "Kee Lam",
+        campus: "City (LACC)",
+        department: "Mathematics (Chair)",
+        overallRating: 4.9,
+        difficulty: 2.3,
+        reviewCount: 110,
+        wouldTakeAgainPercent: 96,
+        rmpUrl: "https://www.ratemyprofessors.com/search/professors/548?q=Kee%20Lam",
+        tier: "TOP_PICK",
+        summary: "👑 ขวัญใจมหาชนฝั่ง City (Option 23)! หัวหน้าภาคคณิตศาสตร์ อธิบายสถิติชัดเจนที่สุด มี Extra credit ให้เด็กเสมอ",
+        pros: [
+          "อธิบายได้กระจ่างที่สุดใน LACCD",
+          "มีคะแนนช่วยและ Extra credit ผ่านศูนย์ Tutoring",
+          "ตรวจงานเป็นธรรม 100%",
+        ],
+        cons: [
+          "Section C04 ใน Winter 2027 ปิดรับแล้ว (Closed) ต้องรอเช็คที่นั่งหลุดหรือเทอมถัดไป",
+        ],
+        tipsForSuccess: "ส่งงานตรงเวลาและเก็บโบนัส Tutoring",
+        teachingStyle: "Master explanations, Extra credit, High organization",
+        winter2027Section: "Option 23: Class# 11736 (Section C04 LEC) · City-Online (Closed)",
+      },
+      {
+        name: "Angela Chung",
+        campus: "East (ELAC)",
+        department: "Mathematics",
+        overallRating: 4.8,
+        difficulty: 2.3,
+        reviewCount: 42,
+        wouldTakeAgainPercent: 94,
+        rmpUrl: "https://www.ratemyprofessors.com/search/professors/1359?q=Angela%20Chung",
+        tier: "TOP_PICK",
+        summary: "ตัวท็อปฝั่ง East (Option 21)! อธิบายสถิติละเอียดมาก เข้าใจง่าย จัดคอร์สบน Canvas เป็นระเบียบเรียบร้อย",
+        pros: [
+          "สอนเข้าใจง่าย ย่อยเรื่องยากให้เห็นภาพชัดเจน",
+          "ใส่ใจนักศึกษาและให้ความช่วยเหลือตลอดเวลา",
+          "สอนผ่าน Online Live ในช่วงเช้า",
+        ],
+        cons: [
+          "Section E01 ใน Winter 2027 ปิดรับแล้ว (Closed)",
+        ],
+        tipsForSuccess: "เข้าฟังช่วง Live และทำการบ้านตามกำหนด จะเข้าใจข้อสอบทั้งหมด",
+        teachingStyle: "Structured Canvas, Patient explanations, Online Live",
+        winter2027Section: "Option 21: Class# 11789 (Section E01 LEC) · EAST-Online Live (Closed)",
+      },
+      {
+        name: "Kayvon Sarvi",
+        campus: "City (LACC)",
+        department: "Mathematics",
+        overallRating: 4.8,
+        difficulty: 2.2,
+        reviewCount: 40,
+        wouldTakeAgainPercent: 93,
+        rmpUrl: "https://www.ratemyprofessors.com/search/professors/548?q=Kayvon%20Sarvi",
+        tier: "TOP_PICK",
+        summary: "สอนดี ละเอียด ใจเย็นมาก (Option 24) ตอบคำถามและตรวจงานรวดเร็ว",
+        pros: [
+          "ใจเย็นและอดทนในการอธิบาย",
+          "เลกเชอร์ออนไลน์ชัดเจน มีแบบฝึกหัดตรงจุด",
+          "ให้เกรดแฟร์มาก",
+        ],
+        cons: [
+          "Section C06 ใน Winter 2027 ปิดรับแล้ว (Closed)",
+        ],
+        tipsForSuccess: "ฝึกทำแบบฝึกหัดท้ายบทและดูตัวอย่างที่อาจารย์เฉลย",
+        teachingStyle: "Online asynchronous, Patient, High clarity",
+        winter2027Section: "Option 24: Class# 11739 (Section C06 LEC) · City-Online (Closed)",
+      },
+      {
+        name: "Zachary Brown",
+        campus: "West (WLAC)",
+        department: "Mathematics",
+        overallRating: 4.7,
+        difficulty: 2.4,
+        reviewCount: 35,
+        wouldTakeAgainPercent: 91,
+        rmpUrl: "https://www.ratemyprofessors.com/search/professors/1361?q=Zachary%20Brown",
+        tier: "TOP_PICK",
+        summary: "ตัวเลือก Online Live ยอดเยี่ยมฝั่ง West (Option 17)! อาจารย์เป็นมิตร สร้างแรงบันดาลใจ และช่วยเหลือนักศึกษาเต็มที่",
+        pros: [
+          "กระตือรือร้นและพร้อมตอบข้อสงสัยของเด็กเสมอ",
+          "ไม่เคยกดดันนักศึกษา",
+          "Winter 2027 ยังมีที่นั่งว่าง (Open Seats 18 of 40)",
+        ],
+        cons: [
+          "เวลาเรียน Mon-Thu 12:00-3:30PM ต้องสะดวกช่วงกลางวัน",
+        ],
+        tipsForSuccess: "เข้าร่วมถาม-ตอบใน Zoom จะได้คะแนนกิจกรรมและเทคนิคทำข้อสอบ",
+        teachingStyle: "Engaging Zoom sessions, Approachable, Supportive",
+        winter2027Section: "Option 17: Class# 11802 (Section W03 LEC) · West-Online Live · 18 seats open",
+      },
+      {
+        name: "Tanshee Cheng",
+        campus: "West (WLAC)",
+        department: "Mathematics",
+        overallRating: 4.3,
+        difficulty: 2.5,
+        reviewCount: 38,
+        wouldTakeAgainPercent: 84,
+        rmpUrl: "https://www.ratemyprofessors.com/search/professors/1361?q=Tanshee%20Cheng",
+        tier: "FAIR_SOLID",
+        summary: "รอบค่ำออนไลน์ฝั่ง West (Option 18) มี Session ทบทวนก่อนสอบที่จำลองข้อสอบจริง",
+        pros: [
+          "มี Review sessions ก่อนสอบซึ่งตรงกับข้อสอบจริงมาก",
+          "ให้คะแนนอย่างเป็นธรรม",
+          "ยังมีที่นั่งว่างเยอะใน Winter 2027 (34 of 40)",
+        ],
+        cons: [
+          "ตารางเรียนช่วงค่ำ 6:30PM - 9:50PM",
+        ],
+        tipsForSuccess: "ห้ามพลาดคาบ Review ก่อนสอบ เพราะแนวข้อสอบจะอยู่ในนั้นทั้งหมด",
+        teachingStyle: "Online Live evening, Exam-prep reviews, Clear steps",
+        winter2027Section: "Option 18: Class# 12471 (Section W04 LEC) · West-Online Live · 34 seats open",
+      },
+      {
+        name: "Thu Hang Hoang",
+        campus: "Harbor (LAHC)",
+        department: "Mathematics",
+        overallRating: 4.4,
+        difficulty: 2.6,
+        reviewCount: 30,
+        wouldTakeAgainPercent: 86,
+        rmpUrl: "https://www.ratemyprofessors.com/search/professors/1358?q=Thu%20Hang%20Hoang",
+        tier: "FAIR_SOLID",
+        summary: "ฝั่ง Harbor (Option 25) คอยให้ความช่วยเหลือ มี Extra credit ช่วยเหลือนักศึกษาบนระบบออนไลน์",
+        pros: [
+          "มี Extra credit ช่วยเหลือ",
+          "ให้คำแนะนำและการสื่อสารบนระบบออนไลน์ดี",
+        ],
+        cons: [
+          "Section H01 ใน Winter 2027 ปิดรับแล้ว (Closed)",
+        ],
+        tipsForSuccess: "ทำการบ้านออนไลน์ให้ครบทุกสัปดาห์อย่าปล่อยให้ค้าง",
+        teachingStyle: "Online asynchronous, Supportive, Extra credit",
+        winter2027Section: "Option 25: Class# 11831 (Section H01 LEC) · Harbor-Online (Closed)",
+      },
+      {
+        name: "John Kawai",
+        campus: "Valley (LAVC)",
+        department: "Mathematics",
+        overallRating: 4.2,
+        difficulty: 2.7,
+        reviewCount: 45,
+        wouldTakeAgainPercent: 82,
+        rmpUrl: "https://www.ratemyprofessors.com/search/professors/1360?q=John%20Kawai",
+        tier: "FAIR_SOLID",
+        summary: "ฝั่ง Valley (Option 14) อาจารย์ใส่ใจมาก ยินดีสละเวลาพิเศษช่วยติวการบ้าน ควิซตรงกับการสอน",
+        pros: [
+          "ยินดีช่วยเหลือนอกเวลาเรียนอย่างเต็มที่",
+          "มีคอร์ส Online ในช่วงกลางวัน (ยังมีที่ว่าง 8 ที่นั่ง)",
+        ],
+        cons: [
+          "การบ้านและการฝึกทำโจทย์มีปริมาณค่อนข้างเยอะ",
+        ],
+        tipsForSuccess: "เข้าร่วมถามการบ้านทุกครั้งที่ติดขัด อาจารย์จะเฉลยทีละขั้นตอน",
+        teachingStyle: "Thorough lectures, Homework-aligned quizzes",
+        winter2027Section: "Option 14: Class# 11743 (Section V02 LEC + V02A LAB) · Valley-Online · 8 seats open",
+      },
+      {
+        name: "Elvira Khasanova",
+        campus: "Pierce (LAPC)",
+        department: "Mathematics",
+        overallRating: 4.0,
+        difficulty: 2.8,
+        reviewCount: 28,
+        wouldTakeAgainPercent: 75,
+        rmpUrl: "https://www.ratemyprofessors.com/search/professors/1357?q=Elvira%20Khasanova",
+        tier: "FAIR_SOLID",
+        summary: "ฝั่ง Pierce (Option 20) อธิบายละเอียด ควิซสม่ำเสมอ สามารถใช้คะแนนสอบมาช่วยดึงเกรดได้",
+        pros: [
+          "อธิบายเนื้อหาอย่างละเอียด",
+          "คลาสเป็นระเบียบชัดเจน",
+        ],
+        cons: [
+          "Winter 2027 เต็มแล้ว ติดสถานะ Waitlist (5 of 5)",
+        ],
+        tipsForSuccess: "เข้าเรียนให้ตรงเวลาและส่งงานให้ครบทุกชิ้น",
+        teachingStyle: "Online Live morning, Structured, Quiz-oriented",
+        winter2027Section: "Option 20: Class# 11733 (Section P01 LEC) · Pierce-Online Live · Waitlist",
+      },
+    ],
+  },
   {
     code: "MATH 260",
     title: "Precalculus",
     department: "MATH",
     units: 5,
     difficultyWarning: "HIGH",
-    warningText: "วิชาพื้นฐาน 5 units สำคัญมากก่อนขึ้น Calculus หากเจออาจารย์กดเกรดจะกระทบ GPA และเวลาอ่านหนังสือ",
+    warningText: "วิชาพื้นฐาน 5 units สำคัญมากก่อนขึ้น Calculus เลือกอาจารย์ที่สอนเป็นระบบและตรวจงานแฟร์ข้าม Campus ได้",
     laccDescription: "Combines college algebra, trigonometry, and analytical geometry. Prepares for Calculus sequence.",
     professors: [
       {
         name: "Naira Sargsian",
+        campus: "City (LACC)",
         department: "Mathematics",
         overallRating: 4.8,
         difficulty: 2.3,
@@ -47,21 +289,42 @@ export const professorIntelCourses: CourseIntel[] = [
         wouldTakeAgainPercent: 89,
         rmpUrl: "https://www.ratemyprofessors.com/search/professors/548?q=Naira%20Sargsian",
         tier: "TOP_PICK",
-        summary: "อาจารย์ใจดีที่สุดในสาย Math 260 สอนเป็นระบบ ตรวจงานเร็ว และให้โอกาสแก้ตัวถ้าตั้งใจเรียน",
+        summary: "สอนเป็นระบบ ตรวจงานเร็วมาก ตอบอีเมลไว และมี Extra credit",
         pros: [
           "อธิบายเนื้อหาละเอียด เป็นขั้นเป็นตอน เข้าใจง่าย",
           "ตอบอีเมลรวดเร็ว และคอยช่วยเหลือเด็กตลอดเวลา",
-          "จัดระเบียบโครงสร้างวิชาบน Canvas ได้ชัดเจนมาก",
           "มี Extra credit ช่วยดึงเกรด",
         ],
         cons: [
           "ถ้าไม่เข้าเรียนหรือไม่ทำการบ้านสม่ำเสมอจะตามไม่ทัน",
         ],
-        tipsForSuccess: "ทำการบ้านส่งตรงเวลาใน Canvas และทบทวนโจทย์ตัวอย่างก่อนสอบ ได้ A แน่นอน",
-        teachingStyle: "Lecture ชัดเจน, Canvas เป็นระบบ, มี Extra credit",
+        tipsForSuccess: "ทำการบ้านส่งตรงเวลาใน Canvas และทบทวนโจทย์ตัวอย่างก่อนสอบ",
+        teachingStyle: "Structured Canvas, Fast feedback, Extra credit",
+      },
+      {
+        name: "Edouard (Eddie) Tchertchian",
+        campus: "Pierce (LAPC)",
+        department: "Mathematics (Chair)",
+        overallRating: 4.2,
+        difficulty: 2.7,
+        reviewCount: 85,
+        wouldTakeAgainPercent: 80,
+        rmpUrl: "https://www.ratemyprofessors.com/search/professors/1357?q=Edouard%20Tchertchian",
+        tier: "TOP_PICK",
+        summary: "หัวหน้าภาคคณิตศาสตร์ Pierce สอนตรงจุด เลกเชอร์เตรียมสอบได้อย่างแม่นยำที่สุด",
+        pros: [
+          "สอนตรงประเด็น ข้อสอบตรงกับที่เน้นในคลาส 100%",
+          "มีคลิปสรุปเนื้อหาและแบบฝึกหัดอย่างละเอียด",
+        ],
+        cons: [
+          "ชอบให้นักศึกษาถามคำถามที่ตรงประเด็น",
+        ],
+        tipsForSuccess: "ดูคลิปทบทวนก่อนสอบ ข้อสอบออกตรงตามที่เน้นย้ำในคลิป",
+        teachingStyle: "Direct, Exam-focused, Video explanations",
       },
       {
         name: "Ronald Kendis",
+        campus: "City (LACC)",
         department: "Mathematics",
         overallRating: 4.1,
         difficulty: 2.7,
@@ -78,29 +341,7 @@ export const professorIntelCourses: CourseIntel[] = [
           "สไตล์การสอนแบบดั้งเดิม อาจจะดำเนินเรื่องช้าสำหรับบางคน",
         ],
         tipsForSuccess: "จดเลกเชอร์ตามอย่างละเอียด ข้อสอบตรงกับตัวอย่างที่สอน",
-        teachingStyle: "Traditional chalkboard/slide, Step-by-step",
-      },
-      {
-        name: "Ha Nguyen",
-        department: "Mathematics",
-        overallRating: 3.5,
-        difficulty: 3.8,
-        reviewCount: 74,
-        wouldTakeAgainPercent: 58,
-        rmpUrl: "https://www.ratemyprofessors.com/search/professors/548?q=Ha%20Nguyen",
-        tier: "STRICT_TOUGH",
-        summary: "แม่นทฤษฎีมาก แต่ข้อสอบยากและค่อนข้างกดเกรด ไม่ยืดหยุ่นเรื่องเวลาส่งงาน",
-        pros: [
-          "มีความรู้ลึกซึ้ง เหมาะสำหรับคนที่ชอบความท้าทาย",
-        ],
-        cons: [
-          "ข้อสอบยาก คะแนนอิงกับผลสอบเป็นหลัก",
-          "เข้มงวดเรื่อง Late work มาก",
-          "ตัดเกรดค่อนข้างโหด",
-        ],
-        redFlags: ["ข้อสอบยาก", "กดเกรด", "Late work โดนตัดศูนย์ทันที"],
-        tipsForSuccess: "ต้องฝึกทำโจทย์ล่วงหน้าเยอะๆ และตรวจเช็คคำตอบหลายรอบ ห้ามส่งงานช้าเด็ดขาด",
-        teachingStyle: "Test-heavy, Fast-paced, Strict deadline",
+        teachingStyle: "Traditional, Step-by-step, Generous partial credit",
       },
     ],
   },
@@ -110,11 +351,12 @@ export const professorIntelCourses: CourseIntel[] = [
     department: "MATH",
     units: 5,
     difficultyWarning: "CRITICAL",
-    warningText: "วิชาชี้ชะตา 5 units สำหรับสาย STEM/Cybersecurity หากเจออาจารย์ไม่ดีจะทำให้ตกหลุมพราง Derivative & Optimization",
+    warningText: "วิชาชี้ชะตา 5 units สำหรับสาย STEM/Cybersecurity คัดสรรอาจารย์ที่ช่วยเก็บ A จากทั่วทั้ง LACCD",
     laccDescription: "Limits, continuity, derivatives and integrals of algebraic and trigonometric functions.",
     professors: [
       {
         name: "Kee Lam",
+        campus: "City (LACC)",
         department: "Mathematics (Chair)",
         overallRating: 4.9,
         difficulty: 2.5,
@@ -127,7 +369,6 @@ export const professorIntelCourses: CourseIntel[] = [
           "คำอธิบายเรื่อง Limits, Derivatives และ Optimization ชัดเจนที่สุด",
           "ให้ Partial credit สูงมากถ้าเขียนวิธีคิดถูกต้อง",
           "มีโอกาสเก็บ Extra credit ผ่าน Tutoring center",
-          "ใส่ใจนักศึกษาและเข้าหาได้ง่ายมาก",
         ],
         cons: [
           "คลาสเต็มเร็วมากตั้งแต่วันแรกของ Priority enrollment",
@@ -136,7 +377,29 @@ export const professorIntelCourses: CourseIntel[] = [
         teachingStyle: "Clear structured modules, Generous partial credit, Tutoring extra credit",
       },
       {
+        name: "Zachary Brown",
+        campus: "West (WLAC)",
+        department: "Mathematics",
+        overallRating: 4.7,
+        difficulty: 2.6,
+        reviewCount: 35,
+        wouldTakeAgainPercent: 91,
+        rmpUrl: "https://www.ratemyprofessors.com/search/professors/1361?q=Zachary%20Brown",
+        tier: "TOP_PICK",
+        summary: "ยอดเยี่ยมฝั่ง West! อธิบายแนวคิด Derivative ลึกซึ้ง บรรยากาศการเรียนเป็นมิตรมาก",
+        pros: [
+          "อธิบายที่มาของสูตร Calculus ได้เห็นภาพ",
+          "เป็นกันเอง ยินดีตอบคำถามเด็กทุกคน",
+        ],
+        cons: [
+          "การบ้านและการฝึกเขียนวิธีทำต้องส่งสม่ำเสมอ",
+        ],
+        tipsForSuccess: "เข้า Office hours เสมอหากติดเรื่องการพิสูจน์หรือประยุกต์สูตร",
+        teachingStyle: "Student-centered, Intuitive concepts, Fair grading",
+      },
+      {
         name: "Vincent Lee",
+        campus: "City (LACC)",
         department: "Mathematics",
         overallRating: 3.8,
         difficulty: 3.6,
@@ -148,11 +411,9 @@ export const professorIntelCourses: CourseIntel[] = [
         pros: [
           "สอนเป็นระบบมาก ไม่มีนอกเรื่อง",
           "ให้ Partial credit สำหรับวิธีทำที่ดี แม้คำตอบสุดท้ายจะผิด",
-          "เข้าหาได้ง่ายใน Office hours",
         ],
         cons: [
-          "ข้อสอบยาก ไม่แจก A ง่ายๆ",
-          "คะแนนสอบมีน้ำหนักสูงมาก",
+          "ข้อสอบยาก ไม่แจก A ง่ายๆ ต้องแม่นทฤษฎี",
         ],
         tipsForSuccess: "เขียนแสดงขั้นตอนการคำนวณอย่างเป็นระเบียบ อย่าลัดขั้นตอนเวลาสอบ",
         teachingStyle: "Rigorous lecture, Organized, Heavy exam weighting",
@@ -165,11 +426,12 @@ export const professorIntelCourses: CourseIntel[] = [
     department: "MATH",
     units: 5,
     difficultyWarning: "CRITICAL",
-    warningText: "วิชาที่เด็ก STEM ดรอปมากที่สุด (Integration techniques, Infinite series) ต้องเลือกอาจารย์ที่อธิบายเก่งและไม่กดคะแนน",
+    warningText: "วิชาที่ยากที่สุดใน Calculus Sequence (Techniques of Integration, Infinite Series) เลือกเฉพาะอาจารย์ที่ช่วยเก็บเกรด",
     laccDescription: "Applications of integration, techniques of integration, improper integrals, infinite series, power series.",
     professors: [
       {
         name: "Kee Lam",
+        campus: "City (LACC)",
         department: "Mathematics (Chair)",
         overallRating: 4.9,
         difficulty: 2.7,
@@ -181,16 +443,16 @@ export const professorIntelCourses: CourseIntel[] = [
         pros: [
           "เปลี่ยนเนื้อหาซับซ้อนอย่าง Taylor Series ให้กลายเป็นเรื่องเข้าใจได้",
           "แจกแจงเกณฑ์คะแนนอย่างโปร่งใส มีโบนัสและ Extra credit",
-          "สไลด์และโน้ตสรุปยอดเยี่ยม",
         ],
         cons: [
-          "การบ้านและการฝึกทำโจทย์ยังคงต้องใช้ความสม่ำเสมอ",
+          "โจทย์ Series Convergence มีปริมาณเยอะ ต้องขยันสม่ำเสมอ",
         ],
         tipsForSuccess: "ฝึกฝนโจทย์ Series Convergence Tests ตามที่อาจารย์เน้นย้ำ",
         teachingStyle: "Supportive, Master of explanations, Fair grading",
       },
       {
         name: "Vincent Lee",
+        campus: "City (LACC)",
         department: "Mathematics",
         overallRating: 3.8,
         difficulty: 3.7,
@@ -209,27 +471,6 @@ export const professorIntelCourses: CourseIntel[] = [
         tipsForSuccess: "ทำ Practice exam ซ้ำ 2 รอบ และจับเวลาเสมือนจริง",
         teachingStyle: "Structured, Academic standard, Practice exam provided",
       },
-      {
-        name: "Ha Nguyen",
-        department: "Mathematics",
-        overallRating: 3.5,
-        difficulty: 3.9,
-        reviewCount: 74,
-        wouldTakeAgainPercent: 58,
-        rmpUrl: "https://www.ratemyprofessors.com/search/professors/548?q=Ha%20Nguyen",
-        tier: "STRICT_TOUGH",
-        summary: "ตรวจเข้มงวดและหักคะแนนจุดเล็กจุดน้อยง่าย หากพื้นฐานคณิตไม่แกร่งจะเหนื่อยมาก",
-        pros: [
-          "เหมาะกับคนที่ต้องการความแม่นยำทางทฤษฎีขั้นสูง",
-        ],
-        cons: [
-          "ตรวจงานเข้มงวด หักคะแนนจุกจิก",
-          "ความกดดันในการสอบสูง",
-        ],
-        redFlags: ["หักคะแนนจุกจิก", "ไม่ยืดหยุ่น", "ข้อสอบยาก"],
-        tipsForSuccess: "ตรวจสอบรูปแบบสัญลักษณ์คณิตศาสตร์ให้ตรงกับที่อาจารย์สอน 100%",
-        teachingStyle: "High pressure, Strict deduction",
-      },
     ],
   },
   {
@@ -243,6 +484,7 @@ export const professorIntelCourses: CourseIntel[] = [
     professors: [
       {
         name: "Kee Lam",
+        campus: "City (LACC)",
         department: "Mathematics (Chair)",
         overallRating: 4.9,
         difficulty: 2.6,
@@ -253,8 +495,7 @@ export const professorIntelCourses: CourseIntel[] = [
         summary: "สอนเห็นภาพ 3 มิติชัดเจน อธิบาย Multiple Integrals และ Stokes' Theorem ได้ยอดเยี่ยมที่สุด",
         pros: [
           "ใช้วิธีสอนแบบเห็นภาพชัดเจน ช่วยให้ไม่งงกับพิกัดทรงกลมและทรงกระบอก",
-          "บรรยากาศการเรียนเป็นมิตรมาก",
-          "ให้คะแนนเป็นธรรมและมีคะแนนช่วย",
+          "บรรยากาศการเรียนเป็นมิตรมากและให้เกรดเป็นธรรม",
         ],
         cons: [
           "เปิดสอนบางเทอม ต้องเช็คตารางล่วงหน้า",
@@ -264,6 +505,7 @@ export const professorIntelCourses: CourseIntel[] = [
       },
       {
         name: "Vincent Lee",
+        campus: "City (LACC)",
         department: "Mathematics",
         overallRating: 3.8,
         difficulty: 3.8,
@@ -295,6 +537,7 @@ export const professorIntelCourses: CourseIntel[] = [
     professors: [
       {
         name: "Kee Lam",
+        campus: "City (LACC)",
         department: "Mathematics (Chair)",
         overallRating: 4.9,
         difficulty: 2.6,
@@ -306,7 +549,6 @@ export const professorIntelCourses: CourseIntel[] = [
         pros: [
           "มีเอกสารสรุปสูตรและการแปลง Laplace อย่างเป็นระบบ",
           "ข้อสอบแฟร์ ไม่วางกับดักหลอกเด็ก",
-          "ช่วยเหลือเด็กในทุกจุดที่ติดขัด",
         ],
         cons: [
           "ต้องมีพื้นฐาน Calc II แน่นพอสมควร",
@@ -316,6 +558,7 @@ export const professorIntelCourses: CourseIntel[] = [
       },
       {
         name: "Kai Yang",
+        campus: "City (LACC)",
         department: "Mathematics",
         overallRating: 4.4,
         difficulty: 2.8,
@@ -327,7 +570,6 @@ export const professorIntelCourses: CourseIntel[] = [
         pros: [
           "Study guide ดีมาก ตรงกับข้อสอบจริง",
           "เป็นมิตรและตอบคำถามอย่างตั้งใจ",
-          "การให้คะแนนยืดหยุ่น",
         ],
         cons: [
           "การบ้านในระบบออนไลน์มีกำหนดส่งสม่ำเสมอ",
@@ -343,11 +585,35 @@ export const professorIntelCourses: CourseIntel[] = [
     department: "PHYS",
     units: 5,
     difficultyWarning: "CRITICAL",
-    warningText: "Mechanics + Calculus หนัก 5 units มีทั้งเลกเชอร์และแล็บ ถ้าเจออาจารย์กดคะแนนแล็บจะกระทบ A ทันที",
+    warningText: "Mechanics + Calculus 5 units สามารถลงเรียนข้ามไป Valley (LAVC) เพื่อเรียนกับอาจารย์ที่ใจดีและให้ Partial credit ได้",
     laccDescription: "Calculus-based study of motion, forces, energy, momentum, rotational kinematics, gravitation, and oscillations.",
     professors: [
       {
+        name: "Alexander (Alex) Lee",
+        campus: "Valley (LAVC)",
+        department: "Physics",
+        overallRating: 4.6,
+        difficulty: 2.5,
+        reviewCount: 80,
+        wouldTakeAgainPercent: 92,
+        rmpUrl: "https://www.ratemyprofessors.com/search/professors/1360?q=Alexander%20Lee",
+        tier: "TOP_PICK",
+        summary: "👑 ดาวเด่นวิชาฟิสิกส์วิศวะของฝั่ง Valley! สอนเคลียร์มาก ให้ Partial credit และ Extra credit ใจกว้างมาก",
+        pros: [
+          "อธิบายเนื้อหาและแคลคูลัสในฟิสิกส์ได้ชัดเจนและเป็นระเบียบ",
+          "ใจกว้างมากเรื่อง Partial credit ในการสอบคำนวณ",
+          "มี Extra credit ช่วยเหลือนักศึกษา",
+          "ห่วงใยความเข้าใจของเด็กอย่างแท้จริง",
+        ],
+        cons: [
+          "ต้องเดินทางหรือลงตารางเรียนของฝั่ง Valley",
+        ],
+        tipsForSuccess: "เขียนแสดงวิธีทำและการแตกแรง FBD ให้ชัดเจน จะได้คะแนนวิธีทำเกือบเต็มเสมอ",
+        teachingStyle: "Exceptionally clear, Generous partial & extra credit, Highly organized",
+      },
+      {
         name: "Dean Arvidson",
+        campus: "City (LACC)",
         department: "Physics & Astronomy",
         overallRating: 4.5,
         difficulty: 2.3,
@@ -355,12 +621,11 @@ export const professorIntelCourses: CourseIntel[] = [
         wouldTakeAgainPercent: 91,
         rmpUrl: "https://www.ratemyprofessors.com/search/professors/548?q=Dean%20Arvidson",
         tier: "TOP_PICK",
-        summary: "อาจารย์สายชิล ใจดีที่สุดในภาคฟิสิกส์ บรรยากาศไม่เครียด แล็บไม่กดคะแนน รักษาเกรด A ได้ปลอดภัยที่สุด",
+        summary: "อาจารย์สายชิล ใจดีที่สุดในภาคฟิสิกส์ LACC บรรยากาศไม่เครียด แล็บไม่กดคะแนน รักษาเกรด A ได้ปลอดภัยที่สุด",
         pros: [
           "ใจดีมาก บรรยากาศการเรียนเป็นกันเอง ไม่ตึงเครียด",
           "อธิบายแนวคิดฟิสิกส์เข้าใจง่าย ไม่ใช้ภาษาเชิงวิชาการที่ยากเกินไป",
           "รายงานแล็บตรวจเป็นธรรม ให้คำชมและกำลังใจ",
-          "คะแนนสอบและเกรดไม่กดเด็ก",
         ],
         cons: [
           "สไตล์การสอนค่อนข้างช้า สำหรับคนที่ชอบแบบไวอาจต้องปรับตัว",
@@ -370,6 +635,7 @@ export const professorIntelCourses: CourseIntel[] = [
       },
       {
         name: "Jayesh Bhakta",
+        campus: "City (LACC)",
         department: "Physics",
         overallRating: 4.1,
         difficulty: 2.6,
@@ -382,33 +648,12 @@ export const professorIntelCourses: CourseIntel[] = [
           "มีการสาธิตการทดลองสดในห้องเรียนทุกคาบ ทำให้เห็นภาพ",
           "มี Extra credit ช่วยเหลือคะแนนเยอะ",
           "อนุญาตให้รีเทค/ทำควิซแก้มือได้หากคะแนนไม่ดี",
-          "รักการสอนและเอาใจใส่นักศึกษา",
         ],
         cons: [
           "มีควิซบ่อย ต้องทบทวนเนื้อหาสม่ำเสมอ",
         ],
         tipsForSuccess: "อย่าขาดเรียนเพราะมักมีการสาธิตที่ตรงกับข้อสอบ และรีบขอแก้มือควิซทันทีที่คะแนนตก",
         teachingStyle: "Live demonstrations, Quiz retakes, Generous extra credit",
-      },
-      {
-        name: "Varoujan Akopian",
-        department: "Physics",
-        overallRating: 4.0,
-        difficulty: 3.1,
-        reviewCount: 35,
-        wouldTakeAgainPercent: 67,
-        rmpUrl: "https://www.ratemyprofessors.com/search/professors/548?q=Varoujan%20Akopian",
-        tier: "FAIR_SOLID",
-        summary: "เนื้อหาแน่น ตรงตามมาตรฐานวิศวกรรมสากล ตรงไปตรงมา แต่งานคำนวณและข้อสอบท้าทาย",
-        pros: [
-          "เตรียมตัวเด็กสำหรับโอนย้ายไปมหาวิทยาลัยชั้นนำได้ดีมาก",
-          "ตรงไปตรงมา เกณฑ์คะแนนชัดเจน",
-        ],
-        cons: [
-          "การบ้านและการคำนวณค่อนข้างเข้มข้น ไม่ปล่อยเกรดง่าย",
-        ],
-        tipsForSuccess: "ฝึกทำโจทย์การบ้านด้วยตัวเอง ห้ามลอก เพราะข้อสอบดัดแปลงมาจากการบ้าน",
-        teachingStyle: "Rigorous academic, Homework-derived exams",
       },
     ],
   },
@@ -418,11 +663,33 @@ export const professorIntelCourses: CourseIntel[] = [
     department: "PHYS",
     units: 5,
     difficultyWarning: "CRITICAL",
-    warningText: "Electricity & Magnetism + Circuit Theory 5 units วิชาปราบเซียน ต้องได้อาจารย์ที่มี Extra credit และเปิดโอกาสช่วย",
+    warningText: "Electricity & Magnetism + Circuit Theory 5 units เลือกอาจารย์ที่มี Quiz Retake หรือ Extra credit ช่วยพยุงเกรด",
     laccDescription: "Calculus-based study of electrostatics, electric fields, Gauss's law, circuits, magnetism, and electromagnetic waves.",
     professors: [
       {
+        name: "Alexander (Alex) Lee",
+        campus: "Valley (LAVC)",
+        department: "Physics",
+        overallRating: 4.6,
+        difficulty: 2.7,
+        reviewCount: 80,
+        wouldTakeAgainPercent: 92,
+        rmpUrl: "https://www.ratemyprofessors.com/search/professors/1360?q=Alexander%20Lee",
+        tier: "TOP_PICK",
+        summary: "ช่วยให้ผ่านด่าน E&M ได้อย่างเข้าใจที่สุด ตรวจสอบวิธีคิดและให้คะแนนขั้นตอนการคำนวณอย่างแฟร์",
+        pros: [
+          "อธิบายกฎของ Gauss, Ampere และวงจร RLC ได้อย่างเป็นระบบ",
+          "มี Extra credit และโอกาสดึงคะแนน",
+        ],
+        cons: [
+          "เนื้อหาวิชานี้เข้มข้นมาก ต้องให้เวลากับการทำโจทย์",
+        ],
+        tipsForSuccess: "ฝึกเขียนสมการ Integral ของสนามไฟฟ้าตามชีทตัวอย่าง",
+        teachingStyle: "Step-by-step calculus physics, Extra credit, Supportive",
+      },
+      {
         name: "Jayesh Bhakta",
+        campus: "City (LACC)",
         department: "Physics",
         overallRating: 4.1,
         difficulty: 2.8,
@@ -434,32 +701,12 @@ export const professorIntelCourses: CourseIntel[] = [
         pros: [
           "เนื้อหา E&M ซับซ้อน แต่อาจารย์คอยช่วยเหลือและมีแต้มพิเศษช่วยดึงคะแนน",
           "มีให้ทำ Quiz Retake ช่วยลดความเครียด",
-          "ใจดีและให้คำปรึกษาตลอดก่อนสอบไฟนอล",
         ],
         cons: [
           "สูตรคณิตศาสตร์ในวิชา 102 เยอะมาก ต้องจำและเข้าใจวิธีประยุกต์",
         ],
         tipsForSuccess: "เชื่อมโยงทฤษฎีสนามไฟฟ้ากับโจทย์ตัวอย่างในคลาส และเก็บแต้ม Extra credit ให้ครบ",
         teachingStyle: "Quiz retakes, Extra credit, Supportive mentoring",
-      },
-      {
-        name: "Varoujan Akopian",
-        department: "Physics",
-        overallRating: 4.0,
-        difficulty: 3.3,
-        reviewCount: 35,
-        wouldTakeAgainPercent: 67,
-        rmpUrl: "https://www.ratemyprofessors.com/search/professors/548?q=Varoujan%20Akopian",
-        tier: "FAIR_SOLID",
-        summary: "สอนลึกซึ้ง เหมาะกับผู้ที่จะศึกษาต่อด้านวิศวกรรมไฟฟ้า/คอมพิวเตอร์ แต่ต้องใช้ชั่วโมงอ่านหนังสือสูง",
-        pros: [
-          "สอนทฤษฎีวงจรไฟฟ้าและสนามแม่เหล็กได้อย่างลึกซึ้ง",
-        ],
-        cons: [
-          "ข้อสอบและรายงานแล็บเข้มงวด ไม่ปล่อยคะแนนง่าย",
-        ],
-        tipsForSuccess: "เน้นฝึกคำนวณวงจร AC/DC และกฎของ Gauss/Ampere ให้คล่องแคล่ว",
-        teachingStyle: "Theoretical depth, Rigorous lab reports",
       },
     ],
   },
@@ -469,11 +716,12 @@ export const professorIntelCourses: CourseIntel[] = [
     department: "ENGL",
     units: 3,
     difficultyWarning: "MODERATE",
-    warningText: "วิชาวรรณกรรมและการเขียนเชิงวิพากษ์ อาจารย์บางคนกดเกรด Essay หนักมากและตรวจงานช้า ต้องเลือกอาจารย์ที่ให้ Rewrite!",
+    warningText: "วิชาวรรณกรรมและการเขียนเชิงวิพากษ์ เลือกเฉพาะอาจารย์ที่ตรวจงานเร็วและมีนโยบายให้ Rewrite แก้คะแนน",
     laccDescription: "Critical reading, analysis, and written arguments based on literature including fiction, poetry, and drama.",
     professors: [
       {
         name: "Sean Ireland",
+        campus: "City (LACC)",
         department: "English",
         overallRating: 5.0,
         difficulty: 2.0,
@@ -485,8 +733,7 @@ export const professorIntelCourses: CourseIntel[] = [
         pros: [
           "คะแนนรีวิว 5.0 เต็ม และ 100% อยากลงเรียนซ้ำ",
           "คอมเมนต์ใน Essay ละเอียด มีคุณค่า และสร้างแรงบันดาลใจ",
-          "เกณฑ์การให้คะแนนแฟร์มากที่สุดในหมวดภาษาอังกฤษ",
-          "ตรวจงานรวดเร็ว ไม่ดองงาน",
+          "เกณฑ์การให้คะแนนแฟร์มากที่สุด ตรวจงานรวดเร็ว ไม่ดองงาน",
         ],
         cons: [
           "คลาสเต็มภายในไม่กี่ชั่วโมงหลังจากเปิดรับลงทะเบียน",
@@ -496,6 +743,7 @@ export const professorIntelCourses: CourseIntel[] = [
       },
       {
         name: "Jeffrey Nishimura",
+        campus: "City (LACC)",
         department: "English & ESL (Chair)",
         overallRating: 4.2,
         difficulty: 2.8,
@@ -517,6 +765,7 @@ export const professorIntelCourses: CourseIntel[] = [
       },
       {
         name: "William Lemon",
+        campus: "City (LACC)",
         department: "English",
         overallRating: 4.3,
         difficulty: 2.5,
@@ -535,28 +784,6 @@ export const professorIntelCourses: CourseIntel[] = [
         tipsForSuccess: "สอบถามในคาบเรียนหากโจทย์ essay มีจุดที่ไม่แน่ใจ",
         teachingStyle: "Humorous, Engaging literature, Direct feedback",
       },
-      {
-        name: "Michael Manous",
-        department: "English",
-        overallRating: 2.8,
-        difficulty: 4.1,
-        reviewCount: 48,
-        wouldTakeAgainPercent: 40,
-        rmpUrl: "https://www.ratemyprofessors.com/search/professors/548?q=Michael%20Manous",
-        tier: "AVOID",
-        summary: "⚠️ หลีกเลี่ยงหากต้องการปกป้องเกรด A: ตรวจงานช้า กดเกรดสูง จุกจิกทุกจุด งานอ่านหนักเกินสัดส่วนวิชา",
-        pros: [
-          "เข้มงวดเรื่องมาตรฐานวิชาการ",
-        ],
-        cons: [
-          "กดเกรดเด็กอย่างมาก แทบไม่มีใครได้เกรด A เต็ม",
-          "ตรวจงานช้าและให้ข้อติเตียนที่สร้างความเครียด",
-          "ปริมาณงานอ่านมหาศาล",
-        ],
-        redFlags: ["กดเกรด", "ตรวจงานช้า", "งานหนักเกินสัดส่วน", "รีวิวต่ำกว่า 3.0"],
-        tipsForSuccess: "หากหลีกเลี่ยงไม่ได้ ต้องให้ Writing Center ตรวจ Draft 2 รอบก่อนส่ง และส่งให้ตรงเวลาห้ามเลทแม้แต่นาทีเดียว",
-        teachingStyle: "Extremely critical grading, Heavy workload, Slow turnaround",
-      },
     ],
   },
   {
@@ -565,11 +792,34 @@ export const professorIntelCourses: CourseIntel[] = [
     department: "CHEM",
     units: 5,
     difficultyWarning: "CRITICAL",
-    warningText: "วิชาเคมีทั่วไป 5 units (Lecture + Lab) เนื้อหา Stoichiometry, Thermodynamics และ Equilibrium ปริมาณงานเยอะมาก",
+    warningText: "วิชาเคมีทั่วไป 5 units (Lecture + Lab) เลือกอาจารย์ที่มี Extra credit และให้เวลากับเด็กใน Office hours",
     laccDescription: "Principles of chemistry, atomic structure, periodic properties, bonding, stoichiometry, gas laws, thermochemistry, solutions.",
     professors: [
       {
+        name: "Sara Harvey",
+        campus: "Pierce (LAPC)",
+        department: "Chemistry (Chair)",
+        overallRating: 4.5,
+        difficulty: 2.9,
+        reviewCount: 50,
+        wouldTakeAgainPercent: 88,
+        rmpUrl: "https://www.ratemyprofessors.com/search/professors/1357?q=Sara%20Harvey",
+        tier: "TOP_PICK",
+        summary: "หัวหน้าภาคเคมี Pierce โครงสร้างการสอนยอดเยี่ยม ตรวจแล็บมีเหตุผลและเอาใจใส่นักศึกษา",
+        pros: [
+          "โครงสร้างการเรียนและการทดลองแล็บชัดเจน",
+          "ยินดีช่วยเหลือเด็กที่ตามเนื้อหาไม่ทัน",
+          "ตรวจงานเป็นธรรม",
+        ],
+        cons: [
+          "ต้องมีเวลาเข้าแล็บที่ Pierce",
+        ],
+        tipsForSuccess: "อ่านคู่มือแล็บล่วงหน้าก่อนเข้าห้องทดลองเสมอ",
+        teachingStyle: "Organized lab protocols, Thorough lecture, Supportive",
+      },
+      {
         name: "Marcos Alvarez",
+        campus: "City (LACC)",
         department: "Chemistry",
         overallRating: 4.6,
         difficulty: 3.0,
@@ -582,7 +832,6 @@ export const professorIntelCourses: CourseIntel[] = [
           "ใส่ใจความก้าวหน้าของนักศึกษาอย่างแท้จริง",
           "ให้เวลาอธิบายใน Office hours เต็มที่จนกว่าจะเข้าใจ",
           "มี Extra credit ช่วยเหลือคะแนนสอบ",
-          "ให้โอกาสเรียนรู้จากข้อผิดพลาดในแล็บ",
         ],
         cons: [
           "ข้อสอบคำนวณไม่ง่าย ต้องแม่นทฤษฎีและสูตร",
@@ -592,6 +841,7 @@ export const professorIntelCourses: CourseIntel[] = [
       },
       {
         name: "Terry Boan",
+        campus: "City (LACC)",
         department: "Chemistry",
         overallRating: 4.2,
         difficulty: 3.2,
@@ -603,87 +853,12 @@ export const professorIntelCourses: CourseIntel[] = [
         pros: [
           "อธิบายขั้นตอนการแก้โจทย์เคมีทีละสเต็ป",
           "จัดทำคลิปวิดีโอแนะนำการทำการบ้านบน Canvas ได้เป็นประโยชน์มาก",
-          "สร้างความเข้าใจและแรงบันดาลใจในวิชาเคมี",
         ],
         cons: [
           "การบ้านและการเตรียมแล็บมีปริมาณสม่ำเสมอทุกสัปดาห์",
         ],
         tipsForSuccess: "ดูวิดีโอคลิปที่อาจารย์เตรียมไว้ให้บน Canvas ก่อนทำการบ้านเสมอ",
         teachingStyle: "Interactive problem-solving, Video guides, Consistent homework",
-      },
-      {
-        name: "Glen Baghdasarian",
-        department: "Chemistry (Chair)",
-        overallRating: 3.8,
-        difficulty: 4.0,
-        reviewCount: 82,
-        wouldTakeAgainPercent: 68,
-        rmpUrl: "https://www.ratemyprofessors.com/search/professors/548?q=Glen%20Baghdasarian",
-        tier: "STRICT_TOUGH",
-        summary: "เลกเชอร์สนุก มีพลังและอารมณ์ขัน มีเคิร์ฟช่วยปรับคะแนน แต่สอนเร็วมากและข้อสอบยากซับซ้อน",
-        pros: [
-          "เลกเชอร์มีพลัง น่าตื่นเต้น ไม่หลับแน่นอน",
-          "มี Curve ปรับเกรดช่วยเหลือนักศึกษา",
-        ],
-        cons: [
-          "สอนเร็วมากและข้อสอบยาก มีโจทย์ประยุกต์เยอะ",
-          "ไม่ประนีประนอมกับคนที่ไม่เตรียมตัวมาล่วงหน้า",
-        ],
-        tipsForSuccess: "ต้องอ่านหนังสือล่วงหน้า 1 บทก่อนเข้าเรียนเสมอ ไม่งั้นจะตามไม่ทันในห้อง",
-        teachingStyle: "Fast-paced, High-energy lecture, Exam curves",
-      },
-    ],
-  },
-  {
-    code: "STAT C1000",
-    title: "Elementary Statistics",
-    department: "STAT",
-    units: 4,
-    difficultyWarning: "HIGH",
-    warningText: "วิชาสถิติพื้นฐาน (เดิมรหัส MATH 227) เนื้อหา Probability & Hypothesis Testing ถ้าเจออาจารย์ดีจะได้สอบ Open-notes สบายใจ",
-    laccDescription: "Descriptive statistics, probability, sampling, hypothesis testing, correlation, regression, ANOVA, and contingency tables.",
-    professors: [
-      {
-        name: "Ruzanna Mardirosian",
-        department: "Mathematics & Statistics",
-        overallRating: 4.8,
-        difficulty: 2.1,
-        reviewCount: 65,
-        wouldTakeAgainPercent: 95,
-        rmpUrl: "https://www.ratemyprofessors.com/search/professors/548?q=Ruzanna%20Mardirosian",
-        tier: "TOP_PICK",
-        summary: "👑 นางฟ้าแห่งวิชาสถิติ LACC! การบ้านยืดหยุ่น มี Extra credit และข้อสอบ Open-notes/Open-book ทำเกรด A ได้แน่นอนที่สุด",
-        pros: [
-          "ข้อสอบเปิดสมุดจด (Open-notes / Open-book) ได้ ช่วยลดความเครียด",
-          "การบ้านยืดหยุ่น ขอแค่ส่งครบก่อนปิดเทอม",
-          "มี Extra credit ช่วยเหลือคะแนน",
-          "อธิบายสถิติและวิธีใช้เครื่องคิดเลขได้เข้าใจง่ายที่สุด",
-        ],
-        cons: [
-          "ต้องมีเครื่องคิดเลขสถิติ TI-84 หรือซอฟต์แวร์ที่แนะนำ",
-        ],
-        tipsForSuccess: "จดสูตรและขั้นตอนการกด TI-84 ใส่สมุดไว้เปิดตอนสอบ ได้ A แน่นอน 100%",
-        teachingStyle: "Open-notes exams, Flexible homework deadline, Extra credit generous",
-      },
-      {
-        name: "Raymond Badalian",
-        department: "Mathematics & Statistics",
-        overallRating: 4.0,
-        difficulty: 2.9,
-        reviewCount: 45,
-        wouldTakeAgainPercent: 78,
-        rmpUrl: "https://www.ratemyprofessors.com/search/professors/548?q=Raymond%20Badalian",
-        tier: "FAIR_SOLID",
-        summary: "เกณฑ์การให้คะแนนชัดเจน มีโครงสร้างวิชาแน่นอน เป็นธรรม แต่งานค่อนข้างเยอะ",
-        pros: [
-          "เกณฑ์การประเมินผลโปร่งใส ไม่มีการตุกติก",
-          "เข้าหาได้ง่ายและตอบคำถามชัดเจน",
-        ],
-        cons: [
-          "การบ้านและการฝึกทำโจทย์บนระบบมีปริมาณเยอะ",
-        ],
-        tipsForSuccess: "รักษาวินัยการส่งการบ้านทุกสัปดาห์อย่าให้ค้าง",
-        teachingStyle: "Clear syllabus, Transparent grading, Structured schedule",
       },
     ],
   },

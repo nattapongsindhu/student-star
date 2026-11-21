@@ -21,6 +21,20 @@ describe("professor intel dataset", () => {
     expect(codes).not.toContain("ENGL C1001");
   });
 
+  it("STAT C1000 has verified LACCD professors and does not include outside names", () => {
+    const statCourse = getIntelByCourseCode("STAT C1000");
+    expect(statCourse).toBeDefined();
+    const profNames = statCourse!.professors.map((p) => p.name);
+    // Verified LACCD professors from schedule
+    expect(profNames).toContain("Bret Carthew");
+    expect(profNames).toContain("Kee Lam");
+    expect(profNames).toContain("Angela Chung");
+    expect(profNames).toContain("Zachary Brown");
+    expect(profNames).toContain("Kayvon Sarvi");
+    // Verify non-LACCD name removed
+    expect(profNames).not.toContain("Ruzanna Mardirosian");
+  });
+
   it("has valid rating and difficulty ranges for all professors", () => {
     for (const course of professorIntelCourses) {
       expect(course.professors.length).toBeGreaterThan(0);
@@ -30,6 +44,7 @@ describe("professor intel dataset", () => {
         expect(prof.difficulty).toBeGreaterThanOrEqual(1.0);
         expect(prof.difficulty).toBeLessThanOrEqual(5.0);
         expect(prof.rmpUrl).toContain("ratemyprofessors.com");
+        expect(prof.campus).toBeDefined();
       }
     }
   });
