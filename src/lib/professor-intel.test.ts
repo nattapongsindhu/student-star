@@ -49,6 +49,25 @@ describe("professor intel dataset", () => {
     expect(aladadyan?.tier).toBe("AVOID");
   });
 
+  it("PHYS 101 has verified Spring 2027 LACCD schedule professors and tiers", () => {
+    const phys101 = getIntelByCourseCode("PHYS 101");
+    expect(phys101).toBeDefined();
+    const profNames = phys101!.professors.map((p) => p.name);
+    expect(profNames).toContain("James Ortiz");
+    expect(profNames).toContain("Velveth Klee");
+    expect(profNames).toContain("Robert Lindsay");
+    expect(profNames).toContain("Corinna Jobe");
+    expect(profNames).toContain("Carlos Vazquez");
+
+    const ortiz = phys101!.professors.find((p) => p.name === "James Ortiz");
+    expect(ortiz?.tier).toBe("TOP_PICK");
+    expect(ortiz?.scheduleSection).toContain("Class# 20508");
+
+    const klee = phys101!.professors.find((p) => p.name === "Velveth Klee");
+    expect(klee?.tier).toBe("TOP_PICK");
+    expect(klee?.scheduleSection).toContain("Class# 13265");
+  });
+
   it("STAT C1000 has verified Spring 2027 professors and deleted all winter ones", () => {
     const statCourse = getIntelByCourseCode("STAT C1000");
     expect(statCourse).toBeDefined();
