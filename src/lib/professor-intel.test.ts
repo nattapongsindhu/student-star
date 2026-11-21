@@ -68,6 +68,27 @@ describe("professor intel dataset", () => {
     expect(klee?.scheduleSection).toContain("Class# 13265");
   });
 
+  it("CHEM 101 has verified Spring 2027 LACCD schedule professors and avoid flags", () => {
+    const chem101 = getIntelByCourseCode("CHEM 101");
+    expect(chem101).toBeDefined();
+    const profNames = chem101!.professors.map((p) => p.name);
+    expect(profNames).toContain("Zara Sarkisian");
+    expect(profNames).toContain("Neil Quebbemann");
+    expect(profNames).toContain("Amir Keshavarz");
+    expect(profNames).toContain("Vanessa Valverde");
+    expect(profNames).toContain("John Milligan");
+
+    const zara = chem101!.professors.find((p) => p.name === "Zara Sarkisian");
+    expect(zara?.tier).toBe("TOP_PICK");
+    expect(zara?.scheduleSection).toContain("Class# 18363");
+
+    const milligan = chem101!.professors.find((p) => p.name === "John Milligan");
+    expect(milligan?.tier).toBe("AVOID");
+
+    const valverde = chem101!.professors.find((p) => p.name === "Vanessa Valverde");
+    expect(valverde?.tier).toBe("AVOID");
+  });
+
   it("STAT C1000 has verified Spring 2027 professors and deleted all winter ones", () => {
     const statCourse = getIntelByCourseCode("STAT C1000");
     expect(statCourse).toBeDefined();
