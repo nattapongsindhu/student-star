@@ -4,6 +4,7 @@ import { AssignmentSnapshot } from "@/types/sync";
 import { detectAssignmentChanges } from "./change-detection";
 import { calculateAssignmentRisk } from "./risk-engine";
 import { seedCourses } from "./semester";
+import { findVerifiedSubmissionOverride } from "./verified-submissions";
 
 export type CanvasSyncStatus = "ok" | "token_expired" | "sync_failed";
 
@@ -265,7 +266,10 @@ export async function syncCanvasToSupabase() {
       const estimatedMinutes = estimateMinutes(assignment);
       const existing = existingById.get(`${courseId}-${assignment.id}`);
       let status = statusFor(assignment);
-      if (status === "DISCOVERED" && (existing?.status === "USER_MARKED_SUBMITTED" || existing?.status === "CANCELLED")) {
+      const verifiedOverride = findVerifiedSubmissionOverride(course?.code ?? courseId, assignment.name);
+      if (status === "DISCOVERED" && verifiedOverride) {
+        status = "USER_MARKED_SUBMITTED";
+      } else if (status === "DISCOVERED" && (existing?.status === "USER_MARKED_SUBMITTED" || existing?.status === "CANCELLED")) {
         status = existing.status;
       }
       const canvasSubmissionConfirmed = status === "CANVAS_CONFIRMED" || status === "GRADED";
@@ -300,7 +304,7 @@ export async function syncCanvasToSupabase() {
         risk_level: isCancelled ? "LOW" : risk.level,
         progress_percent: isCancelled ? 0 : (status === "USER_MARKED_SUBMITTED" || canvasSubmissionConfirmed ? 100 : 0),
         canvas_submission_confirmed: canvasSubmissionConfirmed,
-        notes: existing?.notes ?? null,
+        notes: existing?.notes ?? verifiedOverride?.notes ?? null,
         url: assignment.html_url ?? null,
         source: "canvas",
         last_seen_at: new Date().toISOString(),

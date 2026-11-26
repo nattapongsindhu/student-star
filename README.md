@@ -7,7 +7,7 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-Database-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
 [![Canvas LMS](https://img.shields.io/badge/Canvas_LMS-REST_API-E13F2B?style=for-the-badge&logo=instructure&logoColor=white)](https://canvas.instructure.com/)
-[![Vitest](https://img.shields.io/badge/Vitest-39%20Tests%20Passing-6E9F18?style=for-the-badge&logo=vitest&logoColor=white)](https://vitest.dev/)
+[![Vitest](https://img.shields.io/badge/Vitest-43%20Tests%20Passing-6E9F18?style=for-the-badge&logo=vitest&logoColor=white)](https://vitest.dev/)
 [![Status](https://img.shields.io/badge/GPA_Target-4.00%20(Dean's_Honor_List)-0A5C36?style=for-the-badge&logo=google-scholar&logoColor=white)](#)
 
 > **"Zero Missed Assignments → Protect an A in Every Class."**  

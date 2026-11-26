@@ -1,6 +1,7 @@
 import { getSupabaseAdmin } from "./supabase";
 import { isCanvasTokenExpiredError } from "./canvas-sync";
 import { seedAssignments, seedCourses } from "./semester";
+import { reconcileAssignmentWithVerifiedProof } from "./verified-submissions";
 import type { CanvasSyncStatus } from "./canvas-sync";
 import type { Assignment, Course } from "./semester";
 
@@ -108,11 +109,24 @@ export async function getDashboardData(): Promise<DashboardData> {
   }
 
   const latestSync = latestSyncResult.data as SyncRunRow | null;
+  const rawCourses = (coursesResult.data as Course[]) ?? [];
+  const courseCodeById = new Map(rawCourses.map((c) => [c.id, c.code]));
+
+  const reconciledAssignments = ((assignmentsResult.data as Assignment[]) ?? []).map((assignment) => {
+    const code = courseCodeById.get(assignment.course_id) ?? assignment.course_id;
+    return reconcileAssignmentWithVerifiedProof(code, assignment);
+  });
+
+  const rawCourseAssignments = (courseAssignmentsResult.data ?? assignmentsResult.data) as Assignment[];
+  const reconciledCourseAssignments = (rawCourseAssignments ?? []).map((assignment) => {
+    const code = courseCodeById.get(assignment.course_id) ?? assignment.course_id;
+    return reconcileAssignmentWithVerifiedProof(code, assignment);
+  });
 
   return {
-    courses: coursesResult.data as Course[],
-    assignments: assignmentsResult.data as Assignment[],
-    courseAssignments: (courseAssignmentsResult.data ?? assignmentsResult.data) as Assignment[],
+    courses: rawCourses,
+    assignments: reconciledAssignments,
+    courseAssignments: reconciledCourseAssignments,
     lastSyncAt: successfulSyncResult.data?.finished_at ?? null,
     lastAttemptAt: latestSync?.finished_at ?? successfulSyncResult.data?.finished_at ?? null,
     syncStatus: statusFromSyncRun(latestSync),
